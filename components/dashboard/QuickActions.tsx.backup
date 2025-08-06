@@ -1,15 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import NotificationBadge from "@/components/ui/NotificationBadge";
+import NotificationBadge from "@/components/layout/NotificationBadge";
 import { useMessages } from "@/hooks/useMessages";
 
 export default function QuickActions() {
-  const { totalUnreadCount, loading } = useMessages({
-    userId: 'test-client-123',
-    pollingInterval: 30000,
-    enableNotifications: true
-  });
+  const { unreadCount, loading } = useMessages();
 
   const actions = [
     {
@@ -25,7 +21,7 @@ export default function QuickActions() {
       icon: "💬",
       href: "/dashboard/messages",
       color: "from-orange-500 to-orange-600",
-      notificationCount: totalUnreadCount
+      notificationCount: unreadCount.total
     },
     {
       title: "Plannings",
@@ -74,7 +70,7 @@ export default function QuickActions() {
                 transition: 'all 0.2s ease',
                 cursor: 'pointer',
                 position: 'relative',
-                border: action.notificationCount && action.notificationCount > 0 ? '1px solid rgba(59, 130, 246, 0.2)' : '1px solid transparent'
+                border: action.notificationCount ? '1px solid rgba(59, 130, 246, 0.2)' : '1px solid transparent'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = '#f8fafc';
@@ -85,26 +81,29 @@ export default function QuickActions() {
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
-              <NotificationBadge 
-                count={action.notificationCount || 0}
-                size="sm"
-                animate={true}
-                variant="red"
-              >
-                <div style={{
-                  width: '2.5rem',
-                  height: '2.5rem',
-                  borderRadius: '0.5rem',
-                  background: 'linear-gradient(135deg, #3b82f6, #f97316)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.25rem',
-                  boxShadow: action.notificationCount && action.notificationCount > 0 ? '0 0 0 2px rgba(59, 130, 246, 0.3)' : 'none'
-                }}>
-                  {action.icon}
-                </div>
-              </NotificationBadge>
+              <div style={{
+                width: '2.5rem',
+                height: '2.5rem',
+                borderRadius: '0.5rem',
+                background: 'linear-gradient(135deg, #3b82f6, #f97316)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.25rem',
+                position: 'relative',
+                boxShadow: action.notificationCount ? '0 0 0 2px rgba(59, 130, 246, 0.3)' : 'none'
+              }}>
+                {action.icon}
+                
+                {action.notificationCount && action.notificationCount > 0 && (
+                  <NotificationBadge
+                    count={action.notificationCount}
+                    size="sm"
+                    animate={true}
+                    backgroundColor="#ef4444"
+                  />
+                )}
+              </div>
               
               <div style={{ flex: 1 }}>
                 <p style={{ 

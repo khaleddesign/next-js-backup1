@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import StatsCardEnhanced from "../../components/dashboard/StatsCardEnhanced";
+import StatsCard from "../../components/dashboard/StatsCard";
 import QuickActions from "../../components/dashboard/QuickActions";
 import ActivityFeed from "../../components/dashboard/ActivityFeed";
-import { useToast, showInfoToast } from "@/components/ui/Toast";
 
 // Mock data réalistes
 const mockStats = {
@@ -33,27 +32,13 @@ export default function DashboardPage() {
   });
 
   const [timeOfDay, setTimeOfDay] = useState("");
-  const { addToast } = useToast();
-  const infoToast = showInfoToast(addToast);
 
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setTimeOfDay("Bonjour");
     else if (hour < 18) setTimeOfDay("Bon après-midi");
     else setTimeOfDay("Bonsoir");
-
-    // Message de bienvenue avec les nouvelles fonctionnalités
-    setTimeout(() => {
-      infoToast(
-        "Nouvelles fonctionnalités disponibles !",
-        "Notifications temps réel, chat intégré et bien plus...",
-        {
-          label: "Découvrir",
-          onClick: () => window.open("/test", "_blank")
-        }
-      );
-    }, 2000);
-  }, [infoToast]);
+  }, []);
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8fafc" }}>
@@ -96,13 +81,6 @@ export default function DashboardPage() {
               }}>
                 ChantierPro
               </h1>
-              <p style={{
-                margin: 0,
-                fontSize: "0.75rem",
-                color: "#64748b"
-              }}>
-                v2.0 - Notifications temps réel
-              </p>
             </div>
           </div>
 
@@ -144,46 +122,40 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Stats Grid - Utilisation des nouvelles StatsCardEnhanced */}
+        {/* Stats Grid */}
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
           gap: "1.5rem",
           marginBottom: "2rem"
         }}>
-          <StatsCardEnhanced
+          <StatsCard
             title="Chantiers Actifs"
             value={mockStats.chantiersActifs}
             icon="🏗️"
-            color="blue"
+            color="from-blue-500 to-blue-600"
             change="+3 ce mois"
-            href="/dashboard/chantiers"
           />
-          <StatsCardEnhanced
-            title="Messages"
+          <StatsCard
+            title="Messages Non Lus"
             value={mockStats.messagesNonLus}
             icon="💬"
-            color="orange"
+            color="from-orange-500 to-orange-600"
             change="2 urgents"
-            type="messages"
-            href="/dashboard/messages"
           />
-          <StatsCardEnhanced
+          <StatsCard
             title="Équipes Actives"
             value={mockStats.equipesDisponibles}
             icon="👥"
-            color="green"
+            color="from-green-500 to-green-600"
             change="100% disponible"
-            type="tasks"
-            href="/dashboard/equipes"
           />
-          <StatsCardEnhanced
+          <StatsCard
             title="CA du Mois"
             value={`${(mockStats.chiffreAffaireMois / 1000).toFixed(0)}k€`}
             icon="💰"
-            color="purple"
+            color="from-purple-500 to-purple-600"
             change={`+${mockStats.evolutionCA}%`}
-            type="alerts"
           />
         </div>
 
@@ -201,23 +173,9 @@ export default function DashboardPage() {
             padding: "1.5rem",
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
           }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              marginBottom: '1rem' 
-            }}>
-              <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#1e293b", margin: 0 }}>
-                Évolution des Chantiers
-              </h3>
-              <button
-                className="btn-ghost"
-                onClick={() => infoToast("Graphique", "Données simulées pour la démonstration")}
-                style={{ fontSize: '0.875rem', padding: '0.5rem' }}
-              >
-                ℹ️ Info
-              </button>
-            </div>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "1rem", color: "#1e293b" }}>
+              Évolution des Chantiers
+            </h3>
             <div style={{ height: "200px", display: "flex", alignItems: "end", gap: "1rem", padding: "1rem 0" }}>
               {mockChartData.map((data, index) => (
                 <div key={data.mois} style={{ flex: 1, textAlign: "center" }}>
@@ -240,24 +198,6 @@ export default function DashboardPage() {
 
         {/* Activity Feed */}
         <ActivityFeed />
-
-        {/* Debug Section */}
-        <div className="card" style={{ marginTop: "2rem", background: "#fef3c7", border: "1px solid #fbbf24" }}>
-          <h3 style={{ color: "#92400e", marginBottom: "1rem" }}>
-            🧪 Zone de Test
-          </h3>
-          <p style={{ color: "#92400e", fontSize: "0.875rem", marginBottom: "1rem" }}>
-            Testez les nouvelles fonctionnalités de notifications et de messagerie.
-          </p>
-          <a
-            href="/test"
-            target="_blank"
-            className="btn-primary"
-            style={{ fontSize: "0.875rem" }}
-          >
-            🧪 Accéder aux tests
-          </a>
-        </div>
       </main>
     </div>
   );
