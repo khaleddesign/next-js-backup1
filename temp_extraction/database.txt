@@ -1,0 +1,266 @@
+--- Schema Prisma ---
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(CLIENT)
+  phone         String?
+  company       String?
+  address       String?
+  
+  accounts      Account[]
+  sessions      Session[]
+  chantiers     Chantier[] @relation("ChantierClient")
+  assignedChantiers Chantier[] @relation("ChantierAssignee")
+  messages      Message[]
+  comments      Comment[]
+  timelineEvents TimelineEvent[]
+  devis         Devis[]
+  plannings     Planning[]
+  notifications Notification[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Chantier {
+  id          String        @id @default(cuid())
+  nom         String
+  description String        @db.Text
+  adresse     String
+  client      User          @relation("ChantierClient", fields: [clientId], references: [id])
+  clientId    String
+  statut      ChantierStatus @default(PLANIFIE)
+  progression Int           @default(0)
+  dateDebut   DateTime
+  dateFin     DateTime
+  budget      Float
+  superficie  String
+  photo       String?
+  photos      String[]
+  lat         Float?
+  lng         Float?
+  
+  assignees   User[]        @relation("ChantierAssignee")
+  timeline    TimelineEvent[]
+  comments    Comment[]
+  messages    Message[]
+  devis       Devis[]
+  plannings   Planning[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model TimelineEvent {
+  id          String            @id @default(cuid())
+  chantier    Chantier          @relation(fields: [chantierId], references: [id], onDelete: Cascade)
+  chantierId  String
+  titre       String
+  description String            @db.Text
+  date        DateTime
+  type        TimelineEventType
+  createdBy   User              @relation(fields: [createdById], references: [id])
+  createdById String
+  
+  createdAt   DateTime          @default(now())
+}
+
+model Comment {
+  id         String      @id @default(cuid())
+  chantier   Chantier    @relation(fields: [chantierId], references: [id], onDelete: Cascade)
+  chantierId String
+  auteur     User        @relation(fields: [auteurId], references: [id])
+  auteurId   String
+  message    String      @db.Text
+  photos     String[]
+  reactions  Json        @default("[]")
+  
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  expediteur     User        @relation(fields: [expediteurId], references: [id])
+  expediteurId   String
+  destinataireId String?
+  chantier       Chantier?   @relation(fields: [chantierId], references: [id])
+  chantierId     String?
+  message        String      @db.Text
+  photos         String[]
+  typeMessage    MessageType @default(DIRECT)
+  lu             Boolean     @default(false)
+  reactions      Json        @default("[]")
+  threadId       String?
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Devis {
+  id            String      @id @default(cuid())
+  numero        String      @unique
+  chantier      Chantier    @relation(fields: [chantierId], references: [id])
+  chantierId    String
+  client        User        @relation(fields: [clientId], references: [id])
+  clientId      String
+  type          DevisType
+  montant       Float
+  tva           Float       @default(20.0)
+  statut        DevisStatus @default(BROUILLON)
+  dateCreation  DateTime    @default(now())
+  dateEcheance  DateTime
+  lignes        Json        @default("[]")
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Planning {
+  id          String         @id @default(cuid())
+  titre       String
+  description String?        @db.Text
+  dateDebut   DateTime
+  dateFin     DateTime
+  chantier    Chantier?      @relation(fields: [chantierId], references: [id])
+  chantierId  String?
+  assignees   User[]
+  type        PlanningType
+  statut      PlanningStatus @default(PLANIFIE)
+  lieu        String?
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  titre     String
+  message   String           @db.Text
+  type      NotificationType @default(INFO)
+  lu        Boolean          @default(false)
+  lien      String?
+  
+  createdAt DateTime         @default(now())
+}
+
+enum Role {
+  ADMIN
+  COMMERCIAL
+  OUVRIER
+  CLIENT
+}
+
+enum ChantierStatus {
+  PLANIFIE
+  EN_COURS
+  EN_ATTENTE
+  TERMINE
+  ANNULE
+}
+
+enum TimelineEventType {
+  DEBUT
+  ETAPE
+  PROBLEME
+  FIN
+  ATTENTE
+}
+
+enum MessageType {
+  DIRECT
+  CHANTIER
+  GROUPE
+}
+
+enum DevisType {
+  DEVIS
+  FACTURE
+}
+
+enum DevisStatus {
+  BROUILLON
+  ENVOYE
+  ACCEPTE
+  REFUSE
+  PAYE
+}
+
+enum PlanningType {
+  REUNION
+  LIVRAISON
+  INSPECTION
+  AUTRE
+}
+
+enum PlanningStatus {
+  PLANIFIE
+  EN_COURS
+  TERMINE
+  ANNULE
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+--- lib/db.ts ---
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const db = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
+
+
+--- .env (variables sans valeurs) ---
+DATABASE_URL=***
+NEXTAUTH_URL=***
+NEXTAUTH_SECRET=***
