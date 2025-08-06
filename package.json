@@ -29,7 +29,8 @@
     "lucide-react": "^0.536.0",
     "next-auth": "^4.24.11",
     "postcss": "^8.5.6",
-    "prisma": "^6.13.0"
+    "prisma": "^6.13.0",
+    "zod": "^4.0.15"
   },
   "devDependencies": {
     "@types/node": "24.2.0",

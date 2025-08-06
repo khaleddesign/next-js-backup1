@@ -1,13 +1,12 @@
 --- app/dashboard/chantiers/[id]/page.tsx ---
-// app/dashboard/chantiers/[id]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import ChantierHero from "@/components/chantiers/ChantierHero";
-import ChantierTabs from "@/components/chantiers/ChantierTabs";
-import StatusBadge from "@/components/chantiers/StatusBadge";
+import ChantierHero from "../../../../components/chantiers/ChantierHero";
+import ChantierTabs from "../../../../components/chantiers/ChantierTabs";
+import StatusBadge from "../../../../components/chantiers/StatusBadge";
 
 interface Chantier {
   id: string;
@@ -86,30 +85,6 @@ export default function ChantierDetailPage() {
   const [activeTab, setActiveTab] = useState("informations");
   const [newMessage, setNewMessage] = useState("");
 
-  const fetchChantier = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/chantiers/${params.id}`);
-      if (!response.ok) throw new Error('Chantier non trouvé');
-      
-      const data = await response.json();
-      setChantier(data);
-    } catch (error) {
-      console.error('Erreur:', error);
-      // Mock data pour développement
-      setChantier(mockChantier);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (params.id) {
-      fetchChantier();
-    }
-  }, [params.id]);
-
-  // Mock data pour développement
   const mockChantier: Chantier = {
     id: "1",
     nom: "Rénovation Villa Moderne",
@@ -220,6 +195,25 @@ export default function ChantierDetailPage() {
     }
   };
 
+  const fetchChantier = async () => {
+    try {
+      setLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setChantier(mockChantier);
+    } catch (error) {
+      console.error('Erreur:', error);
+      setChantier(mockChantier);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (params.id) {
+      fetchChantier();
+    }
+  }, [params.id]);
+
   const tabs = [
     { id: "informations", label: "Informations", icon: "📋" },
     { id: "timeline", label: "Timeline", icon: "📅", count: chantier?._count.timeline },
@@ -240,8 +234,6 @@ export default function ChantierDetailPage() {
 
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
-    
-    // TODO: Envoyer le message via API
     console.log("Envoi message:", newMessage);
     setNewMessage("");
   };
@@ -271,7 +263,7 @@ export default function ChantierDetailPage() {
     switch (activeTab) {
       case "informations":
         return (
-          <div className="grid" style={{ gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
             <div>
               <div className="card" style={{ marginBottom: '2rem' }}>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#1e293b' }}>
@@ -281,7 +273,7 @@ export default function ChantierDetailPage() {
                   {chantier.description}
                 </p>
                 
-                <div className="grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
                   <div>
                     <label style={{ color: '#64748b', fontSize: '0.875rem', display: 'block', marginBottom: '0.25rem' }}>
                       Date de début
@@ -317,7 +309,6 @@ export default function ChantierDetailPage() {
                 </div>
               </div>
 
-              {/* Localisation */}
               {chantier.lat && chantier.lng && (
                 <div className="card">
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#1e293b' }}>
@@ -341,7 +332,6 @@ export default function ChantierDetailPage() {
               )}
             </div>
 
-            {/* Sidebar avec infos client */}
             <div>
               <div className="card">
                 <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#1e293b' }}>
@@ -421,7 +411,6 @@ export default function ChantierDetailPage() {
               </div>
             ) : (
               <div style={{ position: 'relative' }}>
-                {/* Ligne verticale */}
                 <div style={{
                   position: 'absolute',
                   left: '1rem',
@@ -433,7 +422,6 @@ export default function ChantierDetailPage() {
 
                 {chantier.timeline.map((event, index) => (
                   <div key={event.id} style={{ position: 'relative', paddingLeft: '3rem', marginBottom: '2rem' }}>
-                    {/* Point sur la timeline */}
                     <div style={{
                       position: 'absolute',
                       left: '0.25rem',
@@ -496,7 +484,7 @@ export default function ChantierDetailPage() {
                 <p style={{ color: '#64748b' }}>Aucune photo disponible</p>
               </div>
             ) : (
-              <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
                 {chantier.photos.map((photo, index) => (
                   <div
                     key={index}
@@ -565,69 +553,68 @@ export default function ChantierDetailPage() {
                     }}>
                       {message.expediteur.name.charAt(0)}
                     </div>
-                                          <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                          <span style={{ fontWeight: '600', color: '#1e293b', fontSize: '0.875rem' }}>
-                            {message.expediteur.name}
-                          </span>
-                          <span style={{ color: '#64748b', fontSize: '0.75rem' }}>
-                            {formatDate(message.createdAt)}
-                          </span>
-                        </div>
-                        <div style={{
-                          background: 'white',
-                          padding: '0.75rem',
-                          borderRadius: '0.5rem',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-                        }}>
-                          <p style={{ margin: 0, color: '#1e293b', lineHeight: 1.5 }}>
-                            {message.message}
-                          </p>
-                        </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <span style={{ fontWeight: '600', color: '#1e293b', fontSize: '0.875rem' }}>
+                          {message.expediteur.name}
+                        </span>
+                        <span style={{ color: '#64748b', fontSize: '0.75rem' }}>
+                          {formatDate(message.createdAt)}
+                        </span>
+                      </div>
+                      <div style={{
+                        background: 'white',
+                        padding: '0.75rem',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                      }}>
+                        <p style={{ margin: 0, color: '#1e293b', lineHeight: 1.5 }}>
+                          {message.message}
+                        </p>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-
-              {/* Zone de saisie */}
-              <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
-                <div style={{ flex: 1 }}>
-                  <textarea
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Écrivez votre message..."
-                    style={{
-                      width: '100%',
-                      minHeight: '80px',
-                      padding: '0.75rem',
-                      border: '1px solid #e2e8f0',
-                      borderRadius: '0.5rem',
-                      resize: 'vertical',
-                      fontFamily: 'inherit',
-                      fontSize: '0.875rem'
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.ctrlKey) {
-                        handleSendMessage();
-                      }
-                    }}
-                  />
                 </div>
-                <button
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim()}
-                  className="btn-primary"
-                  style={{
-                    opacity: !newMessage.trim() ? 0.5 : 1,
-                    cursor: !newMessage.trim() ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  Envoyer
-                </button>
-              </div>
+              ))}
             </div>
-          );
+
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
+              <div style={{ flex: 1 }}>
+                <textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Écrivez votre message..."
+                  style={{
+                    width: '100%',
+                    minHeight: '80px',
+                    padding: '0.75rem',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '0.5rem',
+                    resize: 'vertical',
+                    fontFamily: 'inherit',
+                    fontSize: '0.875rem'
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                      handleSendMessage();
+                    }
+                  }}
+                />
+              </div>
+              <button
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim()}
+                className="btn-primary"
+                style={{
+                  opacity: !newMessage.trim() ? 0.5 : 1,
+                  cursor: !newMessage.trim() ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Envoyer
+              </button>
+            </div>
+          </div>
+        );
 
       case "equipe":
         return (
@@ -708,7 +695,6 @@ export default function ChantierDetailPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
-        {/* Breadcrumb */}
         <nav style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#64748b', fontSize: '0.875rem' }}>
             <Link href="/dashboard" style={{ color: '#3b82f6', textDecoration: 'none' }}>
@@ -725,23 +711,22 @@ export default function ChantierDetailPage() {
           </div>
         </nav>
 
-        {/* Hero section */}
         <ChantierHero 
           chantier={chantier}
-          onEdit={() => router.push(`/dashboard/chantiers/${chantier.id}/modifier`)}
+          onEdit={() => console.log('Modifier')}
           onShare={() => console.log('Partager')}
           onArchive={() => console.log('Archiver')}
         />
 
-        {/* Tabs navigation et contenu */}
         <ChantierTabs
           tabs={tabs}
           activeTab={activeTab}
-          onTabChange={setActiveTab}
-        >
-          {renderTabContent()}
-        </ChantierTabs>
-      </div>
-    </div>
-  );
+          onTab
+onTabChange={setActiveTab}
+       >
+         {renderTabContent()}
+       </ChantierTabs>
+     </div>
+   </div>
+ );
 }
