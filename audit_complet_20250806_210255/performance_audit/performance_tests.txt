@@ -1,0 +1,58 @@
+PERFORMANCE - CHECKLIST COMPLÈTE:
+=================================
+
+🚀 CHARGEMENT PAGES (CORE WEB VITALS):
+======================================
+- [ ] Page d'accueil < 2s (LCP)
+- [ ] Dashboard < 3s (avec données)
+- [ ] Liste chantiers < 2s
+- [ ] Détail chantier < 2s
+- [ ] Interface messages < 2s
+- [ ] First Contentful Paint < 1.5s
+- [ ] Largest Contentful Paint < 2.5s
+- [ ] Largest Contentful Paint < 2.5s
+- [ ] Cumulative Layout Shift < 0.1
+- [ ] First Input Delay < 100ms
+
+⚡ INTERACTIONS TEMPS RÉEL:
+===========================
+- [ ] Recherche temps réel < 300ms
+- [ ] Navigation entre pages fluide
+- [ ] Formulaires répondent instantanément
+- [ ] Animations fluides 60fps
+- [ ] Scroll smooth sur longues listes
+- [ ] Upload fichiers avec progress
+- [ ] Pas de freeze UI pendant requêtes
+
+🌐 OPTIMISATIONS RÉSEAU:
+========================
+- [ ] Requêtes API optimisées (pas de doublons)
+- [ ] Images optimisées Next.js
+- [ ] Compression gzip activée
+- [ ] Cache approprié (headers, SWR)
+- [ ] Lazy loading images/composants
+- [ ] Bundle splitting efficace
+- [ ] Prefetch routes importantes
+
+🧠 MÉMOIRE & CPU:
+=================
+- [ ] Pas de memory leaks
+- [ ] Event listeners nettoyés
+- [ ] Intervals/timeouts clearés
+- [ ] Re-renders React minimisés
+- [ ] Virtualisation si listes longues (>1000 items)
+- [ ] Debounce sur recherches
+
+📦 BUILD & BUNDLE ANALYSIS:
+============================
+Commandes à exécuter pour audit:
+npm run build
+npm run analyze (si script existe)
+npx @next/bundle-analyzer
+
+- [ ] Build sans erreurs TypeScript
+- [ ] Bundle size total < 500KB
+- [ ] Chunks optimisés
+- [ ] Tree shaking efficace
+- [ ] Code splitting par routes
+- [ ] Dependencies inutiles supprimées

@@ -1,0 +1,30 @@
+AUDIT HOOKS PERSONNALISÉS:
+===========================
+
+🎣 useMessages (CRITIQUE):
+==========================
+- [ ] Hook existe et est importable
+- [ ] Polling conversations toutes les 30s
+- [ ] État conversations synchronisé
+- [ ] sendMessage fonctionne
+- [ ] Gestion loading/error states
+- [ ] Optimistic updates
+- [ ] Cleanup intervals sur unmount
+- [ ] Types TypeScript corrects
+
+🏗️ AUTRES HOOKS MÉTIER:
+========================
+- [ ] useChantiers: CRUD, filtres, recherche
+- [ ] useAuth: session, login/logout, rôles
+- [ ] useApi: requêtes HTTP, cache, error handling
+- [ ] useDebounce: recherche temps réel optimisée
+- [ ] useNotifications: toasts, badges count
+- [ ] useUpload: gestion fichiers, progress
+
+⚡ PERFORMANCE HOOKS:
+====================
+- [ ] Pas de re-renders inutiles
+- [ ] useCallback/useMemo utilisés à bon escient
+- [ ] Cleanup effects (intervals, listeners)
+- [ ] Dependencies arrays correctes
+- [ ] Pas de memory leaks

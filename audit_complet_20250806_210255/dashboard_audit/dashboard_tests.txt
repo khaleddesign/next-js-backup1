@@ -1,0 +1,12 @@
+AUDIT DASHBOARD - TESTS À EFFECTUER:
+====================================
+FONCTIONNALITÉS À TESTER:
+- [ ] Page dashboard se charge sans erreur
+- [ ] Stats cards affichent des données réelles
+- [ ] Graphiques se génèrent correctement
+- [ ] Navigation vers autres modules fonctionne
+- [ ] Quick actions sont opérationnelles
+- [ ] Feed d'activité se met à jour
+- [ ] Notifications badges sont corrects
+- [ ] Responsive design mobile/tablet
+- [ ] Performance de chargement < 3s

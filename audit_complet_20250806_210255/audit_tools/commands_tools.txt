@@ -1,0 +1,62 @@
+OUTILS & COMMANDES AUDIT CHANTIERPRO
+====================================
+
+🔧 COMMANDES DE BASE:
+=====================
+# Installation et setup
+npm install
+npm run dev                    # Serveur développement
+npm run build                  # Build production
+npm run start                  # Serveur production
+
+# Base de données Prisma
+npx prisma generate           # Générer client Prisma
+npx prisma db push           # Sync schema avec DB
+npx prisma studio            # Interface graphique DB
+npx prisma migrate reset     # Reset complet DB
+npx prisma db seed           # Charger données test
+
+# Qualité code
+npm run lint                  # ESLint vérification
+npm run lint:fix             # ESLint auto-fix
+npm run type-check           # TypeScript vérification
+npx prettier --write .       # Formatage code
+
+🌐 TESTS NAVIGATEUR (DevTools F12):
+====================================
+Console: Erreurs JavaScript
+Network: Requêtes API + performance
+Performance: Core Web Vitals
+Application: LocalStorage, Session, Cookies
+Lighthouse: Audit complet performance/SEO/accessibilité
+
+📱 MODE RESPONSIVE (DevTools):
+===============================
+Ctrl+Shift+M (toggle device mode)
+Presets: iPhone 12, iPad, Pixel 5
+Custom: 375x667, 768x1024, 1366x768
+
+🧪 CURL TESTS APIs:
+===================
+# Test authentification
+curl -X GET http://localhost:3000/api/auth/session
+
+# Test CRUD chantiers
+curl -X GET http://localhost:3000/api/chantiers
+curl -X POST http://localhost:3000/api/chantiers \
+  -H 'Content-Type: application/json' \
+  -d '{"nom":"Test Chantier","statut":"ACTIF"}'
+
+# Test messages (nouveau module)
+curl -X GET http://localhost:3000/api/messages
+curl -X GET http://localhost:3000/api/messages/contacts
+curl -X GET 'http://localhost:3000/api/messages/search?q=test'
+
+🐛 DEBUG CHECKLIST:
+===================
+- [ ] Console.log outputs pour tracer flux
+- [ ] Network tab pour requêtes échouées
+- [ ] React DevTools pour props/state
+- [ ] Sources tab pour breakpoints
+- [ ] Application tab pour storage
+- [ ] Performance tab pour bottlenecks

@@ -1,0 +1,62 @@
+ANALYSE DESIGN SYSTEM CSS:
+===========================
+=== VARIABLES CSS GLOBALES ===
+1:@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+4:  margin: 0;
+5:  padding: 0;
+6:  box-sizing: border-box;
+10:  font-family: 'Inter', system-ui, sans-serif;
+11:  line-height: 1.6;
+12:  color: #333;
+16:  max-width: 1200px;
+17:  margin: 0 auto;
+18:  padding: 0 1rem;
+22:  display: inline-flex;
+23:  align-items: center;
+24:  justify-content: center;
+25:  padding: 0.75rem 1.5rem;
+26:  border: none;
+27:  border-radius: 0.5rem;
+28:  font-weight: 500;
+29:  cursor: pointer;
+30:  transition: all 0.2s ease;
+31:  text-decoration: none;
+35:  background: linear-gradient(135deg, #3b82f6, #f97316);
+36:  color: white;
+39:.btn-primary:hover {
+40:  transform: translateY(-2px);
+41:  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+45:  background: transparent;
+46:  color: white;
+47:  border: 1px solid rgba(255,255,255,0.2);
+50:.btn-ghost:hover {
+51:  background: rgba(255,255,255,0.1);
+55:  background: white;
+56:  border-radius: 1rem;
+57:  padding: 2rem;
+58:  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+62:  background: rgba(255,255,255,0.1);
+63:  backdrop-filter: blur(10px);
+64:  border: 1px solid rgba(255,255,255,0.2);
+65:  border-radius: 1rem;
+69:  background: linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #ea580c 100%);
+70:  min-height: 100vh;
+73:.text-center { text-align: center; }
+74:.flex { display: flex; }
+75:.items-center { align-items: center; }
+76:.justify-center { justify-content: center; }
+77:.justify-between { justify-content: space-between; }
+78:.space-between > * + * { margin-left: 1rem; }
+81:  width: 100%;
+82:  padding: 0.75rem 1rem;
+83:  border: 1px solid rgba(255,255,255,0.2);
+84:  border-radius: 0.5rem;
+
+=== CLASSES UTILITAIRES DÉTECTÉES ===
+.btn-primary {
+.btn-primary:hover {
+.btn-ghost {
+.btn-ghost:hover {
+.card {
+.glass {
+.gradient-bg {

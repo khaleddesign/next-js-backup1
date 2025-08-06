@@ -1,0 +1,11 @@
+INVENTAIRE COMPLET APIs:
+========================
+✅ messages/mark-read/route.ts
+✅ messages/contacts/route.ts
+✅ messages/message/[id]/read/route.ts
+✅ messages/search/route.ts
+✅ messages/route.ts
+✅ messages/chantier/[id]/route.ts
+✅ auth/[...nextauth]/route.ts
+✅ chantiers/route.ts
+✅ chantiers/[id]/route.ts

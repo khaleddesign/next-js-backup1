@@ -1,0 +1,51 @@
+TESTS APIS REST - AUDIT TECHNIQUE COMPLET:
+===========================================
+
+🔐 AUTHENTIFICATION API:
+========================
+- [ ] GET /api/auth/[...nextauth] (NextAuth endpoints)
+- [ ] Session handling correct
+- [ ] Redirections après login/logout
+- [ ] CSRF protection active
+
+🏗️ CHANTIERS API (CRUD COMPLET):
+==================================
+- [ ] GET /api/chantiers → 200 (liste avec données)
+- [ ] POST /api/chantiers → 201 (création réussie)
+- [ ] GET /api/chantiers/[id] → 200 (détail)
+- [ ] PUT /api/chantiers/[id] → 200 (modification)
+- [ ] DELETE /api/chantiers/[id] → 200 (suppression)
+- [ ] GET /api/chantiers/inexistant → 404
+- [ ] POST sans auth → 401
+- [ ] POST données invalides → 400
+
+💬 MESSAGES API (NOUVEAU MODULE):
+==================================
+- [ ] GET /api/messages → 200 (conversations)
+- [ ] POST /api/messages → 201 (nouveau message)
+- [ ] GET /api/messages/contacts → 200 (liste contacts)
+- [ ] GET /api/messages/search?q=term → 200 (résultats)
+- [ ] PUT /api/messages/[id] → 200 (modification)
+- [ ] DELETE /api/messages/[id] → 200 (suppression)
+- [ ] POST /api/messages/mark-read → 200 (marquer lu)
+- [ ] POST /api/messages/files/upload → 201 (upload)
+
+⚡ PERFORMANCE & SÉCURITÉ APIs:
+===============================
+- [ ] Réponse < 500ms pour requêtes simples
+- [ ] Pagination sur listes longues
+- [ ] Rate limiting (100 req/min par user)
+- [ ] Validation stricte données entrantes
+- [ ] Logs d'erreurs détaillés
+- [ ] Headers CORS appropriés
+- [ ] Gestion erreurs DB (connexion, timeout)
+
+🧪 TESTS EDGE CASES:
+====================
+- [ ] Données null/undefined gérées
+- [ ] Caractères spéciaux dans requêtes
+- [ ] Requêtes simultanées multiples
+- [ ] Timeout réseau simulé
+- [ ] DB indisponible temporairement
+- [ ] Payload trop volumineux → 413
+- [ ] Méthodes HTTP non supportées → 405

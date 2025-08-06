@@ -1,0 +1,55 @@
+TESTS CROSS-PLATFORM COMPLETS:
+===============================
+
+💻 DESKTOP BROWSERS:
+====================
+- [ ] Chrome (dernière version)
+- [ ] Firefox (dernière version)
+- [ ] Safari (si macOS disponible)
+- [ ] Edge (Windows)
+- [ ] Opera (test optionnel)
+
+📱 MOBILE BROWSERS:
+===================
+- [ ] Chrome mobile (Android)
+- [ ] Safari mobile (iOS)
+- [ ] Samsung Internet
+- [ ] Firefox mobile
+
+📐 RÉSOLUTIONS TESTÉES:
+=======================
+Desktop:
+- [ ] 1920x1080 (Full HD)
+- [ ] 1366x768 (laptop commun)
+- [ ] 1440x900 (MacBook)
+- [ ] 2560x1440 (2K)
+
+Tablet:
+- [ ] 768x1024 (iPad portrait)
+- [ ] 1024x768 (iPad landscape)
+- [ ] 601x962 (Surface)
+
+Mobile:
+- [ ] 375x667 (iPhone 8)
+- [ ] 414x896 (iPhone 11)
+- [ ] 360x640 (Android commun)
+- [ ] 375x812 (iPhone X)
+
+🧪 TESTS PAR FONCTIONNALITÉ:
+=============================
+Navigation:
+- [ ] Menu hamburger mobile
+- [ ] Sidebar responsive
+- [ ] Tabs navigation touch-friendly
+
+Formulaires:
+- [ ] Inputs utilisables mobile
+- [ ] Keyboards virtuels supportés
+- [ ] Validation temps réel
+- [ ] Upload fichiers mobile
+
+Interactions:
+- [ ] Touch gestures (swipe, pinch)
+- [ ] Hover states desktop
+- [ ] Click/tap targets > 44px
+- [ ] Scroll momentum mobile

@@ -1,0 +1,30 @@
+AUDIT SÉCURITÉ - VALIDATIONS & TYPES:
+=====================================
+
+🔐 VALIDATION DONNÉES ENTRANTES:
+================================
+- [ ] Toutes APIs POST/PUT ont validation Zod/Joi
+- [ ] Sanitisation XSS sur tous inputs
+- [ ] Validation taille fichiers upload
+- [ ] Validation types MIME upload
+- [ ] Limites longueur champs texte
+- [ ] Validation formats email, URL, etc.
+- [ ] Échappement SQL injection
+
+🛡️ PROTECTION ROUTES:
+=====================
+- [ ] Middleware auth sur /dashboard/*
+- [ ] Vérification rôles utilisateur
+- [ ] CSRF protection
+- [ ] Rate limiting APIs
+- [ ] Headers sécurité (HSTS, X-Frame-Options)
+- [ ] Validation JWT tokens
+- [ ] Pas de données sensibles en localStorage
+
+📊 TYPES TYPESCRIPT:
+====================
+- [ ] Types stricts partout (pas de 'any')
+- [ ] Interfaces cohérentes frontend/backend
+- [ ] Types générés depuis Prisma utilisés
+- [ ] Enums pour valeurs fixes
+- [ ] Types optionnels/obligatoires corrects

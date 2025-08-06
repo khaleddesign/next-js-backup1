@@ -1,0 +1,51 @@
+ANALYSE SCHEMA PRISMA:
+=====================
+=== MODELS TROUVÉS ===
+model User {
+model Account {
+model Session {
+model Chantier {
+model TimelineEvent {
+model Comment {
+model Message {
+model Devis {
+model Planning {
+model Notification {
+
+=== ENUMS TROUVÉS ===
+enum Role {
+enum ChantierStatus {
+enum TimelineEventType {
+enum MessageType {
+enum DevisType {
+enum DevisStatus {
+enum PlanningType {
+enum PlanningStatus {
+enum NotificationType {
+
+=== PROVIDER DATABASE ===
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+--
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+--
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
