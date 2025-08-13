@@ -25,7 +25,7 @@ model User {
   messages      Message[]
   comments      Comment[]
   timelineEvents TimelineEvent[]
-  devis         Devis[]
+  devis         Devis[] @relation("DevisClient") @relation("DevisClient")
   plannings     Planning[]
   notifications Notification[]
   
@@ -245,4 +245,201 @@ enum NotificationType {
   SUCCESS
   WARNING
   ERROR
+}
+// ==========================================
+// MODULE DEVIS/FACTURATION
+// ==========================================
+
+model Devis {
+  id                String      @id @default(cuid())
+  numero            String      @unique
+  type              TypeDevis   @default(DEVIS)
+  statut            StatutDevis @default(BROUILLON)
+  
+  // Relations
+  client            User        @relation("DevisClient", fields: [clientId], references: [id])
+  clientId          String
+  chantier          Chantier?   @relation(fields: [chantierId], references: [id])
+  chantierId        String?
+  
+  // Contenu
+  objet             String
+  dateCreation      DateTime    @default(now())
+  dateValidite      DateTime?
+  dateEnvoi         DateTime?
+  dateAcceptation   DateTime?
+  datePaiement      DateTime?
+  
+  // Montants
+  totalHT           Decimal     @default(0)
+  totalTVA          Decimal     @default(0)
+  totalTTC          Decimal     @default(0)
+  
+  // Métadonnées
+  notes             String?     @db.Text
+  conditionsVente   String?     @db.Text
+  
+  // Relations
+  lignes            LigneDevis[]
+  facture           Devis?      @relation("DevisToFacture", fields: [factureId], references: [id])
+  factureId         String?
+  devisOrigine      Devis?      @relation("DevisToFacture")
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model LigneDevis {
+  id          String  @id @default(cuid())
+  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
+  devisId     String
+  
+  designation String
+  quantite    Decimal @default(1)
+  prixUnitaire Decimal
+  tva         Decimal @default(20)
+  total       Decimal
+  
+  ordre       Int
+  createdAt   DateTime @default(now())
+}
+
+enum TypeDevis {
+  DEVIS
+  FACTURE
+}
+
+enum StatutDevis {
+  BROUILLON
+  ENVOYE
+  ACCEPTE
+  REFUSE
+  PAYE
+  ANNULE
+}
+
+model Devis {
+  id                String      @id @default(cuid())
+  numero            String      @unique
+  type              TypeDevis   @default(DEVIS)
+  statut            StatutDevis @default(BROUILLON)
+  
+  client            User        @relation("DevisClient", fields: [clientId], references: [id])
+  clientId          String
+  chantier          Chantier?   @relation(fields: [chantierId], references: [id])
+  chantierId        String?
+  
+  objet             String
+  dateCreation      DateTime    @default(now())
+  dateValidite      DateTime?
+  dateEnvoi         DateTime?
+  dateAcceptation   DateTime?
+  datePaiement      DateTime?
+  
+  totalHT           Decimal     @default(0)
+  totalTVA          Decimal     @default(0)
+  totalTTC          Decimal     @default(0)
+  
+  notes             String?     @db.Text
+  conditionsVente   String?     @db.Text
+  
+  lignes            LigneDevis[]
+  facture           Devis?      @relation("DevisToFacture", fields: [factureId], references: [id])
+  factureId         String?
+  devisOrigine      Devis?      @relation("DevisToFacture")
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model LigneDevis {
+  id          String  @id @default(cuid())
+  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
+  devisId     String
+  
+  designation String
+  quantite    Decimal @default(1)
+  prixUnitaire Decimal
+  tva         Decimal @default(20)
+  total       Decimal
+  
+  ordre       Int
+  createdAt   DateTime @default(now())
+}
+
+enum TypeDevis {
+  DEVIS
+  FACTURE
+}
+
+enum StatutDevis {
+  BROUILLON
+  ENVOYE
+  ACCEPTE
+  REFUSE
+  PAYE
+  ANNULE
+}
+
+model Devis {
+  id                String      @id @default(cuid())
+  numero            String      @unique
+  type              TypeDevis   @default(DEVIS)
+  statut            StatutDevis @default(BROUILLON)
+  
+  client            User        @relation("DevisClient", fields: [clientId], references: [id])
+  clientId          String
+  chantier          Chantier?   @relation(fields: [chantierId], references: [id])
+  chantierId        String?
+  
+  objet             String
+  dateCreation      DateTime    @default(now())
+  dateValidite      DateTime?
+  dateEnvoi         DateTime?
+  dateAcceptation   DateTime?
+  datePaiement      DateTime?
+  
+  totalHT           Decimal     @default(0)
+  totalTVA          Decimal     @default(0)
+  totalTTC          Decimal     @default(0)
+  
+  notes             String?     @db.Text
+  conditionsVente   String?     @db.Text
+  
+  lignes            LigneDevis[]
+  facture           Devis?      @relation("DevisToFacture", fields: [factureId], references: [id])
+  factureId         String?
+  devisOrigine      Devis?      @relation("DevisToFacture")
+  
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model LigneDevis {
+  id          String  @id @default(cuid())
+  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
+  devisId     String
+  
+  designation String
+  quantite    Decimal @default(1)
+  prixUnitaire Decimal
+  tva         Decimal @default(20)
+  total       Decimal
+  
+  ordre       Int
+  createdAt   DateTime @default(now())
+}
+
+enum TypeDevis {
+  DEVIS
+  FACTURE
+}
+
+enum StatutDevis {
+  BROUILLON
+  ENVOYE
+  ACCEPTE
+  REFUSE
+  PAYE
+  ANNULE
 }
