@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import UserAvatar from '../../../components/messages/UserAvatar';
-import MessageInput from '../../../components/messages/MessageInput';
+import UserAvatar from '@/components/messages/UserAvatar';
+import MessageInput from '@/components/messages/MessageInput';
 
 interface User {
   id: string;

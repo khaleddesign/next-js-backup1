@@ -1,246 +1,174 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import TypingIndicator from "./TypingIndicator";
+import { useState, useRef, useCallback } from 'react';
 
 interface MessageInputProps {
-  onSendMessage: (message: string, photos: string[]) => Promise<void>;
+  onSendMessage: (text: string, photos: string[]) => Promise<boolean>;
   placeholder?: string;
   disabled?: boolean;
   showUpload?: boolean;
-  conversationId?: string;
-  onTyping?: (isTyping: boolean) => void;
+  compact?: boolean;
+  maxLength?: number;
 }
 
-export default function MessageInput({ 
-  onSendMessage, 
+export default function MessageInput({
+  onSendMessage,
   placeholder = "Écrivez votre message...",
   disabled = false,
   showUpload = true,
-  conversationId,
-  onTyping
+  compact = false,
+  maxLength = 2000
 }: MessageInputProps) {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [photos, setPhotos] = useState<string[]>([]);
-  const [sending, setSending] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
-  const [showShortcutHelp, setShowShortcutHelp] = useState(false);
-  
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-save brouillon
-  const draftKey = `draft_${conversationId || 'default'}`;
-  
-  useEffect(() => {
-    // Charger le brouillon sauvegardé
-    const savedDraft = localStorage.getItem(draftKey);
-    if (savedDraft && !message) {
-      setMessage(savedDraft);
-    }
-  }, [conversationId, draftKey]);
-
-  useEffect(() => {
-    // Sauvegarder le brouillon
-    if (message) {
-      localStorage.setItem(draftKey, message);
-    } else {
-      localStorage.removeItem(draftKey);
-    }
-  }, [message, draftKey]);
-
-  // Gestion de l'indicateur "en train d'écrire"
-  const handleTyping = useCallback((value: string) => {
-    if (!onTyping) return;
-
-    const isCurrentlyTyping = value.trim().length > 0;
-    
-    if (isCurrentlyTyping !== isTyping) {
-      setIsTyping(isCurrentlyTyping);
-      onTyping(isCurrentlyTyping);
-    }
-
-    // Reset timeout
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    // Arrêter l'indicateur après 3 secondes d'inactivité
-    typingTimeoutRef.current = setTimeout(() => {
-      setIsTyping(false);
-      onTyping(false);
-    }, 3000);
-  }, [isTyping, onTyping]);
-
-  const handleSubmit = async () => {
+  const handleSend = async () => {
     if (!message.trim() && photos.length === 0) return;
-    if (sending) return;
+    if (disabled) return;
 
-    setSending(true);
-    setIsTyping(false);
-    if (onTyping) onTyping(false);
-    
-    try {
-      await onSendMessage(message.trim(), photos);
-      setMessage("");
+    const success = await onSendMessage(message.trim(), photos);
+    if (success) {
+      setMessage('');
       setPhotos([]);
-      localStorage.removeItem(draftKey);
-      
-      // Focus retour sur textarea
       if (textareaRef.current) {
-        textareaRef.current.focus();
+        textareaRef.current.style.height = 'auto';
       }
-    } catch (error) {
-      console.error('Erreur envoi message:', error);
-    } finally {
-      setSending(false);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Ctrl/Cmd + Enter = Envoyer
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    if (e.key === 'Enter') {
+      if (e.shiftKey) {
+        return;
+      }
       e.preventDefault();
-      handleSubmit();
-      return;
-    }
-
-    // Enter seul = Envoyer (sauf si Shift+Enter = nouvelle ligne)
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
-      return;
-    }
-
-    // Escape = Effacer
-    if (e.key === 'Escape') {
-      setMessage("");
-      setPhotos([]);
-      return;
-    }
-
-    // Afficher l'aide sur Ctrl+?
-    if ((e.ctrlKey || e.metaKey) && e.key === '/') {
-      e.preventDefault();
-      setShowShortcutHelp(true);
-      setTimeout(() => setShowShortcutHelp(false), 3000);
-      return;
+      handleSend();
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setMessage(value);
-    handleTyping(value);
-    
-    // Auto-resize textarea
+  const adjustTextareaHeight = useCallback(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 120) + 'px';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      const maxHeight = compact ? 80 : 120;
+      textareaRef.current.style.height = Math.min(scrollHeight, maxHeight) + 'px';
+    }
+  }, [compact]);
+
+  const handleFileSelect = async (files: FileList) => {
+    if (!showUpload) return;
+    
+    setUploading(true);
+    const newPhotos: string[] = [];
+
+    for (let i = 0; i < Math.min(files.length, 5); i++) {
+      const file = files[i];
+      
+      if (!file.type.startsWith('image/')) continue;
+      if (file.size > 10 * 1024 * 1024) continue;
+
+      try {
+        const base64 = await fileToBase64(file);
+        newPhotos.push(base64);
+      } catch (error) {
+        console.error('Erreur upload fichier:', error);
+      }
+    }
+
+    setPhotos(prev => [...prev, ...newPhotos].slice(0, 5));
+    setUploading(false);
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    
+    if (disabled || !showUpload) return;
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileSelect(files);
     }
   };
 
-  const handlePhotoUpload = () => {
-    // Simulation upload avec photos réalistes
-    const constructionPhotos = [
-      "https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=300&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=300&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=300&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=300&h=200&fit=crop",
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=300&h=200&fit=crop"
-    ];
-    
-    const randomPhoto = constructionPhotos[Math.floor(Math.random() * constructionPhotos.length)];
-    setPhotos(prev => [...prev, randomPhoto]);
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!disabled && showUpload) {
+      setDragOver(true);
+    }
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
   };
 
   const removePhoto = (index: number) => {
     setPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-    };
-  }, []);
+  const remainingChars = maxLength - message.length;
+  const isOverLimit = remainingChars < 0;
 
   return (
     <div style={{
-      background: 'white',
-      border: '1px solid #e2e8f0',
-      borderRadius: '1rem',
-      padding: '1rem',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      position: 'relative'
-    }}>
-      {/* Aide raccourcis */}
-      {showShortcutHelp && (
-        <div style={{
-          position: 'absolute',
-          top: '-80px',
-          left: '1rem',
-          right: '1rem',
-          background: '#1e293b',
-          color: 'white',
-          padding: '0.75rem',
-          borderRadius: '0.5rem',
-          fontSize: '0.75rem',
-          zIndex: 10,
-          animation: 'fadeIn 0.2s ease'
-        }}>
-          <div><strong>Raccourcis :</strong></div>
-          <div>• Ctrl/⌘ + Entrée : Envoyer</div>
-          <div>• Maj + Entrée : Nouvelle ligne</div>
-          <div>• Échap : Effacer</div>
-        </div>
-      )}
-
-      {/* Photos sélectionnées */}
+      padding: compact ? '0.75rem' : '1rem',
+      background: dragOver ? '#f0f9ff' : 'transparent',
+      borderRadius: '0.75rem',
+      border: dragOver ? '2px dashed #3b82f6' : 'none',
+      transition: 'all 0.2s ease'
+    }}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+    >
       {photos.length > 0 && (
-        <div style={{ 
-          marginBottom: '1rem',
+        <div style={{
           display: 'flex',
           gap: '0.5rem',
+          marginBottom: '0.75rem',
           flexWrap: 'wrap'
         }}>
           {photos.map((photo, index) => (
-            <div
-              key={index}
-              style={{
-                position: 'relative',
-                width: '60px',
-                height: '60px',
-                borderRadius: '0.5rem',
-                overflow: 'hidden',
-                border: '2px solid #e2e8f0'
-              }}
-            >
+            <div key={index} style={{ position: 'relative' }}>
               <img
                 src={photo}
-                alt={`Photo ${index + 1}`}
+                alt={`Upload ${index + 1}`}
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
+                  width: '60px',
+                  height: '60px',
+                  objectFit: 'cover',
+                  borderRadius: '0.5rem',
+                  border: '1px solid #e2e8f0'
                 }}
               />
               <button
                 onClick={() => removePhoto(index)}
                 style={{
                   position: 'absolute',
-                  top: '2px',
-                  right: '2px',
-                  width: '18px',
-                  height: '18px',
-                  borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.8)',
+                  top: '-6px',
+                  right: '-6px',
+                  width: '20px',
+                  height: '20px',
+                  background: '#ef4444',
                   color: 'white',
                   border: 'none',
+                  borderRadius: '50%',
                   cursor: 'pointer',
-                  fontSize: '10px',
+                  fontSize: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -253,120 +181,122 @@ export default function MessageInput({
         </div>
       )}
 
-      {/* Zone de saisie */}
       <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, position: 'relative' }}>
           <textarea
             ref={textareaRef}
             value={message}
-            onChange={handleChange}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              adjustTextareaHeight();
+            }}
             onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            disabled={disabled || sending}
+            placeholder={dragOver ? "Déposez vos fichiers ici..." : placeholder}
+            disabled={disabled}
             style={{
               width: '100%',
-              minHeight: '44px',
-              maxHeight: '120px',
+              minHeight: compact ? '40px' : '60px',
+              maxHeight: compact ? '80px' : '120px',
               padding: '0.75rem',
-              border: '1px solid #e2e8f0',
-              borderRadius: '0.75rem',
-              resize: 'none',
-              fontFamily: 'inherit',
+              border: `1px solid ${isOverLimit ? '#ef4444' : '#e2e8f0'}`,
+              borderRadius: '0.5rem',
               fontSize: '0.875rem',
-              color: '#1e293b',
-              background: disabled ? '#f8fafc' : 'white',
-              transition: 'border-color 0.2s ease',
-              overflow: 'hidden'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#3b82f6';
-              e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = '#e2e8f0';
-              e.target.style.boxShadow = 'none';
+              fontFamily: 'inherit',
+              resize: 'none',
+              outline: 'none',
+              background: disabled ? '#f9fafb' : 'white',
+              color: disabled ? '#9ca3af' : '#1e293b'
             }}
           />
+          
+          {maxLength && (
+            <div style={{
+              position: 'absolute',
+              bottom: '0.5rem',
+              right: '0.75rem',
+              fontSize: '0.75rem',
+              color: isOverLimit ? '#ef4444' : '#94a3b8',
+              pointerEvents: 'none'
+            }}>
+              {remainingChars}
+            </div>
+          )}
         </div>
 
-        {/* Boutons actions */}
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           {showUpload && (
-            <button
-              onClick={handlePhotoUpload}
-              disabled={disabled || sending || photos.length >= 5}
-              style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '0.75rem',
-                border: '1px solid #e2e8f0',
-                background: 'white',
-                color: photos.length >= 5 ? '#94a3b8' : '#64748b',
-                cursor: photos.length >= 5 ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.25rem',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                if (photos.length < 5) {
-                  e.currentTarget.style.background = '#f8fafc';
-                  e.currentTarget.style.borderColor = '#3b82f6';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'white';
-                e.currentTarget.style.borderColor = '#e2e8f0';
-              }}
-              title={photos.length >= 5 ? "Maximum 5 photos" : "Ajouter une photo"}
-            >
-              📸
-            </button>
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  if (e.target.files) {
+                    handleFileSelect(e.target.files);
+                  }
+                }}
+              />
+              
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={disabled || uploading || photos.length >= 5}
+                style={{
+                  padding: '0.75rem',
+                  background: 'transparent',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '0.5rem',
+                  cursor: disabled || uploading || photos.length >= 5 ? 'not-allowed' : 'pointer',
+                  color: disabled || uploading || photos.length >= 5 ? '#9ca3af' : '#64748b',
+                  fontSize: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: disabled || uploading || photos.length >= 5 ? 0.5 : 1
+                }}
+                title={photos.length >= 5 ? 'Maximum 5 photos' : 'Ajouter des photos'}
+              >
+                {uploading ? '⏳' : '📷'}
+              </button>
+            </>
           )}
 
           <button
-            onClick={handleSubmit}
-            disabled={(!message.trim() && photos.length === 0) || disabled || sending}
-            className="btn-primary"
+            onClick={handleSend}
+            disabled={disabled || (!message.trim() && photos.length === 0) || isOverLimit}
             style={{
-              minWidth: '44px',
-              height: '44px',
-              borderRadius: '0.75rem',
-              opacity: (!message.trim() && photos.length === 0) || disabled || sending ? 0.5 : 1,
-              cursor: (!message.trim() && photos.length === 0) || disabled || sending ? 'not-allowed' : 'pointer',
-              fontSize: '1.25rem'
+              padding: compact ? '0.5rem 1rem' : '0.75rem 1.5rem',
+              background: disabled || (!message.trim() && photos.length === 0) || isOverLimit
+                ? '#e5e7eb'
+                : 'linear-gradient(135deg, #3b82f6, #f97316)',
+              color: disabled || (!message.trim() && photos.length === 0) || isOverLimit ? '#9ca3af' : 'white',
+              border: 'none',
+              borderRadius: '0.5rem',
+              cursor: disabled || (!message.trim() && photos.length === 0) || isOverLimit ? 'not-allowed' : 'pointer',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
             }}
           >
-            {sending ? '⏳' : '📤'}
+            <span>📤</span>
+            {compact ? '' : 'Envoyer'}
           </button>
         </div>
       </div>
 
-      {/* Indicateurs */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: '0.5rem',
-        fontSize: '0.75rem',
-        color: '#94a3b8'
-      }}>
-        <div>
-          {message.length > 0 && `${message.length}/2000 caractères`}
-          {isTyping && " • En train d'écrire..."}
-        </div>
-        <div>
-          Ctrl+Entrée pour envoyer • Ctrl+/ pour aide
-        </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      {!compact && (
+        <p style={{
+          margin: '0.5rem 0 0 0',
+          fontSize: '0.75rem',
+          color: '#64748b'
+        }}>
+          Maj + Entrée pour nouvelle ligne • Glissez-déposez vos photos
+        </p>
+      )}
     </div>
   );
 }

@@ -1,2 +1,0 @@
---- Migrations Info ---
-⚠️ Aucune migration trouvée - DB peut être en mode db push

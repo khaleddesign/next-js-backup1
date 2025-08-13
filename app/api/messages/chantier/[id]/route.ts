@@ -28,18 +28,36 @@ export async function GET(
       })
     ]);
 
+    // Format attendu par le hook useMessages
+    const formattedMessages = messages.map(message => ({
+      id: message.id,
+      expediteur: message.expediteur,
+      message: message.message,
+      photos: message.photos,
+      createdAt: message.createdAt.toISOString(),
+      lu: message.lu,
+      chantierId: message.chantierId,
+      parentId: message.threadId,
+      reactions: Array.isArray(message.reactions) ? message.reactions : []
+    }));
+
     return NextResponse.json({
-      messages,
+      messages: formattedMessages, // ← IMPORTANT: wrapper dans "messages"
       pagination: {
         page,
         limit,
         total,
         pages: Math.ceil(total / limit)
-      }
+      },
+      success: true,
+      timestamp: new Date().toISOString()
     });
 
   } catch (error) {
     console.error('Erreur API messages chantier:', error);
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    return NextResponse.json({ 
+      error: 'Erreur serveur',
+      details: error instanceof Error ? error.message : 'Erreur inconnue'
+    }, { status: 500 });
   }
 }

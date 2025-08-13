@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import UserAvatar from '../../../components/messages/UserAvatar';
+import UserAvatar from '@/components/messages/UserAvatar';
 
 interface SearchResult {
   type: 'message' | 'contact' | 'file';

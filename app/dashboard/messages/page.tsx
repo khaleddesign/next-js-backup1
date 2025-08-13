@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useMessages } from "@/hooks/useMessages";
+import MessageBubble from "@/components/messages/MessageBubble";
+import MessageThread from "@/components/messages/MessageThread";
 
 export default function MessagesPage() {
  const [searchTerm, setSearchTerm] = useState("");
  const [filter, setFilter] = useState("all");
- const [newMessage, setNewMessage] = useState("");
  
  const { 
    conversations, 
@@ -18,6 +19,10 @@ export default function MessagesPage() {
    sending,
    error,
    sendMessage,
+   editMessage,
+   deleteMessage,
+   pinMessage,
+   copyMessage,
    setActiveConversation
  } = useMessages({
    userId: 'test-client-123',
@@ -25,13 +30,12 @@ export default function MessagesPage() {
    enableNotifications: true
  });
 
- const handleSendMessage = async () => {
-   if (!newMessage.trim() || !activeConversationId) return;
-   
-   const success = await sendMessage(newMessage.trim(), [], activeConversationId);
-   if (success) {
-     setNewMessage("");
-   }
+ const handleSendReply = async (text: string, photos: string[], parentId: string) => {
+   return await sendMessage(text, photos, activeConversationId, parentId);
+ };
+
+ const handleSendMessage = async (text: string, photos: string[]) => {
+   return await sendMessage(text, photos, activeConversationId);
  };
 
  const filteredConversations = conversations.filter(conv => {
@@ -249,56 +253,15 @@ export default function MessagesPage() {
                    </div>
                  ) : (
                    messages.map((message) => (
-                     <div key={message.id} style={{ 
-                       display: 'flex', 
-                       alignItems: 'flex-start', 
-                       gap: '0.75rem',
-                       alignSelf: message.expediteur.id === 'test-client-123' ? 'flex-end' : 'flex-start',
-                       maxWidth: '80%'
-                     }}>
-                       {message.expediteur.id !== 'test-client-123' && (
-                         <div style={{
-                           width: '2rem',
-                           height: '2rem',
-                           borderRadius: '50%',
-                           background: 'linear-gradient(135deg, #3b82f6, #f97316)',
-                           display: 'flex',
-                           alignItems: 'center',
-                           justifyContent: 'center',
-                           color: 'white',
-                           fontSize: '0.75rem',
-                           fontWeight: 'bold',
-                           flexShrink: 0
-                         }}>
-                           {message.expediteur.name.charAt(0)}
-                         </div>
-                       )}
-                       
-                       <div style={{
-                         background: message.expediteur.id === 'test-client-123' 
-                           ? 'linear-gradient(135deg, #3b82f6, #f97316)' 
-                           : 'white',
-                         color: message.expediteur.id === 'test-client-123' ? 'white' : '#1e293b',
-                         padding: '0.75rem',
-                         borderRadius: '1rem',
-                         border: message.expediteur.id === 'test-client-123' ? 'none' : '1px solid #e5e7eb',
-                         wordWrap: 'break-word'
-                       }}>
-                         <p style={{ margin: 0, fontSize: '0.875rem' }}>
-                           {message.message}
-                         </p>
-                         <p style={{ 
-                           margin: '0.25rem 0 0 0', 
-                           fontSize: '0.75rem', 
-                           opacity: 0.7 
-                         }}>
-                           {new Date(message.createdAt).toLocaleTimeString('fr-FR', {
-                             hour: '2-digit',
-                             minute: '2-digit'
-                           })}
-                         </p>
-                       </div>
-                     </div>
+                     message.parentId ? null : (
+                       <MessageThread
+                         key={message.id}
+                         parentMessage={message}
+                         thread={messages}
+                         currentUserId="test-client-123"
+                         onSendReply={handleSendReply}
+                       />
+                     )
                    ))
                  )}
                </div>
@@ -323,8 +286,6 @@ export default function MessagesPage() {
                  
                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
                    <textarea
-                     value={newMessage}
-                     onChange={(e) => setNewMessage(e.target.value)}
                      placeholder="Écrivez votre message..."
                      style={{
                        flex: 1,
@@ -339,17 +300,27 @@ export default function MessagesPage() {
                      }}
                      onKeyDown={(e) => {
                        if (e.key === 'Enter' && e.ctrlKey) {
-                         handleSendMessage();
+                         const target = e.target as HTMLTextAreaElement;
+                         if (target.value.trim()) {
+                           handleSendMessage(target.value.trim(), []);
+                           target.value = '';
+                         }
                        }
                      }}
                    />
                    <button
-                     onClick={handleSendMessage}
-                     disabled={!newMessage.trim() || sending}
+                     onClick={async () => {
+                       const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
+                       if (textarea?.value.trim()) {
+                         await handleSendMessage(textarea.value.trim(), []);
+                         textarea.value = '';
+                       }
+                     }}
+                     disabled={sending}
                      className="btn-primary"
                      style={{
-                       opacity: !newMessage.trim() || sending ? 0.5 : 1,
-                       cursor: !newMessage.trim() || sending ? 'not-allowed' : 'pointer',
+                       opacity: sending ? 0.5 : 1,
+                       cursor: sending ? 'not-allowed' : 'pointer',
                        minWidth: '80px'
                      }}
                    >

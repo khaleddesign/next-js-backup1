@@ -1,1 +1,0 @@
-❌ Configuration auth NON TROUVÉE

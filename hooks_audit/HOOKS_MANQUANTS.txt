@@ -1,8 +1,0 @@
-❌ DOSSIER /hooks NON TROUVÉ - À CRÉER
-Hooks critiques à créer:
-- useMessages.ts (notifications, polling)
-- useChantiers.ts (gestion CRUD chantiers)
-- useAuth.ts (session, rôles)
-- useApi.ts (requêtes HTTP génériques)
-- useLocalStorage.ts (persistance locale)
-- useDebounce.ts (recherche temps réel)

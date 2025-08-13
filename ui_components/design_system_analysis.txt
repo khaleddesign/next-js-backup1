@@ -1,3 +1,0 @@
-ANALYSE DESIGN SYSTEM CSS:
-===========================
-❌ CRITIQUE: globals.css non trouvé - Design system manquant

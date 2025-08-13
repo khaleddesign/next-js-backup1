@@ -1,7 +1,0 @@
-Application status:
-==================
-Date: Mer  6 aoû 2025 10:11:33 CET
-
-✅ node_modules: Installé
-✅ Prisma: Schema présent
-✅ Environnement: .env présent
