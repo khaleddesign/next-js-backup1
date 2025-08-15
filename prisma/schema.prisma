@@ -285,7 +285,10 @@ model Devis {
   factureId         String?
   devisOrigine      Devis?      @relation("DevisToFacture")
   
-  createdAt         DateTime    @default(now())
+  paiements       Paiement[] @relation("FacturePaiements")
+  relances        Relance[]  @relation("FactureRelances")
+  
+  createdAt       DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 }
 
@@ -348,7 +351,10 @@ model Devis {
   factureId         String?
   devisOrigine      Devis?      @relation("DevisToFacture")
   
-  createdAt         DateTime    @default(now())
+  paiements       Paiement[] @relation("FacturePaiements")
+  relances        Relance[]  @relation("FactureRelances")
+  
+  createdAt       DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 }
 
@@ -411,7 +417,10 @@ model Devis {
   factureId         String?
   devisOrigine      Devis?      @relation("DevisToFacture")
   
-  createdAt         DateTime    @default(now())
+  paiements       Paiement[] @relation("FacturePaiements")
+  relances        Relance[]  @relation("FactureRelances")
+  
+  createdAt       DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 }
 
@@ -442,4 +451,61 @@ enum StatutDevis {
   REFUSE
   PAYE
   ANNULE
+}
+
+model Paiement {
+  id              String          @id @default(cuid())
+  facture         Devis           @relation("FacturePaiements", fields: [factureId], references: [id])
+  factureId       String
+  
+  montant         Decimal
+  datePaiement    DateTime        @default(now())
+  methodePaiement MethodePaiement @default(VIREMENT)
+  reference       String?
+  status          StatusPaiement  @default(CONFIRME)
+  notes           String?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Relance {
+  id            String      @id @default(cuid())
+  facture       Devis       @relation("FactureRelances", fields: [factureId], references: [id])
+  factureId     String
+  
+  type          TypeRelance
+  message       String      @db.Text
+  dateEnvoi     DateTime    @default(now())
+  dateEcheance  DateTime?
+  montantDu     Decimal
+  status        StatusRelance @default(ENVOYE)
+  
+  createdAt     DateTime    @default(now())
+}
+
+enum MethodePaiement {
+  VIREMENT
+  CHEQUE
+  CARTE
+  ESPECES
+  PRELEVEMENT
+}
+
+enum StatusPaiement {
+  ATTENTE
+  CONFIRME
+  REJETE
+}
+
+enum TypeRelance {
+  PREMIERE
+  DEUXIEME
+  FINALE
+}
+
+enum StatusRelance {
+  ENVOYE
+  ACCUSE
+  IGNORE
 }
