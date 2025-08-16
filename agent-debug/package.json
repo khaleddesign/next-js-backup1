@@ -1,0 +1,21 @@
+{
+  "name": "chantierpro-debug-agent",
+  "version": "1.0.0",
+  "description": "Agent de détection et correction des erreurs critiques ChantierPro",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "scan": "node src/scanner.js",
+    "fix": "node src/fixer.js",
+    "test": "node src/tester.js"
+  },
+  "dependencies": {
+    "@typescript-eslint/parser": "^6.0.0",
+    "acorn": "^8.0.0",
+    "chalk": "^4.1.2",
+    "eslint": "^8.0.0",
+    "fs-extra": "^11.0.0",
+    "glob": "^10.0.0",
+    "puppeteer": "^21.0.0"
+  }
+}

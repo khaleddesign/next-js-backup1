@@ -1,0 +1,57 @@
+{
+  "criticalErrors": {
+    "syntax": {
+      "severity": "critical",
+      "patterns": [
+        "SyntaxError",
+        "Unexpected token",
+        "Unexpected end of input",
+        "Invalid or unexpected token"
+      ]
+    },
+    "imports": {
+      "severity": "critical", 
+      "patterns": [
+        "Cannot find module",
+        "Module not found",
+        "Attempted import error",
+        "Failed to resolve import"
+      ]
+    },
+    "types": {
+      "severity": "critical",
+      "patterns": [
+        "Property .* does not exist on type",
+        "Type .* is not assignable to type",
+        "Cannot use namespace .* as a type",
+        "TS\\d+:"
+      ]
+    },
+    "runtime": {
+      "severity": "critical",
+      "patterns": [
+        "TypeError",
+        "ReferenceError", 
+        "is not a function",
+        "Cannot read property .* of undefined",
+        "Cannot read properties of undefined",
+        "Cannot read properties of null"
+      ]
+    },
+    "react": {
+      "severity": "critical",
+      "patterns": [
+        "Each child in a list should have a unique \"key\" prop",
+        "Cannot update a component while rendering a different component",
+        "Maximum update depth exceeded",
+        "Invalid hook call"
+      ]
+    }
+  },
+  "autoFix": {
+    "imports": true,
+    "types": true,
+    "syntax": false,
+    "react": true
+  }
+}
