@@ -243,25 +243,21 @@ export default function ChantierDetailPage() {
   if (loading) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+        <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
         <p>Chargement du chantier...</p>
-            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+      </div>
     );
   }
 
   if (!chantier) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
         <h2>Chantier introuvable</h2>
         <Link href="/dashboard/chantiers" className="btn-primary" style={{ marginTop: '1rem' }}>
           Retour aux chantiers
         </Link>
-            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+      </div>
     );
   }
 
@@ -287,7 +283,6 @@ export default function ChantierDetailPage() {
                     <p style={{ color: '#1e293b', fontWeight: '500', margin: 0 }}>
                       {new Date(chantier.dateDebut).toLocaleDateString('fr-FR')}
                     </p>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
                   <div>
                     <label style={{ color: '#64748b', fontSize: '0.875rem', display: 'block', marginBottom: '0.25rem' }}>
@@ -296,7 +291,6 @@ export default function ChantierDetailPage() {
                     <p style={{ color: '#1e293b', fontWeight: '500', margin: 0 }}>
                       {new Date(chantier.dateFin).toLocaleDateString('fr-FR')}
                     </p>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
                   <div>
                     <label style={{ color: '#64748b', fontSize: '0.875rem', display: 'block', marginBottom: '0.25rem' }}>
@@ -305,7 +299,6 @@ export default function ChantierDetailPage() {
                     <p style={{ color: '#059669', fontWeight: '600', fontSize: '1.125rem', margin: 0 }}>
                       {chantier.budget.toLocaleString('fr-FR')} €
                     </p>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
                   <div>
                     <label style={{ color: '#64748b', fontSize: '0.875rem', display: 'block', marginBottom: '0.25rem' }}>
@@ -314,11 +307,8 @@ export default function ChantierDetailPage() {
                     <p style={{ color: '#1e293b', fontWeight: '500', margin: 0 }}>
                       {chantier.superficie}
                     </p>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
-                      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
+  </div>
 </div>
 
               {chantier.lat && chantier.lng && (
@@ -339,12 +329,9 @@ export default function ChantierDetailPage() {
                     color: '#64748b'
                   }}>
                     🗺️ Carte interactive (Lat: {chantier.lat}, Lng: {chantier.lng})
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
-                      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+  </div>
               )}
-                  <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
 
             <div>
@@ -366,7 +353,6 @@ export default function ChantierDetailPage() {
                     fontWeight: 'bold'
                   }}>
                     {chantier.client.name.charAt(0)}
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
                   <div>
                     <p style={{ margin: 0, fontWeight: '600', color: '#1e293b' }}>
@@ -377,10 +363,8 @@ export default function ChantierDetailPage() {
                         {chantier.client.company}
                       </p>
                     )}
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
-                      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+  </div>
 
                 <div style={{ gap: '1rem' }}>
                   <div style={{ marginBottom: '0.75rem' }}>
@@ -390,7 +374,6 @@ export default function ChantierDetailPage() {
                     <a href={`mailto:${chantier.client.email}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
                       {chantier.client.email}
                     </a>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
 
                   {chantier.client.phone && (
@@ -401,8 +384,7 @@ export default function ChantierDetailPage() {
                       <a href={`tel:${chantier.client.phone}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>
                         {chantier.client.phone}
                       </a>
-                          <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+  </div>
                   )}
 
                   {chantier.client.address && (
@@ -413,16 +395,11 @@ export default function ChantierDetailPage() {
                       <p style={{ color: '#1e293b', margin: 0, fontSize: '0.875rem' }}>
                         {chantier.client.address}
                       </p>
-                          <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+  </div>
                   )}
-                      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
+  </div>
 </div>
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
-                  <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
         );
 
@@ -431,10 +408,8 @@ export default function ChantierDetailPage() {
           <div style={{ maxWidth: '800px' }}>
             {chantier.timeline.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '3rem' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
                 <p style={{ color: '#64748b' }}>Aucun événement dans la timeline</p>
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
             ) : (
               <div style={{ position: 'relative' }}>
@@ -471,8 +446,7 @@ export default function ChantierDetailPage() {
                         <span style={{ color: '#64748b', fontSize: '0.875rem' }}>
                           {formatDate(event.date)}
                         </span>
-                            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+    </div>
                       <p style={{ color: '#64748b', marginBottom: '1rem', lineHeight: 1.5 }}>
                         {event.description}
                       </p>
@@ -490,22 +464,16 @@ export default function ChantierDetailPage() {
                           fontWeight: 'bold'
                         }}>
                           {event.createdBy.name.charAt(0)}
-                              <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+      </div>
                         <span style={{ color: '#64748b', fontSize: '0.875rem' }}>
                           {event.createdBy.name} • {event.createdBy.role}
                         </span>
-                            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                          <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
+    </div>
+  </div>
 </div>
                 ))}
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
             )}
-                <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
         );
 
@@ -514,10 +482,8 @@ export default function ChantierDetailPage() {
           <div>
             {chantier.photos.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '3rem' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📸      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📸</div>
                 <p style={{ color: '#64748b' }}>Aucune photo disponible</p>
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
@@ -559,15 +525,11 @@ export default function ChantierDetailPage() {
                       fontSize: '0.75rem'
                     }}>
                       {index + 1}/{chantier.photos.length}
-                          <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
+  </div>
 </div>
                 ))}
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
             )}
-                <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
         );
 
@@ -592,8 +554,7 @@ export default function ChantierDetailPage() {
                       flexShrink: 0
                     }}>
                       {message.expediteur.name.charAt(0)}
-                          <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+  </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.25rem' }}>
                         <span style={{ fontWeight: '600', color: '#1e293b', fontSize: '0.875rem' }}>
@@ -602,8 +563,7 @@ export default function ChantierDetailPage() {
                         <span style={{ color: '#64748b', fontSize: '0.75rem' }}>
                           {formatDate(message.createdAt)}
                         </span>
-                            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+    </div>
                       <div style={{
                         background: 'white',
                         padding: '0.75rem',
@@ -613,16 +573,11 @@ export default function ChantierDetailPage() {
                         <p style={{ margin: 0, color: '#1e293b', lineHeight: 1.5 }}>
                           {message.message}
                         </p>
-                            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
+    </div>
+  </div>
 </div>
-                          <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+  </div>
               ))}
-                  <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
 
             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
@@ -647,7 +602,6 @@ export default function ChantierDetailPage() {
                     }
                   }}
                 />
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
               <button
                 onClick={handleSendMessage}
@@ -660,9 +614,7 @@ export default function ChantierDetailPage() {
               >
                 Envoyer
               </button>
-                  <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
-                <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
         );
 
@@ -671,10 +623,8 @@ export default function ChantierDetailPage() {
           <div style={{ maxWidth: '600px' }}>
             {chantier.assignees.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '3rem' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👥      <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👥</div>
                 <p style={{ color: '#64748b' }}>Aucun membre d'équipe assigné</p>
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -694,8 +644,7 @@ export default function ChantierDetailPage() {
                         fontWeight: 'bold'
                       }}>
                         {member.name.charAt(0)}
-                            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+    </div>
                       <div style={{ flex: 1 }}>
                         <h4 style={{ margin: 0, color: '#1e293b', fontWeight: '600' }}>
                           {member.name}
@@ -705,8 +654,7 @@ export default function ChantierDetailPage() {
                            member.role === 'COMMERCIAL' ? 'Commercial' :
                            member.role === 'ADMIN' ? 'Administrateur' : member.role}
                         </p>
-                            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
+    </div>
                       <div style={{ textAlign: 'right' }}>
                         <a 
                           href={`mailto:${member.email}`} 
@@ -732,17 +680,12 @@ export default function ChantierDetailPage() {
                             📞 {member.phone}
                           </a>
                         )}
-                            <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                          <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-                        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
+    </div>
+  </div>
 </div>
                 ))}
-                    <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
             )}
-                <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
         );
 
@@ -767,7 +710,6 @@ export default function ChantierDetailPage() {
             <span style={{ color: '#1e293b', fontWeight: '500' }}>
               {chantier?.nom}
             </span>
-                <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
 </div>
         </nav>
 
@@ -781,14 +723,13 @@ export default function ChantierDetailPage() {
         <ChantierTabs
           tabs={tabs}
           activeTab={activeTab}
-          onTabChange
-onTabChangeChange={setActiveTab}
-       >
-         {renderTabContent()}
-       </ChantierTabs>
-           <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
-         <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
-</div>
- );
+          onTabChange={setActiveTab}
+        >
+          {renderTabContent()}
+        </ChantierTabs>
+        
+        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
+      </div>
+    </div>
+  );
 }
