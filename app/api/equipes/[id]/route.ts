@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // GET /api/equipes/[id] - Détails d'un membre
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const membre = await db.user.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         assignedChantiers: {
           select: {
@@ -77,11 +78,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // PUT /api/equipes/[id] - Modifier un membre
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
+    const { id } = await params;
     const data = await request.json();
     
     // Vérifier que le membre existe
     const existingMembre = await db.user.findUnique({
-      where: { id: params.id }
+      where: { id }
     });
 
     if (!existingMembre) {
@@ -106,7 +108,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     // Mettre à jour le membre
     const updatedMembre = await db.user.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: data.name?.trim(),
         email: data.email?.trim().toLowerCase(),
@@ -152,9 +154,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 // DELETE /api/equipes/[id] - Supprimer un membre
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const { id } = await params;
     // Vérifier que le membre existe
     const existingMembre = await db.user.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         assignedChantiers: {
           where: {
@@ -182,7 +185,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     // Supprimer le membre (ou le désactiver selon votre logique métier)
     await db.user.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({

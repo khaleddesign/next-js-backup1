@@ -3,11 +3,12 @@ import { db } from '@/lib/db';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const message = await db.message.update({
-      where: { id: params.id },
+      where: { id },
       data: { lu: true },
       include: {
         expediteur: {

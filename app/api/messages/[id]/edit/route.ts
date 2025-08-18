@@ -3,9 +3,10 @@ import { db } from '@/lib/db';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { message: newMessage, userId } = await request.json();
 
     if (!newMessage || !newMessage.trim()) {
@@ -24,7 +25,7 @@ export async function PUT(
 
     try {
       const existingMessage = await db.message.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
           expediteur: {
             select: { id: true, name: true, role: true }
@@ -58,7 +59,7 @@ export async function PUT(
       }
 
       const updatedMessage = await db.message.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           message: newMessage.trim(),
           updatedAt: new Date()
@@ -84,7 +85,7 @@ export async function PUT(
       
       return NextResponse.json({
         message: {
-          id: params.id,
+          id,
           message: newMessage.trim(),
           isEdited: true,
           editedAt: new Date().toISOString(),
@@ -111,9 +112,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { userId } = await request.json();
 
     if (!userId) {
@@ -125,7 +127,7 @@ export async function DELETE(
 
     try {
       const existingMessage = await db.message.findUnique({
-        where: { id: params.id },
+        where: { id },
         select: { expediteurId: true }
       });
 
@@ -144,7 +146,7 @@ export async function DELETE(
       }
 
       await db.message.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           message: '[Message supprimé]',
           deletedAt: new Date(),

@@ -9,6 +9,7 @@ datasource db {
 
 model User {
   id            String    @id @default(cuid())
+  nom           String?
   name          String?
   email         String    @unique
   emailVerified DateTime?
@@ -25,9 +26,11 @@ model User {
   messages      Message[]
   comments      Comment[]
   timelineEvents TimelineEvent[]
-  devis         Devis[] @relation("DevisClient") @relation("DevisClient")
-  plannings     Planning[]
+  devis         Devis[] @relation("DevisClient")
+  planningsOrganisateur Planning[] @relation("PlanningOrganisateur")
+  planningsParticipant Planning[] @relation("PlanningParticipants")
   notifications Notification[]
+  documents     Document[] @relation("DocumentUploader")
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -83,7 +86,8 @@ model Chantier {
   comments    Comment[]
   messages    Message[]
   devis       Devis[]
-  plannings   Planning[]
+  plannings   Planning[] @relation("PlanningChantier")
+  documents   Document[] @relation("DocumentChantier")
   
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -136,39 +140,76 @@ model Message {
 }
 
 model Devis {
-  id            String      @id @default(cuid())
-  numero        String      @unique
-  chantier      Chantier    @relation(fields: [chantierId], references: [id])
-  chantierId    String
-  client        User        @relation(fields: [clientId], references: [id])
-  clientId      String
-  type          DevisType
-  montant       Float
-  tva           Float       @default(20.0)
-  statut        DevisStatus @default(BROUILLON)
-  dateCreation  DateTime    @default(now())
-  dateEcheance  DateTime
-  lignes        Json        @default("[]")
+  id              String      @id @default(cuid())
+  numero          String      @unique
+  chantier        Chantier?   @relation(fields: [chantierId], references: [id])
+  chantierId      String?
+  client          User        @relation("DevisClient", fields: [clientId], references: [id])
+  clientId        String
+  type            DevisType
+  objet           String?
+  montant         Float
+  totalHT         Float?
+  totalTVA        Float?
+  totalTTC        Float?
+  tva             Float       @default(20.0)
+  statut          DevisStatus @default(BROUILLON)
+  dateCreation    DateTime    @default(now())
+  dateEcheance    DateTime
+  lignes          Json        @default("[]")
+  notes           String?     @db.Text
+  conditionsVente String?     @db.Text
+  factureId       String?
   
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
 model Planning {
-  id          String         @id @default(cuid())
-  titre       String
-  description String?        @db.Text
-  dateDebut   DateTime
-  dateFin     DateTime
-  chantier    Chantier?      @relation(fields: [chantierId], references: [id])
-  chantierId  String?
-  assignees   User[]
-  type        PlanningType
-  statut      PlanningStatus @default(PLANIFIE)
-  lieu        String?
+  id            String         @id @default(cuid())
+  titre         String
+  description   String?        @db.Text
+  type          PlanningType   @default(REUNION)
+  dateDebut     DateTime
+  dateFin       DateTime
+  recurrence    String?
   
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  chantier      Chantier?      @relation("PlanningChantier", fields: [chantierId], references: [id])
+  chantierId    String?
+  organisateur  User           @relation("PlanningOrganisateur", fields: [organisateurId], references: [id])
+  organisateurId String
+  participants  User[]         @relation("PlanningParticipants")
+  
+  statut        PlanningStatus @default(PLANIFIE)
+  notes         String?        @db.Text
+  lieu          String?
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Document {
+  id            String       @id @default(cuid())
+  nom           String
+  nomOriginal   String
+  type          TypeDocument
+  taille        Int
+  url           String
+  urlThumbnail  String?
+  
+  chantier      Chantier?    @relation("DocumentChantier", fields: [chantierId], references: [id])
+  chantierId    String?
+  uploader      User         @relation("DocumentUploader", fields: [uploaderId], references: [id])
+  uploaderId    String
+  
+  metadonnees   Json?
+  tags          String[]
+  dossier       String?
+  public        Boolean      @default(false)
+  lienPartage   String?      @unique
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 model Notification {
@@ -240,272 +281,18 @@ enum PlanningStatus {
   ANNULE
 }
 
+enum TypeDocument {
+  PHOTO
+  PDF
+  PLAN
+  FACTURE
+  CONTRAT
+  AUTRE
+}
+
 enum NotificationType {
   INFO
   SUCCESS
   WARNING
   ERROR
-}
-// ==========================================
-// MODULE DEVIS/FACTURATION
-// ==========================================
-
-model Devis {
-  id                String      @id @default(cuid())
-  numero            String      @unique
-  type              TypeDevis   @default(DEVIS)
-  statut            StatutDevis @default(BROUILLON)
-  
-  // Relations
-  client            User        @relation("DevisClient", fields: [clientId], references: [id])
-  clientId          String
-  chantier          Chantier?   @relation(fields: [chantierId], references: [id])
-  chantierId        String?
-  
-  // Contenu
-  objet             String
-  dateCreation      DateTime    @default(now())
-  dateValidite      DateTime?
-  dateEnvoi         DateTime?
-  dateAcceptation   DateTime?
-  datePaiement      DateTime?
-  
-  // Montants
-  totalHT           Decimal     @default(0)
-  totalTVA          Decimal     @default(0)
-  totalTTC          Decimal     @default(0)
-  
-  // Métadonnées
-  notes             String?     @db.Text
-  conditionsVente   String?     @db.Text
-  
-  // Relations
-  lignes            LigneDevis[]
-  facture           Devis?      @relation("DevisToFacture", fields: [factureId], references: [id])
-  factureId         String?
-  devisOrigine      Devis?      @relation("DevisToFacture")
-  
-  paiements       Paiement[] @relation("FacturePaiements")
-  relances        Relance[]  @relation("FactureRelances")
-  
-  createdAt       DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-}
-
-model LigneDevis {
-  id          String  @id @default(cuid())
-  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
-  devisId     String
-  
-  designation String
-  quantite    Decimal @default(1)
-  prixUnitaire Decimal
-  tva         Decimal @default(20)
-  total       Decimal
-  
-  ordre       Int
-  createdAt   DateTime @default(now())
-}
-
-enum TypeDevis {
-  DEVIS
-  FACTURE
-}
-
-enum StatutDevis {
-  BROUILLON
-  ENVOYE
-  ACCEPTE
-  REFUSE
-  PAYE
-  ANNULE
-}
-
-model Devis {
-  id                String      @id @default(cuid())
-  numero            String      @unique
-  type              TypeDevis   @default(DEVIS)
-  statut            StatutDevis @default(BROUILLON)
-  
-  client            User        @relation("DevisClient", fields: [clientId], references: [id])
-  clientId          String
-  chantier          Chantier?   @relation(fields: [chantierId], references: [id])
-  chantierId        String?
-  
-  objet             String
-  dateCreation      DateTime    @default(now())
-  dateValidite      DateTime?
-  dateEnvoi         DateTime?
-  dateAcceptation   DateTime?
-  datePaiement      DateTime?
-  
-  totalHT           Decimal     @default(0)
-  totalTVA          Decimal     @default(0)
-  totalTTC          Decimal     @default(0)
-  
-  notes             String?     @db.Text
-  conditionsVente   String?     @db.Text
-  
-  lignes            LigneDevis[]
-  facture           Devis?      @relation("DevisToFacture", fields: [factureId], references: [id])
-  factureId         String?
-  devisOrigine      Devis?      @relation("DevisToFacture")
-  
-  paiements       Paiement[] @relation("FacturePaiements")
-  relances        Relance[]  @relation("FactureRelances")
-  
-  createdAt       DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-}
-
-model LigneDevis {
-  id          String  @id @default(cuid())
-  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
-  devisId     String
-  
-  designation String
-  quantite    Decimal @default(1)
-  prixUnitaire Decimal
-  tva         Decimal @default(20)
-  total       Decimal
-  
-  ordre       Int
-  createdAt   DateTime @default(now())
-}
-
-enum TypeDevis {
-  DEVIS
-  FACTURE
-}
-
-enum StatutDevis {
-  BROUILLON
-  ENVOYE
-  ACCEPTE
-  REFUSE
-  PAYE
-  ANNULE
-}
-
-model Devis {
-  id                String      @id @default(cuid())
-  numero            String      @unique
-  type              TypeDevis   @default(DEVIS)
-  statut            StatutDevis @default(BROUILLON)
-  
-  client            User        @relation("DevisClient", fields: [clientId], references: [id])
-  clientId          String
-  chantier          Chantier?   @relation(fields: [chantierId], references: [id])
-  chantierId        String?
-  
-  objet             String
-  dateCreation      DateTime    @default(now())
-  dateValidite      DateTime?
-  dateEnvoi         DateTime?
-  dateAcceptation   DateTime?
-  datePaiement      DateTime?
-  
-  totalHT           Decimal     @default(0)
-  totalTVA          Decimal     @default(0)
-  totalTTC          Decimal     @default(0)
-  
-  notes             String?     @db.Text
-  conditionsVente   String?     @db.Text
-  
-  lignes            LigneDevis[]
-  facture           Devis?      @relation("DevisToFacture", fields: [factureId], references: [id])
-  factureId         String?
-  devisOrigine      Devis?      @relation("DevisToFacture")
-  
-  paiements       Paiement[] @relation("FacturePaiements")
-  relances        Relance[]  @relation("FactureRelances")
-  
-  createdAt       DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-}
-
-model LigneDevis {
-  id          String  @id @default(cuid())
-  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
-  devisId     String
-  
-  designation String
-  quantite    Decimal @default(1)
-  prixUnitaire Decimal
-  tva         Decimal @default(20)
-  total       Decimal
-  
-  ordre       Int
-  createdAt   DateTime @default(now())
-}
-
-enum TypeDevis {
-  DEVIS
-  FACTURE
-}
-
-enum StatutDevis {
-  BROUILLON
-  ENVOYE
-  ACCEPTE
-  REFUSE
-  PAYE
-  ANNULE
-}
-
-model Paiement {
-  id              String          @id @default(cuid())
-  facture         Devis           @relation("FacturePaiements", fields: [factureId], references: [id])
-  factureId       String
-  
-  montant         Decimal
-  datePaiement    DateTime        @default(now())
-  methodePaiement MethodePaiement @default(VIREMENT)
-  reference       String?
-  status          StatusPaiement  @default(CONFIRME)
-  notes           String?
-  
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-}
-
-model Relance {
-  id            String      @id @default(cuid())
-  facture       Devis       @relation("FactureRelances", fields: [factureId], references: [id])
-  factureId     String
-  
-  type          TypeRelance
-  message       String      @db.Text
-  dateEnvoi     DateTime    @default(now())
-  dateEcheance  DateTime?
-  montantDu     Decimal
-  status        StatusRelance @default(ENVOYE)
-  
-  createdAt     DateTime    @default(now())
-}
-
-enum MethodePaiement {
-  VIREMENT
-  CHEQUE
-  CARTE
-  ESPECES
-  PRELEVEMENT
-}
-
-enum StatusPaiement {
-  ATTENTE
-  CONFIRME
-  REJETE
-}
-
-enum TypeRelance {
-  PREMIERE
-  DEUXIEME
-  FINALE
-}
-
-enum StatusRelance {
-  ENVOYE
-  ACCUSE
-  IGNORE
 }

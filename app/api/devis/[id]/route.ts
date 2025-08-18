@@ -3,11 +3,12 @@ import { db } from '@/lib/db';
 
 export async function GET(
  request: NextRequest,
- { params }: { params: { id: string } }
+ { params }: { params: Promise<{ id: string }> }
 ) {
  try {
+   const { id } = await params;
    const devis = await db.devis.findUnique({
-     where: { id: params.id },
+     where: { id },
      include: {
        client: {
          select: { 
@@ -44,13 +45,14 @@ export async function GET(
 
 export async function PUT(
  request: NextRequest,
- { params }: { params: { id: string } }
+ { params }: { params: Promise<{ id: string }> }
 ) {
  try {
+   const { id } = await params;
    const data = await request.json();
    
    const existingDevis = await db.devis.findUnique({
-     where: { id: params.id },
+     where: { id },
      include: { lignes: true }
    });
 
@@ -68,11 +70,11 @@ export async function PUT(
    const totalTTC = totalHT + totalTVA;
 
    await db.ligneDevis.deleteMany({
-     where: { devisId: params.id }
+     where: { devisId: id }
    });
 
    const updatedDevis = await db.devis.update({
-     where: { id: params.id },
+     where: { id },
      data: {
        objet: data.objet,
        chantierId: data.chantierId || null,
@@ -110,11 +112,12 @@ export async function PUT(
 
 export async function DELETE(
  request: NextRequest,
- { params }: { params: { id: string } }
+ { params }: { params: Promise<{ id: string }> }
 ) {
  try {
+   const { id } = await params;
    const devis = await db.devis.findUnique({
-     where: { id: params.id }
+     where: { id }
    });
 
    if (!devis) {
@@ -126,7 +129,7 @@ export async function DELETE(
    }
 
    await db.devis.delete({
-     where: { id: params.id }
+     where: { id }
    });
 
    return NextResponse.json({ message: 'Devis supprimé avec succès' });

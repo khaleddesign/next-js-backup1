@@ -279,3 +279,6 @@ export default function DashboardLayout({ children }: LayoutProps) {
     </div>
   );
 }
+// Ajouter ces liens dans la navigation :
+// 📅 Planning     → /dashboard/planning  
+// 📸 Documents    → /dashboard/documents

@@ -3,9 +3,10 @@ import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50');
     const page = parseInt(searchParams.get('page') || '1');
@@ -13,7 +14,7 @@ export async function GET(
 
     const [messages, total] = await Promise.all([
       db.message.findMany({
-        where: { chantierId: params.id },
+        where: { chantierId: id },
         include: {
           expediteur: {
             select: { id: true, name: true, role: true }
@@ -24,7 +25,7 @@ export async function GET(
         skip: offset
       }),
       db.message.count({
-        where: { chantierId: params.id }
+        where: { chantierId: id }
       })
     ]);
 
