@@ -626,7 +626,7 @@ export default function NouveauMessagePage() {
                 Étape {['recipients', 'compose', 'preview'].indexOf(step) + 1} sur 3
               </span>
               
-              {step !== 'preview' && (
+              {step === 'recipients' && (
                 <button
                   onClick={handleNext}
                   disabled={!canProceed()}

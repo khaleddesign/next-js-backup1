@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma, ChantierStatus } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '12');
     const offset = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.ChantierWhereInput = {};
     
     if (search) {
       where.OR = [
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (statut && statut !== 'TOUS') {
-      where.statut = statut;
+      where.statut = statut as ChantierStatus;
     }
 
     const [chantiers, total] = await Promise.all([
@@ -73,6 +74,38 @@ export async function POST(request: NextRequest) {
       if (!data[field]) {
         return NextResponse.json({ error: `Le champ ${field} est requis` }, { status: 400 });
       }
+    }
+
+    // Validation des dates
+    const dateDebut = new Date(data.dateDebut);
+    const dateFin = new Date(data.dateFin);
+    
+    if (isNaN(dateDebut.getTime()) || isNaN(dateFin.getTime())) {
+      return NextResponse.json({ error: 'Dates invalides' }, { status: 400 });
+    }
+
+    if (dateFin <= dateDebut) {
+      return NextResponse.json({ error: 'La date de fin doit être après la date de début' }, { status: 400 });
+    }
+
+    // Validation du budget
+    const budget = parseFloat(data.budget);
+    if (isNaN(budget) || budget <= 0) {
+      return NextResponse.json({ error: 'Le budget doit être un nombre positif' }, { status: 400 });
+    }
+
+    // Vérifier que le client existe
+    const client = await db.user.findUnique({
+      where: { id: data.clientId },
+      select: { id: true, role: true }
+    });
+
+    if (!client) {
+      return NextResponse.json({ error: 'Client introuvable' }, { status: 404 });
+    }
+
+    if (client.role !== 'CLIENT') {
+      return NextResponse.json({ error: 'L\'utilisateur sélectionné n\'est pas un client' }, { status: 400 });
     }
 
     const chantier = await db.chantier.create({

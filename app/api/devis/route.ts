@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma, DevisStatus, DevisType } from '@prisma/client';
+
+interface LigneDevisInput {
+  designation: string;
+  quantite: string | number;
+  prixUnitaire: string | number;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +18,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '12');
     const offset = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.DevisWhereInput = {};
     
     if (search) {
       where.OR = [
@@ -22,11 +29,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (statut && statut !== 'TOUS') {
-      where.statut = statut;
+      where.statut = statut as DevisStatus;
     }
 
     if (type && type !== 'TOUS') {
-      where.type = type;
+      where.type = type as DevisType;
     }
 
     try {
@@ -40,10 +47,10 @@ export async function GET(request: NextRequest) {
             chantier: {
               select: { id: true, nom: true }
             },
-            lignes: true,
+            ligneDevis: true,
             _count: {
               select: {
-                lignes: true
+                ligneDevis: true
               }
             }
           },
@@ -87,7 +94,7 @@ export async function GET(request: NextRequest) {
           totalTTC: 5400,
           dateCreation: new Date().toISOString(),
           dateValidite: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          _count: { lignes: 7 }
+          _count: { ligneDevis: 7 }
         },
         {
           id: 'dev-2',
@@ -104,7 +111,7 @@ export async function GET(request: NextRequest) {
           totalTTC: 10500,
           dateCreation: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
           dateValidite: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-          _count: { lignes: 10 }
+          _count: { ligneDevis: 10 }
         },
         {
           id: 'fac-1',
@@ -120,7 +127,7 @@ export async function GET(request: NextRequest) {
           },
           totalTTC: 10500,
           dateCreation: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-          _count: { lignes: 10 }
+          _count: { ligneDevis: 10 }
         },
         {
           id: 'fac-2',
@@ -136,7 +143,7 @@ export async function GET(request: NextRequest) {
           },
           totalTTC: 3840,
           dateCreation: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          _count: { lignes: 6 }
+          _count: { ligneDevis: 6 }
         }
       ];
 
@@ -184,10 +191,31 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
     
+    // Validation plus robuste
     const required = ['clientId', 'objet', 'type'];
     for (const field of required) {
       if (!data[field]) {
         return NextResponse.json({ error: `Le champ ${field} est requis` }, { status: 400 });
+      }
+    }
+
+    // Validation du type
+    if (!['DEVIS', 'FACTURE'].includes(data.type)) {
+      return NextResponse.json({ error: 'Type invalide. Doit être DEVIS ou FACTURE' }, { status: 400 });
+    }
+
+    // Validation des lignes
+    if (!data.lignes || !Array.isArray(data.lignes) || data.lignes.length === 0) {
+      return NextResponse.json({ error: 'Au moins une ligne est requise' }, { status: 400 });
+    }
+
+    // Validation de chaque ligne
+    for (const ligne of data.lignes) {
+      if (!ligne.designation || !ligne.quantite || !ligne.prixUnitaire) {
+        return NextResponse.json({ error: 'Chaque ligne doit avoir une designation, une quantité et un prix unitaire' }, { status: 400 });
+      }
+      if (isNaN(parseFloat(ligne.quantite)) || isNaN(parseFloat(ligne.prixUnitaire))) {
+        return NextResponse.json({ error: 'La quantité et le prix unitaire doivent être des nombres valides' }, { status: 400 });
       }
     }
 
@@ -198,8 +226,8 @@ export async function POST(request: NextRequest) {
       });
       const numero = `${numeroPrefix}${String(count + 1).padStart(4, '0')}`;
 
-      const totalHT = data.lignes?.reduce((sum: number, ligne: any) => 
-        sum + (parseFloat(ligne.quantite) * parseFloat(ligne.prixUnitaire)), 0) || 0;
+      const totalHT = data.lignes?.reduce((sum: number, ligne: LigneDevisInput) => 
+        sum + (parseFloat(ligne.quantite.toString()) * parseFloat(ligne.prixUnitaire.toString())), 0) || 0;
       const totalTVA = totalHT * 0.20;
       const totalTTC = totalHT + totalTVA;
 
@@ -210,20 +238,20 @@ export async function POST(request: NextRequest) {
           clientId: data.clientId,
           chantierId: data.chantierId || null,
           objet: data.objet,
-          dateValidite: data.dateValidite ? new Date(data.dateValidite) : null,
+          montant: totalTTC,
+          dateEcheance: data.dateValidite ? new Date(data.dateValidite) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           totalHT: totalHT,
           totalTVA: totalTVA,
           totalTTC: totalTTC,
           notes: data.notes || null,
           conditionsVente: data.conditionsVente || null,
           statut: 'BROUILLON',
-          lignes: {
-            create: data.lignes?.map((ligne: any, index: number) => ({
-              designation: ligne.designation,
-              quantite: parseFloat(ligne.quantite),
-              prixUnitaire: parseFloat(ligne.prixUnitaire),
-              tva: parseFloat(ligne.tva || '20'),
-              total: parseFloat(ligne.quantite) * parseFloat(ligne.prixUnitaire),
+          ligneDevis: {
+            create: data.lignes?.map((ligne: LigneDevisInput, index: number) => ({
+              description: ligne.designation,
+              quantite: parseFloat(ligne.quantite.toString()),
+              prixUnit: parseFloat(ligne.prixUnitaire.toString()),
+              total: parseFloat(ligne.quantite.toString()) * parseFloat(ligne.prixUnitaire.toString()),
               ordre: index + 1
             })) || []
           }
@@ -235,7 +263,7 @@ export async function POST(request: NextRequest) {
           chantier: {
             select: { id: true, nom: true }
           },
-          lignes: true
+          ligneDevis: true
         }
       });
 

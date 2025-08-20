@@ -235,7 +235,7 @@ export default function NewMessageModal({ isOpen, onClose, onSelectRecipients }:
           ].map((tab) => (
             <button
               key={tab.key}
-              onClick={() => !tab.disabled && setActiveTab(tab.key as any)}
+              onClick={() => !tab.disabled && setActiveTab(tab.key as 'users' | 'chantiers' | 'groupes')}
               disabled={tab.disabled}
               style={{
                 flex: 1,
@@ -316,8 +316,6 @@ export default function NewMessageModal({ isOpen, onClose, onSelectRecipients }:
                             <UserAvatar 
                               user={user} 
                               size="md" 
-                              showStatus={true}
-                              status={user.isOnline ? 'online' : 'offline'}
                             />
                             <div style={{ flex: 1 }}>
                               <p style={{ margin: 0, fontWeight: '500', color: '#1e293b' }}>

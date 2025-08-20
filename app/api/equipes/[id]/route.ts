@@ -136,7 +136,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         ...updatedMembre,
         createdAt: updatedMembre.createdAt.toISOString(),
         updatedAt: updatedMembre.updatedAt.toISOString(),
-        avatar: updatedMembre.name.split(' ').map(n => n[0]).join('').toUpperCase()
+        avatar: updatedMembre.name?.split(' ').map(n => n[0]).join('').toUpperCase() || ''
       },
       success: true,
       message: 'Membre mis à jour avec succès'

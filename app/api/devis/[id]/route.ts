@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+interface LigneDevisInput {
+  designation: string;
+  quantite: string | number;
+  prixUnitaire: string | number;
+}
+
 export async function GET(
  request: NextRequest,
  { params }: { params: Promise<{ id: string }> }
@@ -19,14 +25,8 @@ export async function GET(
        chantier: {
          select: { id: true, nom: true, adresse: true }
        },
-       lignes: {
+       ligneDevis: {
          orderBy: { ordre: 'asc' }
-       },
-       facture: {
-         select: { id: true, numero: true, statut: true }
-       },
-       devisOrigine: {
-         select: { id: true, numero: true }
        }
      }
    });
@@ -53,7 +53,7 @@ export async function PUT(
    
    const existingDevis = await db.devis.findUnique({
      where: { id },
-     include: { lignes: true }
+     include: { ligneDevis: true }
    });
 
    if (!existingDevis) {
@@ -64,8 +64,8 @@ export async function PUT(
      return NextResponse.json({ error: 'Seuls les devis brouillon peuvent être modifiés' }, { status: 400 });
    }
 
-   const totalHT = data.lignes?.reduce((sum: number, ligne: any) => 
-     sum + (parseFloat(ligne.quantite) * parseFloat(ligne.prixUnitaire)), 0) || 0;
+   const totalHT = data.lignes?.reduce((sum: number, ligne: LigneDevisInput) => 
+     sum + (parseFloat(ligne.quantite.toString()) * parseFloat(ligne.prixUnitaire.toString())), 0) || 0;
    const totalTVA = totalHT * 0.20;
    const totalTTC = totalHT + totalTVA;
 
@@ -78,19 +78,19 @@ export async function PUT(
      data: {
        objet: data.objet,
        chantierId: data.chantierId || null,
-       dateValidite: data.dateValidite ? new Date(data.dateValidite) : null,
+       montant: totalTTC,
+       dateEcheance: data.dateValidite ? new Date(data.dateValidite) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
        totalHT: totalHT,
        totalTVA: totalTVA,
        totalTTC: totalTTC,
        notes: data.notes || null,
        conditionsVente: data.conditionsVente || null,
-       lignes: {
-         create: data.lignes?.map((ligne: any, index: number) => ({
-           designation: ligne.designation,
-           quantite: parseFloat(ligne.quantite),
-           prixUnitaire: parseFloat(ligne.prixUnitaire),
-           tva: parseFloat(ligne.tva || '20'),
-           total: parseFloat(ligne.quantite) * parseFloat(ligne.prixUnitaire),
+       ligneDevis: {
+         create: data.lignes?.map((ligne: LigneDevisInput, index: number) => ({
+           description: ligne.designation,
+           quantite: parseFloat(ligne.quantite.toString()),
+           prixUnit: parseFloat(ligne.prixUnitaire.toString()),
+           total: parseFloat(ligne.quantite.toString()) * parseFloat(ligne.prixUnitaire.toString()),
            ordre: index + 1
          })) || []
        }
@@ -98,7 +98,7 @@ export async function PUT(
      include: {
        client: true,
        chantier: true,
-       lignes: { orderBy: { ordre: 'asc' } }
+       ligneDevis: { orderBy: { ordre: 'asc' } }
      }
    });
 

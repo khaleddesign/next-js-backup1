@@ -13,6 +13,13 @@ interface LigneDevisEdit {
   total: number;
 }
 
+// Interface pour le calculateur de totaux
+interface LigneCalcul {
+  quantite: number;
+  prixUnit: number;
+  tva?: number;
+}
+
 interface DevisEdit {
   id: string;
   numero: string;
@@ -388,7 +395,13 @@ export default function EditDevisPage() {
           ))}
         </div>
 
-        <TotauxCalculator lignes={formData.lignes} />
+        <TotauxCalculator 
+          lignes={formData.lignes.map((ligne): LigneCalcul => ({
+            quantite: parseFloat(ligne.quantite) || 0,
+            prixUnit: parseFloat(ligne.prixUnitaire) || 0,
+            tva: parseFloat(ligne.tva) || 20
+          }))}
+        />
       </div>
 
       <div className="card" style={{ padding: '2rem', marginBottom: '2rem' }}>

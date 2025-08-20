@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useToast, showSuccessToast, showErrorToast } from "@/components/ui/Toast";
 
 interface FormData {
   nom: string;
@@ -53,6 +54,10 @@ const mockClients = [
 
 export default function NouveauChantierPage() {
   const router = useRouter();
+  const { addToast } = useToast();
+  const successToast = showSuccessToast(addToast);
+  const errorToast = showErrorToast(addToast);
+  
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -141,7 +146,30 @@ export default function NouveauChantierPage() {
     setIsSubmitting(true);
 
     try {
-      const submitData = {
+      // Si nouveau client, créer d'abord le client
+      let clientId = formData.clientId;
+      
+      if (formData.clientType === 'new') {
+        const clientResponse = await fetch('/api/equipes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...formData.newClient,
+            role: 'CLIENT'
+          })
+        });
+
+        if (!clientResponse.ok) {
+          const errorData = await clientResponse.json();
+          throw new Error(errorData.error || 'Erreur lors de la création du client');
+        }
+
+        const clientData = await clientResponse.json();
+        clientId = clientData.id;
+      }
+
+      // Créer le chantier
+      const chantierData = {
         nom: formData.nom,
         description: formData.description,
         adresse: formData.adresse,
@@ -150,17 +178,38 @@ export default function NouveauChantierPage() {
         dateFin: formData.dateFin,
         budget: formData.budget,
         photo: formData.photo,
-        clientId: formData.clientType === 'existing' ? formData.clientId : mockClients[0].id,
-        newClient: formData.clientType === 'new' ? formData.newClient : null
+        clientId: clientId
       };
 
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const chantierResponse = await fetch('/api/chantiers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(chantierData)
+      });
+
+      if (!chantierResponse.ok) {
+        const errorData = await chantierResponse.json();
+        throw new Error(errorData.error || 'Erreur lors de la création du chantier');
+      }
+
+      const chantier = await chantierResponse.json();
+      console.log('Chantier créé avec succès:', chantier);
       
-      console.log('Chantier créé:', submitData);
-      router.push('/dashboard/chantiers');
+      successToast(
+        'Chantier créé avec succès !',
+        `Le chantier "${chantier.nom}" a été créé et vous allez être redirigé.`
+      );
+      
+      setTimeout(() => {
+        router.push(`/dashboard/chantiers/${chantier.id}`);
+      }, 1500);
     } catch (error) {
       console.error('Erreur lors de la création:', error);
-      alert('Erreur lors de la création du chantier');
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la création du chantier';
+      errorToast(
+        'Erreur lors de la création',
+        errorMessage
+      );
     } finally {
       setIsSubmitting(false);
     }

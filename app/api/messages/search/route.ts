@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 interface SearchFilters {
   dateRange?: 'today' | 'week' | 'month' | 'all';
@@ -42,11 +43,11 @@ export async function GET(request: NextRequest) {
     
     // Filters
     const filters: SearchFilters = {
-      dateRange: (searchParams.get('dateRange') as any) || 'all',
+      dateRange: (searchParams.get('dateRange') as SearchFilters['dateRange']) || 'all',
       person: searchParams.get('person') || undefined,
       chantier: searchParams.get('chantier') || undefined,
-      fileType: (searchParams.get('fileType') as any) || 'all',
-      messageType: (searchParams.get('messageType') as any) || 'all'
+      fileType: (searchParams.get('fileType') as SearchFilters['fileType']) || 'all',
+      messageType: (searchParams.get('messageType') as SearchFilters['messageType']) || 'all'
     };
 
     if (!query || query.length < 2) {
@@ -127,7 +128,7 @@ async function searchMessages(
   limit: number, 
   offset: number
 ): Promise<SearchResult[]> {
-  const whereClause: any = {
+  const whereClause: Prisma.MessageWhereInput = {
     OR: [
       { message: { contains: query, mode: 'insensitive' } },
       { expediteur: { name: { contains: query, mode: 'insensitive' } } }
@@ -189,12 +190,15 @@ async function searchMessages(
   return messages.map(message => ({
     type: 'message' as const,
     id: message.id,
-    title: `Message de ${message.expediteur.name}`,
+    title: `Message de ${message.expediteur.name || 'Anonyme'}`,
     content: message.message,
     timestamp: message.createdAt.toISOString(),
     relevanceScore: calculateRelevanceScore(message.message, query) + (message.typeMessage === 'CHANTIER' ? 0.1 : 0),
     metadata: {
-      expediteur: message.expediteur,
+      expediteur: {
+        ...message.expediteur,
+        name: message.expediteur.name || 'Anonyme'
+      },
       chantier: message.chantier || undefined
     }
   }));
@@ -206,7 +210,7 @@ async function searchContacts(
   userId: string, 
   limit: number
 ): Promise<SearchResult[]> {
-  const whereClause: any = {
+  const whereClause: Prisma.UserWhereInput = {
     id: { not: userId },
     OR: [
       { name: { contains: query, mode: 'insensitive' } },
@@ -231,14 +235,14 @@ async function searchContacts(
   return users.map(user => ({
     type: 'contact' as const,
     id: user.id,
-    title: user.name,
+    title: user.name || 'Utilisateur sans nom',
     content: `${user.role}${user.company ? ` • ${user.company}` : ''} • ${user.email}`,
     timestamp: user.createdAt.toISOString(),
-    relevanceScore: calculateRelevanceScore(`${user.name} ${user.email} ${user.company || ''}`, query),
+    relevanceScore: calculateRelevanceScore(`${user.name || ''} ${user.email} ${user.company || ''}`, query),
     metadata: {
       expediteur: {
         id: user.id,
-        name: user.name,
+        name: user.name || 'Utilisateur sans nom',
         role: user.role
       }
     }
@@ -252,11 +256,8 @@ async function searchFiles(
   limit: number
 ): Promise<SearchResult[]> {
   // Recherche dans les fichiers attachés aux messages
-  const whereClause: any = {
-    OR: [
-      { photos: { not: { equals: [] } } },
-      { files: { not: { equals: [] } } }
-    ]
+  const whereClause: Prisma.MessageWhereInput = {
+    photos: { isEmpty: false }
   };
 
   if (filters.chantier) {
@@ -292,7 +293,11 @@ async function searchFiles(
             timestamp: message.createdAt.toISOString(),
             relevanceScore: calculateRelevanceScore(fileName, query),
             metadata: {
-              expediteur: message.expediteur,
+              expediteur: {
+                id: message.expediteur.id,
+                name: message.expediteur.name || 'Anonyme',
+                role: message.expediteur.role.toString()
+              },
               chantier: message.chantier || undefined,
               fileUrl: photoUrl,
               fileType: 'image',
@@ -304,7 +309,7 @@ async function searchFiles(
     });
 
     // Traiter les fichiers
-    (message.files || []).forEach((fileUrl, index) => {
+    (message.photos || []).forEach((fileUrl: string, index: number) => {
       if (filters.fileType === 'all' || filters.fileType === 'document') {
         const fileName = extractFileNameFromUrl(fileUrl);
         if (fileName.toLowerCase().includes(query.toLowerCase())) {
@@ -316,7 +321,11 @@ async function searchFiles(
             timestamp: message.createdAt.toISOString(),
             relevanceScore: calculateRelevanceScore(fileName, query),
             metadata: {
-              expediteur: message.expediteur,
+              expediteur: {
+                id: message.expediteur.id,
+                name: message.expediteur.name || 'Anonyme',
+                role: message.expediteur.role.toString()
+              },
               chantier: message.chantier || undefined,
               fileUrl: fileUrl,
               fileType: 'document',
@@ -398,13 +407,13 @@ function generateMockSearchResults(query: string, filters: SearchFilters): Searc
     }
 
     if (filters.fileType && filters.fileType !== 'all') {
-      if (result.type === 'file') {
+      // Le type 'file' n'existe pas dans les types possibles (message, contact)
+      // Cette logique de filtrage des fichiers n'est pas applicable pour nos types
+      if (result.type === 'message' && (result as any).metadata?.fileType) {
         match = match && (
-          (filters.fileType === 'image' && result.metadata.fileType === 'image') ||
-          (filters.fileType === 'document' && result.metadata.fileType === 'document')
+          (filters.fileType === 'image' && (result as any).metadata.fileType === 'image') ||
+          (filters.fileType === 'document' && (result as any).metadata.fileType === 'document')
         );
-      } else {
-        match = result.type !== 'file';
       }
     }
 

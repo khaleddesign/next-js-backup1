@@ -149,7 +149,6 @@ export async function DELETE(
         where: { id },
         data: {
           message: '[Message supprimé]',
-          deletedAt: new Date(),
           photos: []
         }
       });

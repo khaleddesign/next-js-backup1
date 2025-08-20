@@ -22,7 +22,7 @@ interface DevisCardProps {
    dateCreation: string;
    dateValidite?: string;
    _count?: {
-     lignes: number;
+     ligneDevis: number;
    };
  };
 }
@@ -211,7 +211,7 @@ export default function DevisCard({ devis }: DevisCardProps) {
              fontSize: '0.75rem',
              color: '#64748b'
            }}>
-             {devis._count?.lignes || 0} ligne{(devis._count?.lignes || 0) > 1 ? 's' : ''}
+             {devis._count?.ligneDevis || 0} ligne{(devis._count?.ligneDevis || 0) > 1 ? 's' : ''}
            </div>
          </div>
          <div style={{ textAlign: 'right' }}>

@@ -28,13 +28,12 @@ export async function POST(
     const updatedDevis = await db.devis.update({
       where: { id },
       data: {
-        statut: 'ENVOYE',
-        dateEnvoi: new Date()
+        statut: 'ENVOYE'
       },
       include: {
         client: true,
         chantier: true,
-        lignes: true
+        ligneDevis: true
       }
     });
 

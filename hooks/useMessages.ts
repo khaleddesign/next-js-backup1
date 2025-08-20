@@ -59,7 +59,7 @@ export function useMessages({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const pollingRef = useRef<NodeJS.Timeout>();
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
   const lastNotificationRef = useRef<number>(0);
   
   const fetchConversations = useCallback(async () => {
@@ -154,24 +154,24 @@ export function useMessages({
     const targetConversationId = conversationId || activeConversationId;
     if (!targetConversationId) return false;
     
+    const optimisticMessage: Message = {
+      id: `temp-${Date.now()}`,
+      expediteur: {
+        id: userId,
+        name: 'Moi',
+        role: 'CLIENT'
+      },
+      message: text.trim(),
+      photos,
+      createdAt: new Date().toISOString(),
+      lu: true,
+      chantierId: targetConversationId,
+      parentId
+    };
+    
     try {
       setSending(true);
       setError(null);
-      
-      const optimisticMessage: Message = {
-        id: `temp-${Date.now()}`,
-        expediteur: {
-          id: userId,
-          name: 'Moi',
-          role: 'CLIENT'
-        },
-        message: text.trim(),
-        photos,
-        createdAt: new Date().toISOString(),
-        lu: true,
-        chantierId: targetConversationId,
-        parentId
-      };
       
       if (targetConversationId === activeConversationId) {
         if (parentId) {

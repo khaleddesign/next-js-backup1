@@ -118,10 +118,7 @@ export default function ActivityFeed() {
               padding: "0.75rem",
               borderRadius: "0.5rem",
               cursor: activity.href ? "pointer" : "default",
-              transition: "background 0.2s ease",
-              ":hover": {
-                background: activity.href ? "#f8fafc" : "transparent"
-              }
+              transition: "background 0.2s ease"
             }}
             onMouseEnter={(e) => {
               if (activity.href) {

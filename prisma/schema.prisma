@@ -140,11 +140,11 @@ model Message {
 }
 
 model Devis {
-  id              String      @id @default(cuid())
-  numero          String      @unique
-  chantier        Chantier?   @relation(fields: [chantierId], references: [id])
+  id              String        @id @default(cuid())
+  numero          String        @unique
+  chantier        Chantier?     @relation(fields: [chantierId], references: [id])
   chantierId      String?
-  client          User        @relation("DevisClient", fields: [clientId], references: [id])
+  client          User          @relation("DevisClient", fields: [clientId], references: [id])
   clientId        String
   type            DevisType
   objet           String?
@@ -152,17 +152,59 @@ model Devis {
   totalHT         Float?
   totalTVA        Float?
   totalTTC        Float?
-  tva             Float       @default(20.0)
-  statut          DevisStatus @default(BROUILLON)
-  dateCreation    DateTime    @default(now())
+  tva             Float         @default(20.0)
+  statut          DevisStatus   @default(BROUILLON)
+  dateCreation    DateTime      @default(now())
   dateEcheance    DateTime
-  lignes          Json        @default("[]")
-  notes           String?     @db.Text
-  conditionsVente String?     @db.Text
+  lignes          Json          @default("[]")
+  ligneDevis      LigneDevis[]
+  paiements       Paiement[]    @relation("FacturePaiements")
+  relances        Relance[]     @relation("FactureRelances")
+  notes           String?       @db.Text
+  conditionsVente String?       @db.Text
   factureId       String?
   
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model LigneDevis {
+  id          String  @id @default(cuid())
+  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
+  devisId     String
+  description String
+  quantite    Float
+  prixUnit    Float
+  total       Float
+  ordre       Int     @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Paiement {
+  id          String   @id @default(cuid())
+  facture     Devis    @relation("FacturePaiements", fields: [factureId], references: [id], onDelete: Cascade)
+  factureId   String
+  montant     Float
+  datePaiement DateTime
+  methode     String
+  reference   String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Relance {
+  id          String   @id @default(cuid())
+  facture     Devis    @relation("FactureRelances", fields: [factureId], references: [id], onDelete: Cascade)
+  factureId   String
+  dateRelance DateTime
+  type        String   @default("EMAIL")
+  message     String   @db.Text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Planning {

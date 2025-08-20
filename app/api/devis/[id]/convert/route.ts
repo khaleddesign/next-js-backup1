@@ -10,7 +10,7 @@ export async function POST(
     const devis = await db.devis.findUnique({
       where: { id },
       include: {
-        lignes: { orderBy: { ordre: 'asc' } },
+        ligneDevis: { orderBy: { ordre: 'asc' } },
         client: true,
         chantier: true
       }
@@ -40,19 +40,20 @@ export async function POST(
         clientId: devis.clientId,
         chantierId: devis.chantierId,
         objet: devis.objet,
+        montant: devis.totalTTC || 0,
         totalHT: devis.totalHT,
         totalTVA: devis.totalTVA,
         totalTTC: devis.totalTTC,
+        dateEcheance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         notes: devis.notes,
         conditionsVente: devis.conditionsVente,
         statut: 'ENVOYE',
         factureId: devis.id,
-        lignes: {
-          create: devis.lignes.map(ligne => ({
-            designation: ligne.designation,
+        ligneDevis: {
+          create: devis.ligneDevis.map(ligne => ({
+            description: ligne.description,
             quantite: ligne.quantite,
-            prixUnitaire: ligne.prixUnitaire,
-            tva: ligne.tva,
+            prixUnit: ligne.prixUnit,
             total: ligne.total,
             ordre: ligne.ordre
           }))
@@ -61,8 +62,7 @@ export async function POST(
       include: {
         client: true,
         chantier: true,
-        lignes: { orderBy: { ordre: 'asc' } },
-        devisOrigine: true
+        ligneDevis: { orderBy: { ordre: 'asc' } }
       }
     });
 

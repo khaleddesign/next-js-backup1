@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
     let relances = [];
 
     try {
-      const whereClause: any = {};
+      const whereClause: Prisma.RelanceWhereInput = {};
       if (factureId) whereClause.factureId = factureId;
 
       relances = await db.relance.findMany({
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
             select: { numero: true, client: { select: { name: true } } }
           }
         },
-        orderBy: { dateEnvoi: 'desc' }
+        orderBy: { dateRelance: 'desc' }
       });
     } catch (dbError) {
       relances = [
@@ -69,10 +70,7 @@ export async function POST(request: NextRequest) {
           factureId,
           type,
           message: message || getDefaultRelanceMessage(type),
-          dateEnvoi: new Date(),
-          dateEcheance: new Date(Date.now() + getRelanceDelai(type) * 24 * 60 * 60 * 1000),
-          montantDu: facture.totalTTC,
-          status: 'ENVOYE'
+          dateRelance: new Date()
         },
         include: {
           facture: {

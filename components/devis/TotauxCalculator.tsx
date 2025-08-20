@@ -5,7 +5,7 @@ import { useState } from 'react';
 interface TotauxCalculatorProps {
   lignes: Array<{
     quantite: number;
-    prixUnitaire: number;
+    prixUnit: number;
     tva?: number;
   }>;
   showDetails?: boolean;
@@ -22,12 +22,12 @@ export default function TotauxCalculator({ lignes, showDetails = false }: Totaux
   };
 
   const totalHT = lignes.reduce((sum, ligne) => 
-    sum + (ligne.quantite * ligne.prixUnitaire), 0
+    sum + (ligne.quantite * ligne.prixUnit), 0
   );
   
   const totalTVA = lignes.reduce((sum, ligne) => {
     const taux = (ligne.tva || 20) / 100;
-    return sum + (ligne.quantite * ligne.prixUnitaire * taux);
+    return sum + (ligne.quantite * ligne.prixUnit * taux);
   }, 0);
   
   const totalTTC = totalHT + totalTVA;

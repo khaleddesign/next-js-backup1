@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useToast, showSuccessToast, showErrorToast, showWarningToast } from "@/components/ui/Toast";
 
 interface Client {
   id: string;
@@ -36,9 +37,14 @@ interface DevisData {
   lignes: LigneDevis[];
 }
 
-export default function NouveauDevisPage() {
+function NouveauDevisPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { addToast } = useToast();
+  const successToast = showSuccessToast(addToast);
+  const errorToast = showErrorToast(addToast);
+  const warningToast = showWarningToast(addToast);
+  
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
@@ -156,6 +162,17 @@ export default function NouveauDevisPage() {
     try {
       setLoading(true);
       
+      // Validation côté client avant envoi
+      if (!devisData.clientId || !devisData.objet) {
+        warningToast('Champs manquants', 'Veuillez remplir tous les champs obligatoires');
+        return;
+      }
+
+      if (devisData.lignes.some(ligne => !ligne.designation || !ligne.quantite || !ligne.prixUnitaire)) {
+        warningToast('Lignes incomplètes', 'Toutes les lignes doivent être complètement remplies');
+        return;
+      }
+
       const response = await fetch('/api/devis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -165,13 +182,34 @@ export default function NouveauDevisPage() {
       const result = await response.json();
 
       if (response.ok) {
-        router.push(`/dashboard/devis/${result.id}`);
+        console.log('Devis créé avec succès:', result);
+        
+        successToast(
+          `${devisData.type === 'DEVIS' ? 'Devis' : 'Facture'} créé avec succès !`,
+          `Le document "${result.numero || result.objet}" a été créé.`
+        );
+        
+        // Redirection vers la liste des devis ou le détail
+        setTimeout(() => {
+          if (result.id) {
+            router.push(`/dashboard/devis/${result.id}`);
+          } else {
+            router.push('/dashboard/devis');
+          }
+        }, 1500);
       } else {
-        alert(result.error || 'Erreur lors de la création');
+        console.error('Erreur API:', result);
+        errorToast(
+          'Erreur lors de la création',
+          result.error || result.details || 'Une erreur est survenue'
+        );
       }
     } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors de la création');
+      console.error('Erreur réseau ou parsing:', error);
+      errorToast(
+        'Erreur de connexion',
+        'Impossible de contacter le serveur. Veuillez réessayer.'
+      );
     } finally {
       setLoading(false);
     }
@@ -808,4 +846,12 @@ export default function NouveauDevisPage() {
      </div>
    </div>
  );
+}
+
+export default function NouveauDevisPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NouveauDevisPageContent />
+    </Suspense>
+  );
 }

@@ -1,5 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
+
+type DevisWithRelations = Prisma.DevisGetPayload<{
+  include: {
+    client: {
+      select: {
+        name: true;
+        email: true;
+        company: true;
+      };
+    };
+    chantier: {
+      select: {
+        nom: true;
+        adresse: true;
+      };
+    };
+    ligneDevis: {
+      orderBy: {
+        ordre: 'asc';
+      };
+    };
+  };
+}>;
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const whereClause: any = { id: { in: devisIds } };
+      const whereClause: Prisma.DevisWhereInput = { id: { in: devisIds } };
       
       if (dateRange) {
         whereClause.dateCreation = {
@@ -24,7 +48,7 @@ export async function POST(request: NextRequest) {
         include: {
           client: { select: { name: true, email: true, company: true } },
           chantier: { select: { nom: true, adresse: true } },
-          lignes: includeDetails ? { orderBy: { ordre: 'asc' } } : false
+          ligneDevis: includeDetails ? { orderBy: { ordre: 'asc' } } : false
         },
         orderBy: { dateCreation: 'desc' }
       });
@@ -63,7 +87,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function generateCSV(devisList: any[], includeDetails: boolean): string {
+function generateCSV(devisList: DevisWithRelations[], includeDetails: boolean): string {
   const headers = ['Numéro', 'Type', 'Statut', 'Objet', 'Client', 'Total TTC'];
   let csvContent = headers.join(',') + '\n';
 
@@ -72,7 +96,7 @@ function generateCSV(devisList: any[], includeDetails: boolean): string {
       devis.numero,
       devis.type,
       devis.statut,
-      `"${devis.objet.replace(/"/g, '""')}"`,
+      `"${(devis.objet || '').replace(/"/g, '""')}"`,
       `"${devis.client.name}"`,
       devis.totalTTC
     ];

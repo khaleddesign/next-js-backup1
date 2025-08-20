@@ -31,11 +31,11 @@ export default function MessagesPage() {
  });
 
  const handleSendReply = async (text: string, photos: string[], parentId: string) => {
-   return await sendMessage(text, photos, activeConversationId, parentId);
+   return await sendMessage(text, photos, activeConversationId || undefined, parentId);
  };
 
  const handleSendMessage = async (text: string, photos: string[]) => {
-   return await sendMessage(text, photos, activeConversationId);
+   return await sendMessage(text, photos, activeConversationId || undefined);
  };
 
  const filteredConversations = conversations.filter(conv => {

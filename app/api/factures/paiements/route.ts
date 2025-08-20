@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,9 +11,9 @@ export async function GET(request: NextRequest) {
     let paiements = [];
 
     try {
-      const whereClause: any = {};
+      const whereClause: Prisma.PaiementWhereInput = {};
       if (factureId) whereClause.factureId = factureId;
-      if (status !== 'all') whereClause.status = status;
+      // Note: Le modèle Paiement n'a pas de champ status selon le schéma Prisma
 
       paiements = await db.paiement.findMany({
         where: whereClause,
@@ -61,10 +62,9 @@ export async function POST(request: NextRequest) {
         data: {
           factureId,
           montant: parseFloat(montant),
-          methodePaiement: methodePaiement || 'VIREMENT',
+          methode: methodePaiement || 'VIREMENT',
           reference: reference || `PAY${Date.now()}`,
-          datePaiement: datePaiement ? new Date(datePaiement) : new Date(),
-          status: 'CONFIRME'
+          datePaiement: datePaiement ? new Date(datePaiement) : new Date()
         },
         include: {
           facture: true
@@ -74,8 +74,7 @@ export async function POST(request: NextRequest) {
       await db.devis.update({
         where: { id: factureId },
         data: { 
-          statut: 'PAYE',
-          datePaiement: new Date()
+          statut: 'PAYE'
         }
       });
 

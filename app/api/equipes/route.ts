@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma, Role } from '@prisma/client';
 
 // GET /api/equipes - Liste tous les membres
 export async function GET(request: NextRequest) {
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
     
     if (search) {
       where.OR = [
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (role && role !== 'TOUS') {
-      where.role = role;
+      where.role = role as Role;
     }
 
     const [membres, total] = await Promise.all([
@@ -95,13 +96,21 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
     
     // Validation des données
-    const required = ['name', 'email', 'role', 'company'];
+    const required = ['name', 'email', 'role'];
     const missing = required.filter(field => !data[field]);
     
     if (missing.length > 0) {
       return NextResponse.json({
         error: 'Champs manquants',
         details: `Les champs suivants sont requis: ${missing.join(', ')}`
+      }, { status: 400 });
+    }
+
+    // Validation de l'email
+    if (!/\S+@\S+\.\S+/.test(data.email)) {
+      return NextResponse.json({
+        error: 'Email invalide',
+        details: 'Format d\'email incorrect'
       }, { status: 400 });
     }
 
@@ -145,7 +154,7 @@ export async function POST(request: NextRequest) {
         createdAt: nouveauMembre.createdAt.toISOString(),
         chantiersActifs: 0,
         disponible: true,
-        avatar: nouveauMembre.name.split(' ').map(n => n[0]).join('').toUpperCase(),
+        avatar: nouveauMembre.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '',
         specialites: data.specialites || []
       },
       success: true,

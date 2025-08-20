@@ -25,18 +25,17 @@ export interface Devis {
     nom: string;
     adresse: string;
   };
-  lignes: LigneDevis[];
+  ligneDevis: LigneDevis[];
   _count?: {
-    lignes: number;
+    ligneDevis: number;
   };
 }
 
 export interface LigneDevis {
   id?: string;
-  designation: string;
+  description: string;
   quantite: string | number;
-  prixUnitaire: string | number;
-  tva: string | number;
+  prixUnit: string | number;
   total: number;
   ordre?: number;
 }

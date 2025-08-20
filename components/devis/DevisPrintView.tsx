@@ -207,13 +207,13 @@ export default function DevisPrintView({ devis, mode = 'print' }: DevisPrintView
             </tr>
           </thead>
           <tbody>
-            {devis.lignes.map((ligne: any, index: number) => (
+            {devis.ligneDevis.map((ligne: any, index: number) => (
               <tr key={ligne.id} style={{
                 borderBottom: '1px solid #e5e7eb',
                 background: index % 2 === 0 ? 'white' : '#f8fafc'
               }}>
                 <td style={{ padding: '8px', borderRight: '1px solid #e5e7eb' }}>
-                  {ligne.designation}
+                  {ligne.description}
                 </td>
                 <td style={{
                   padding: '8px',
@@ -227,14 +227,14 @@ export default function DevisPrintView({ devis, mode = 'print' }: DevisPrintView
                   textAlign: 'right',
                   borderRight: '1px solid #e5e7eb'
                 }}>
-                  {formatCurrency(Number(ligne.prixUnitaire))}
+                  {formatCurrency(Number(ligne.prixUnit))}
                 </td>
                 <td style={{
                   padding: '8px',
                   textAlign: 'center',
                   borderRight: '1px solid #e5e7eb'
                 }}>
-                  {ligne.tva}%
+                  20%
                 </td>
                 <td style={{ padding: '8px', textAlign: 'right' }}>
                   {formatCurrency(Number(ligne.total))}

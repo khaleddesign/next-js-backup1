@@ -300,7 +300,6 @@ export default function ConversationList({
                 onClick={() => setFilter(filterOption.key as any)}
                 style={{
                   padding: '0.4rem 0.75rem',
-                  border: 'none',
                   borderRadius: '0.5rem',
                   background: filter === filterOption.key 
                     ? 'linear-gradient(135deg, #3b82f6, #f97316)'

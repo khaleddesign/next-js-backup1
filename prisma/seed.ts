@@ -147,7 +147,7 @@ async function main() {
       }
     });
 
-    const chantier3 = await db.user.create({
+    const chantier3 = await db.chantier.create({
       data: {
         id: 'chantier-loft-003',
         nom: 'Loft Industriel',
@@ -250,7 +250,7 @@ async function main() {
           expediteurId: msgData.expediteurId,
           chantierId: chantier1.id,
           message: msgData.message,
-          photos: msgData.photos || [],
+          photos: (msgData as any).photos || [],
           typeMessage: 'CHANTIER',
           lu: msgData.lu !== false,
           createdAt: msgData.createdAt
@@ -284,7 +284,7 @@ async function main() {
           expediteurId: msgData.expediteurId,
           chantierId: chantier2.id,
           message: msgData.message,
-          photos: msgData.photos || [],
+          photos: (msgData as any).photos || [],
           typeMessage: 'CHANTIER',
           lu: msgData.lu !== false,
           createdAt: msgData.createdAt

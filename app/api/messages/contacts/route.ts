@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma, Role } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,12 +16,12 @@ export async function GET(request: NextRequest) {
 
     try {
       // Récupérer tous les utilisateurs (sauf l'utilisateur courant)
-      const whereUsers: any = {
+      const whereUsers: Prisma.UserWhereInput = {
         id: { not: currentUserId }
       };
 
       if (role) {
-        whereUsers.role = role;
+        whereUsers.role = role as Role;
       }
 
       if (search) {
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
       });
 
       // Récupérer les chantiers avec leurs équipes
-      const whereChantiers: any = {};
+      const whereChantiers: Prisma.ChantierWhereInput = {};
 
       if (chantierId) {
         whereChantiers.id = chantierId;
@@ -193,13 +194,13 @@ export async function GET(request: NextRequest) {
           isFavorite: true
         }
       ].filter(user => {
-        let match = true;
-        if (role) match = match && user.role === role;
-        if (status === 'online') match = match && user.isOnline;
-        if (status === 'offline') match = match && !user.isOnline;
+        let match: boolean = true;
+        if (role) match = match && Boolean(user.role === role);
+        if (status === 'online') match = match && Boolean(user.isOnline === true);
+        if (status === 'offline') match = match && Boolean(user.isOnline !== true);
         if (search) {
           const searchLower = search.toLowerCase();
-          match = match && (
+          match = match && Boolean(
             user.name.toLowerCase().includes(searchLower) ||
             user.email.toLowerCase().includes(searchLower) ||
             (user.company && user.company.toLowerCase().includes(searchLower))

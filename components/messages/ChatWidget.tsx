@@ -224,6 +224,7 @@ export default function ChatWidget({
               key={message.id}
               message={message}
               currentUserId={userId}
+              isOwn={message.expediteur.id === userId}
             />
           ))
         )}

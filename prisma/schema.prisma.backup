@@ -1,0 +1,144 @@
+model Planning {
+  id            String      @id @default(cuid())
+  titre         String
+  description   String?     @db.Text
+  type          TypePlanning @default(RDV_CLIENT)
+
+  dateDebut     DateTime
+  dateFin       DateTime
+  recurrence    String?     // JSON pour règles récurrence
+
+  // Relations
+  chantier      Chantier?   @relation("PlanningChantier", fields: [chantierId], references: [id])
+  chantierId    String?
+  organisateur  User        @relation("PlanningOrganisateur", fields: [organisateurId], references: [id])
+  organisateurId String
+  participants  User[]      @relation("PlanningParticipants")
+
+  statut        StatutPlanning @default(PLANIFIE)
+  notes         String?     @db.Text
+  lieu          String?
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Document {
+  id            String      @id @default(cuid())
+  nom           String
+  nomOriginal   String
+  type          TypeDocument
+  taille        Int         // bytes
+  url           String
+  urlThumbnail  String?
+
+  // Relations  
+  chantier      Chantier?   @relation("DocumentChantier", fields: [chantierId], references: [id])
+  chantierId    String?
+  uploader      User        @relation("DocumentUploader", fields: [uploaderId], references: [id])
+  uploaderId    String
+
+  // Métadonnées
+  metadonnees   Json?       // EXIF, géoloc, etc.
+  tags          String[]
+  dossier       String?
+
+  // Partage
+  public        Boolean     @default(false)
+  lienPartage   String?     @unique
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum TypePlanning {
+  RDV_CLIENT
+  PLANNING_CHANTIER
+  LIVRAISON
+  INSPECTION
+  CONGES
+  FORMATION
+}
+
+enum StatutPlanning {
+  PLANIFIE
+  EN_COURS
+  TERMINE
+  ANNULE
+  REPORTE
+}
+
+enum TypeDocument {
+  PHOTO
+  PDF
+  PLAN
+  FACTURE
+  CONTRAT
+  AUTRE
+}
+model Planning {
+  id            String      @id @default(cuid())
+  titre         String
+  description   String?     @db.Text
+  type          TypePlanning @default(RDV_CLIENT)
+  dateDebut     DateTime
+  dateFin       DateTime
+  recurrence    String?
+  chantier      Chantier?   @relation("PlanningChantier", fields: [chantierId], references: [id])
+  chantierId    String?
+  organisateur  User        @relation("PlanningOrganisateur", fields: [organisateurId], references: [id])
+  organisateurId String
+  participants  User[]      @relation("PlanningParticipants")
+  statut        StatutPlanning @default(PLANIFIE)
+  notes         String?     @db.Text
+  lieu          String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Document {
+  id            String      @id @default(cuid())
+  nom           String
+  nomOriginal   String
+  type          TypeDocument
+  taille        Int
+  url           String
+  urlThumbnail  String?
+  chantier      Chantier?   @relation("DocumentChantier", fields: [chantierId], references: [id])
+  chantierId    String?
+  uploader      User        @relation("DocumentUploader", fields: [uploaderId], references: [id])
+  uploaderId    String
+  metadonnees   Json?
+  tags          String[]
+  dossier       String?
+  public        Boolean     @default(false)
+  lienPartage   String?     @unique
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum TypePlanning {
+  RDV_CLIENT
+  PLANNING_CHANTIER
+  LIVRAISON
+  INSPECTION
+  CONGES
+  FORMATION
+}
+
+enum StatutPlanning {
+  PLANIFIE
+  EN_COURS
+  TERMINE
+  ANNULE
+  REPORTE
+}
+
+enum TypeDocument {
+  PHOTO
+  PDF
+  PLAN
+  FACTURE
+  CONTRAT
+  AUTRE
+}

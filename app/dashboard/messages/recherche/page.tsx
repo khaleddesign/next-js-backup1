@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import UserAvatar from '@/components/messages/UserAvatar';
@@ -36,7 +36,7 @@ interface SearchFilters {
   messageType: 'DIRECT' | 'CHANTIER' | 'GROUPE' | 'all';
 }
 
-export default function RecherchePage() {
+function RecherchePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
@@ -843,5 +843,13 @@ export default function RecherchePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecherchePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RecherchePageContent />
+    </Suspense>
   );
 }

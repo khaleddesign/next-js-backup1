@@ -1,35 +1,31 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import "./tailwind.css";
 import "./globals.css";
-import DocumentTitleBadge from "@/components/layout/DocumentTitleBadge";
-import { ToastProvider } from "@/components/ui/Toast";
-import ErrorBoundary from "@/components/ui/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ChantierPro - Gestion de chantiers",
-  description: "Application de gestion de chantiers de construction professionnelle",
-  icons: {
-    icon: "/favicon.ico",
-  },
+ title: "ChantierPro - Gestion de chantiers",
+ description: "Application de gestion de chantiers de construction professionnelle",
+ icons: {
+   icon: "/favicon.ico",
+ },
 };
 
 export default function RootLayout({
-  children,
+ children,
 }: {
-  children: React.ReactNode;
+ children: React.ReactNode;
 }) {
-  return (
-    <html lang="fr">
-      <body className={inter.className}>
-        <ErrorBoundary>
-          <ToastProvider>
-            <DocumentTitleBadge />
-            {children}
-          </ToastProvider>
-        </ErrorBoundary>
-      </body>
-    </html>
-  );
+ return (
+   <html lang="fr">
+     <head>
+       <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+     </head>
+     <body className={inter.className}>
+       {children}
+     </body>
+   </html>
+ );
 }

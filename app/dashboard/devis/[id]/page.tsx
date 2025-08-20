@@ -33,12 +33,11 @@ interface DevisDetail {
     nom: string;
     adresse: string;
   };
-  lignes: Array<{
+  ligneDevis: Array<{
     id: string;
-    designation: string;
+    description: string;
     quantite: number;
-    prixUnitaire: number;
-    tva: number;
+    prixUnit: number;
     total: number;
     ordre: number;
   }>;
@@ -540,14 +539,14 @@ export default function DevisDetailPage() {
        </div>
 
        <div style={{ marginBottom: '1.5rem' }}>
-         {devis.lignes.map((ligne, index) => (
+         {devis.ligneDevis.map((ligne, index) => (
            <div key={ligne.id} style={{
              display: 'grid',
              gridTemplateColumns: 'auto 2fr 80px 100px 80px 100px',
              gap: '1rem',
              alignItems: 'center',
              padding: '1rem 0',
-             borderBottom: index < devis.lignes.length - 1 ? '1px solid #e5e7eb' : 'none'
+             borderBottom: index < devis.ligneDevis.length - 1 ? '1px solid #e5e7eb' : 'none'
            }}>
              <div style={{ 
                fontWeight: '500',
@@ -557,7 +556,7 @@ export default function DevisDetailPage() {
                {ligne.ordre}
              </div>
              <div style={{ fontSize: '0.875rem' }}>
-               {ligne.designation}
+               {ligne.description}
              </div>
              <div style={{ 
                textAlign: 'center',
@@ -571,14 +570,14 @@ export default function DevisDetailPage() {
                fontSize: '0.875rem',
                color: '#64748b'
              }}>
-               {formatCurrency(Number(ligne.prixUnitaire))}
+               {formatCurrency(Number(ligne.prixUnit))}
              </div>
              <div style={{ 
                textAlign: 'center',
                fontSize: '0.875rem',
                color: '#64748b'
              }}>
-               {ligne.tva}%
+               20%
              </div>
              <div style={{ 
                textAlign: 'right',
@@ -608,7 +607,7 @@ export default function DevisDetailPage() {
                Récapitulatif
              </h4>
              <p style={{ margin: 0, fontSize: '0.875rem', color: '#0369a1' }}>
-               {devis.lignes.length} ligne{devis.lignes.length > 1 ? 's' : ''}
+               {devis.ligneDevis.length} ligne{devis.ligneDevis.length > 1 ? 's' : ''}
              </p>
            </div>
            <div style={{ textAlign: 'right' }}>

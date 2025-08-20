@@ -2,94 +2,162 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/dashboard");
+    setIsLoading(true);
+    
+    // Simulation de l'authentification
+    setTimeout(() => {
+      setIsLoading(false);
+      router.push("/dashboard");
+    }, 1000);
+  };
+
+  const handleRoleLogin = (role: string) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      router.push("/dashboard");
+    }, 500);
   };
 
   return (
-    <div className="gradient-bg flex items-center justify-center" style={{ padding: '2rem' }}>
-      <div style={{ width: '100%', maxWidth: '400px'}}>
-        {/* Logo */}
-        <div className="text-center" style={{ marginBottom: '2rem' }}>
-          <div style={{
-            display: 'inline-flex',
-            width: '4rem',
-            height: '4rem',
-            background: 'linear-gradient(135deg, #3b82f6, #f97316)',
-            borderRadius: '1rem',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: '1rem'
-          }}>
-            <span style={{ fontSize: '2rem' }}>🏗️</span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Logo et titre */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-orange-500 rounded-2xl mb-4 shadow-lg">
+            <span className="text-2xl">🏗️</span>
           </div>
-          <h1 style={{ color: 'white', fontSize: '2rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             ChantierPro
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)' }}>
+          <p className="text-gray-600">
             Gestion de chantier ultra-moderne
           </p>
         </div>
 
-        {/* Login Card */}
-        <div className="glass" style={{ padding: '2rem' }}>
-          <div className="text-center" style={{ marginBottom: '2rem' }}>
-            <h2 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+        {/* Carte de connexion */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Connexion
             </h2>
-            <p style={{ color: 'rgba(255,255,255,0.7)' }}>
+            <p className="text-gray-600">
               Accédez à votre espace de gestion
             </p>
           </div>
 
-          <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: '1.5rem' }}>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Adresse email
+              </label>
               <input
+                id="email"
                 type="email"
                 placeholder="votre@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50 focus:bg-white"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                Mot de passe
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50 focus:bg-white"
               />
             </div>
             
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '1.5rem' }}>
-              Se connecter
-            </button>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              size="lg"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Connexion...
+                </>
+              ) : (
+                "Se connecter"
+              )}
+            </Button>
 
-            <div className="grid grid-3">
-              <button
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">ou accès rapide</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <Button
                 type="button"
-                onClick={() => router.push("/dashboard")}
-                className="btn btn-ghost"
-                style={{ fontSize: '0.875rem' }}
+                variant="secondary"
+                size="sm"
+                onClick={() => handleRoleLogin("admin")}
+                disabled={isLoading}
+                className="text-center"
               >
-                Admin
-              </button>
-              <button
+                👑 Admin
+              </Button>
+              <Button
                 type="button"
-                onClick={() => router.push("/dashboard")}
-                className="btn btn-ghost"
-                style={{ fontSize: '0.875rem' }}
+                variant="secondary"
+                size="sm"
+                onClick={() => handleRoleLogin("commercial")}
+                disabled={isLoading}
+                className="text-center"
               >
-                Commercial
-              </button>
-              <button
+                💼 Commercial
+              </Button>
+              <Button
                 type="button"
-                onClick={() => router.push("/dashboard")}
-                className="btn btn-ghost"
-                style={{ fontSize: '0.875rem' }}
+                variant="secondary"
+                size="sm"
+                onClick={() => handleRoleLogin("client")}
+                disabled={isLoading}
+                className="text-center"
               >
-                Client
-              </button>
+                👤 Client
+              </Button>
             </div>
           </form>
+
+          <div className="mt-6 text-center">
+            <a href="#" className="text-sm text-blue-600 hover:text-blue-800 transition-colors">
+              Mot de passe oublié ?
+            </a>
+          </div>
+        </div>
+
+        <div className="text-center mt-6 text-sm text-gray-600">
+          Nouveau sur ChantierPro ?{" "}
+          <a href="#" className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+            Créer un compte
+          </a>
         </div>
       </div>
     </div>

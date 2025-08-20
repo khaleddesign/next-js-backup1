@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
         db.devis.count({ where: { type: 'FACTURE' } }),
         db.devis.findMany({ 
           where: { type: 'DEVIS' },
-          select: { statut: true, totalTTC: true, dateValidite: true }
+          select: { statut: true, totalTTC: true, dateEcheance: true }
         }),
         db.devis.findMany({ 
           where: { type: 'FACTURE' },
@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
 
       const now = new Date();
       const enRetard = devisList.filter(d => 
-        d.dateValidite && 
-        new Date(d.dateValidite) < now && 
+        d.dateEcheance && 
+        new Date(d.dateEcheance) < now && 
         !['ACCEPTE', 'REFUSE', 'ANNULE'].includes(d.statut)
       ).length;
 

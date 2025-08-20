@@ -5,7 +5,7 @@ import Link from 'next/link';
 import StatusBadge from '@/components/devis/StatusBadge';
 
 export default function DevisWidget() {
-  const [recentDevis, setRecentDevis] = useState([]);
+  const [recentDevis, setRecentDevis] = useState<any[]>([]);
   const [stats, setStats] = useState({
     enAttente: 0,
     montantMois: 0,

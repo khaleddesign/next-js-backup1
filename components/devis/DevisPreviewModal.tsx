@@ -152,7 +152,7 @@ L'équipe ChantierPro`
         <div style={{ flex: 1, overflow: 'auto' }}>
           {activeTab === 'preview' ? (
             <div style={{ padding: '2rem' }}>
-              <DevisPrintView devis={devis} mode="preview" />
+              <DevisPrintView devis={devis} mode="print" />
             </div>
           ) : (
             <div style={{ padding: '1.5rem' }}>

@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
+
+type FactureWithRelations = Prisma.DevisGetPayload<{
+  include: {
+    paiements: true;
+    relances: true;
+  };
+}>;
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,7 +42,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function calculateFactureStats(factures: any[]) {
+function calculateFactureStats(factures: FactureWithRelations[]) {
   const now = new Date();
   
   const facturesEnAttente = factures.filter(f => f.statut === 'ENVOYE').length;
@@ -44,16 +52,14 @@ function calculateFactureStats(factures: any[]) {
 
   const facturesEnRetard = factures.filter(f => {
     if (f.statut !== 'ENVOYE') return false;
-    const echeance = new Date(f.dateValidite || f.dateCreation);
-    echeance.setDate(echeance.getDate() + 30);
+    const echeance = new Date(f.dateEcheance);
     return echeance < now;
   }).length;
 
   const montantEnRetard = factures
     .filter(f => {
       if (f.statut !== 'ENVOYE') return false;
-      const echeance = new Date(f.dateValidite || f.dateCreation);
-      echeance.setDate(echeance.getDate() + 30);
+      const echeance = new Date(f.dateEcheance);
       return echeance < now;
     })
     .reduce((sum, f) => sum + Number(f.totalTTC), 0);
@@ -65,8 +71,10 @@ function calculateFactureStats(factures: any[]) {
   const delaiMoyenPaiement = facturesPayees.length > 0 ?
     facturesPayees.reduce((sum, f) => {
       const creation = new Date(f.dateCreation);
-      const paiement = new Date(f.datePaiement || f.updatedAt);
-      const delai = Math.floor((paiement.getTime() - creation.getTime()) / (1000 * 60 * 60 * 24));
+      const dernierPaiement = f.paiements.length > 0 
+        ? new Date(Math.max(...f.paiements.map(p => p.datePaiement.getTime())))
+        : new Date(f.updatedAt);
+      const delai = Math.floor((dernierPaiement.getTime() - creation.getTime()) / (1000 * 60 * 60 * 24));
       return sum + delai;
     }, 0) / facturesPayees.length : 0;
 
