@@ -107,3 +107,66 @@ export interface ActivityItem {
   icon?: string;
   href?: string;
 }
+
+export interface Planning {
+  id: string;
+  titre: string;
+  description?: string;
+  type: 'REUNION' | 'LIVRAISON' | 'INSPECTION' | 'AUTRE';
+  dateDebut: string;
+  dateFin: string;
+  recurrence?: string;
+  statut: 'PLANIFIE' | 'EN_COURS' | 'TERMINE' | 'ANNULE';
+  notes?: string;
+  lieu?: string;
+  chantier?: {
+    id: string;
+    nom: string;
+  };
+  organisateur: {
+    id: string;
+    name: string;
+    role: string;
+  };
+  participants: User[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PlanningFormData {
+  titre: string;
+  description?: string;
+  type: 'REUNION' | 'LIVRAISON' | 'INSPECTION' | 'AUTRE';
+  dateDebut: string;
+  dateFin: string;
+  chantierId?: string;
+  participantIds: string[];
+  notes?: string;
+  lieu?: string;
+  recurrence?: string;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  type: string;
+  color?: string;
+  chantier?: {
+    id: string;
+    nom: string;
+  };
+}
+
+export interface PlanningConflict {
+  eventId: string;
+  conflictWith: {
+    id: string;
+    titre: string;
+    dateDebut: string;
+    dateFin: string;
+  };
+  participants: User[];
+  severity: 'HIGH' | 'MEDIUM' | 'LOW';
+}

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useToast, showSuccessToast, showErrorToast } from "@/components/ui/Toast";
+import { useToast } from "@/components/ui/Toast";
 
 interface FormData {
   nom: string;
@@ -55,8 +55,6 @@ const mockClients = [
 export default function NouveauChantierPage() {
   const router = useRouter();
   const { addToast } = useToast();
-  const successToast = showSuccessToast(addToast);
-  const errorToast = showErrorToast(addToast);
   
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -195,10 +193,11 @@ export default function NouveauChantierPage() {
       const chantier = await chantierResponse.json();
       console.log('Chantier créé avec succès:', chantier);
       
-      successToast(
-        'Chantier créé avec succès !',
-        `Le chantier "${chantier.nom}" a été créé et vous allez être redirigé.`
-      );
+      addToast({ 
+        type: "success", 
+        title: "Chantier créé avec succès !",
+        description: `Le chantier "${chantier.nom}" a été créé et vous allez être redirigé.`
+      });
       
       setTimeout(() => {
         router.push(`/dashboard/chantiers/${chantier.id}`);
@@ -206,10 +205,11 @@ export default function NouveauChantierPage() {
     } catch (error) {
       console.error('Erreur lors de la création:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la création du chantier';
-      errorToast(
-        'Erreur lors de la création',
-        errorMessage
-      );
+      addToast({ 
+        type: "error", 
+        title: "Erreur lors de la création",
+        description: "Une erreur est survenue lors de la création du chantier."
+      });
     } finally {
       setIsSubmitting(false);
     }

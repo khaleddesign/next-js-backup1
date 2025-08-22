@@ -1,0 +1,3677 @@
+{
+  "meta": {
+    "timestamp": "2025-08-22T14:13:58.938Z",
+    "project": "ChantierPro",
+    "summary": {
+      "components": 83,
+      "pages": 74,
+      "layouts": 9,
+      "inconsistencies": 4
+    }
+  },
+  "tailwindConfig": {
+    "file": "tailwind.config.js",
+    "content": "#!/usr/bin/env node\n\n/**\n * Script d'extraction complète pour l'agent d'uniformisation design ChantierPro\n * Extrait TOUT le code nécessaire pour créer un design moderne unifié\n */\n\nconst fs = require('fs');\nconst path = require('path');\n\nclass ChantierProDesignExtractor {\n  constructor(projectPath = './') {\n    this.projectPath = projectPath;\n    this.extraction = {\n      timestamp: new Date().toISOString(),\n      project: 'ChantierPro - Design Moderne Unifié',\n      \n      // Configuration système\n      tailwindConfig: null,\n      globalCSS: null,\n      tsConfig: null,\n      \n      // Composants UI de base\n      baseComponents: {\n        card: null,\n        button: null,\n        input: null,\n        badge: null,\n        progress: null,\n        toast: null\n      },\n      \n      // Layout system\n      layouts: {\n        main: null,\n        dashboard: null,\n        sidebar: null,\n        header: null\n      },\n      \n      // Pages avec code complet\n      pages: {\n        dashboard: null,\n        chantiers: [],\n        messages: [],\n        devis: [],\n        documents: [],\n        planning: []\n      },\n      \n      // Design patterns détectés\n      currentPatterns: {\n        colorUsage: {},\n        buttonVariants: [],\n        cardVariants: [],\n        spacingPatterns: [],\n        typographyPatterns: []\n      },\n      \n      // Recommandations design moderne\n      modernDesignRecommendations: {\n        colorPalette: null,\n        componentSystem: null,\n        layoutImprovements: null\n      }\n    };\n  }\n\n  async extract() {\n    console.log('🎨 Extraction complète pour design moderne ChantierPro...\\n');\n    \n    try {\n      // 1. Extraire la configuration système\n      await this.extractSystemConfig();\n      \n      // 2. Extraire les composants UI de base COMPLETS\n      await this.extractBaseComponents();\n      \n      // 3. Extraire le système de layout COMPLET\n      await this.extractLayoutSystem();\n      \n      // 4. Extraire les pages principales avec code complet\n      await this.extractPagesWithCode();\n      \n      // 5. Analyser les patterns actuels\n      await this.analyzeCurrentPatterns();\n      \n      // 6. Générer les recommandations design moderne\n      await this.generateModernDesignRecommendations();\n      \n      // 7. Créer l'archive complète\n      await this.createCompleteArchive();\n      \n    } catch (error) {\n      console.error('❌ Erreur lors de l\\'extraction:', error.message);\n    }\n  }\n\n  async extractSystemConfig() {\n    console.log('⚙️ Extraction configuration système...');\n    \n    // Tailwind config COMPLET\n    const tailwindPaths = ['tailwind.config.js', 'tailwind.config.ts', 'tailwind.config.mjs'];\n    for (const configPath of tailwindPaths) {\n      const fullPath = path.join(this.projectPath, configPath);\n      if (fs.existsSync(fullPath)) {\n        this.extraction.tailwindConfig = {\n          filename: configPath,\n          fullContent: fs.readFileSync(fullPath, 'utf8')\n        };\n        break;\n      }\n    }\n\n    // CSS global COMPLET\n    const cssPaths = [\n      'src/app/globals.css',\n      'app/globals.css', \n      'styles/globals.css',\n      'src/styles/globals.css'\n    ];\n    for (const cssPath of cssPaths) {\n      const fullPath = path.join(this.projectPath, cssPath);\n      if (fs.existsSync(fullPath)) {\n        this.extraction.globalCSS = {\n          filename: cssPath,\n          fullContent: fs.readFileSync(fullPath, 'utf8')\n        };\n        break;\n      }\n    }\n\n    // TypeScript config\n    const tsConfigPath = path.join(this.projectPath, 'tsconfig.json');\n    if (fs.existsSync(tsConfigPath)) {\n      this.extraction.tsConfig = {\n        filename: 'tsconfig.json',\n        fullContent: fs.readFileSync(tsConfigPath, 'utf8')\n      };\n    }\n\n    console.log('  ✅ Configuration système extraite');\n  }\n\n  async extractBaseComponents() {\n    console.log('🧩 Extraction composants UI de base...');\n    \n    const baseComponentsMap = {\n      card: ['components/ui/card.tsx', 'src/components/ui/card.tsx'],\n      button: ['components/ui/button.tsx', 'src/components/ui/button.tsx'],\n      input: ['components/ui/input.tsx', 'src/components/ui/input.tsx'],\n      badge: ['components/ui/badge.tsx', 'src/components/ui/badge.tsx'],\n      progress: ['components/ui/progress.tsx', 'src/components/ui/progress.tsx'],\n      toast: ['components/ui/Toast.tsx', 'components/ui/toast.tsx', 'src/components/ui/Toast.tsx']\n    };\n\n    for (const [componentName, possiblePaths] of Object.entries(baseComponentsMap)) {\n      for (const componentPath of possiblePaths) {\n        const fullPath = path.join(this.projectPath, componentPath);\n        if (fs.existsSync(fullPath)) {\n          this.extraction.baseComponents[componentName] = {\n            filename: componentPath,\n            fullContent: fs.readFileSync(fullPath, 'utf8')\n          };\n          break;\n        }\n      }\n    }\n\n    console.log('  ✅ Composants UI de base extraits');\n  }\n\n  async extractLayoutSystem() {\n    console.log('🏗️ Extraction système de layout...');\n    \n    const layoutFiles = {\n      main: ['app/layout.tsx', 'src/app/layout.tsx'],\n      dashboard: ['components/layout/DashboardLayout.tsx', 'src/components/layout/DashboardLayout.tsx'],\n      sidebar: ['components/layout/ModernSidebar.tsx', 'components/layout/Sidebar.tsx', 'src/components/layout/ModernSidebar.tsx'],\n      header: ['components/layout/ModernHeader.tsx', 'components/layout/Header.tsx', 'src/components/layout/ModernHeader.tsx']\n    };\n\n    for (const [layoutName, possiblePaths] of Object.entries(layoutFiles)) {\n      for (const layoutPath of possiblePaths) {\n        const fullPath = path.join(this.projectPath, layoutPath);\n        if (fs.existsSync(fullPath)) {\n          this.extraction.layouts[layoutName] = {\n            filename: layoutPath,\n            fullContent: fs.readFileSync(fullPath, 'utf8')\n          };\n          break;\n        }\n      }\n    }\n\n    console.log('  ✅ Système de layout extrait');\n  }\n\n  async extractPagesWithCode() {\n    console.log('📄 Extraction pages avec code complet...');\n    \n    const pageCategories = {\n      dashboard: [\n        'app/dashboard/page.tsx',\n        'src/app/dashboard/page.tsx'\n      ],\n      chantiers: [\n        'app/dashboard/chantiers/page.tsx',\n        'app/dashboard/chantiers/[id]/page.tsx',\n        'app/dashboard/chantiers/nouveau/page.tsx'\n      ],\n      messages: [\n        'app/dashboard/messages/page.tsx',\n        'app/dashboard/messages/nouveau/page.tsx'\n      ],\n      devis: [\n        'app/dashboard/devis/page.tsx',\n        'app/dashboard/devis/[id]/page.tsx',\n        'app/dashboard/devis/nouveau/page.tsx'\n      ],\n      documents: [\n        'app/dashboard/documents/page.tsx',\n        'app/dashboard/documents/[id]/page.tsx'\n      ],\n      planning: [\n        'app/dashboard/planning/page.tsx',\n        'app/dashboard/planning/[id]/page.tsx'\n      ]\n    };\n\n    for (const [category, paths] of Object.entries(pageCategories)) {\n      if (category === 'dashboard') {\n        // Page dashboard principale\n        for (const pagePath of paths) {\n          const fullPath = path.join(this.projectPath, pagePath);\n          if (fs.existsSync(fullPath)) {\n            this.extraction.pages.dashboard = {\n              filename: pagePath,\n              fullContent: fs.readFileSync(fullPath, 'utf8')\n            };\n            break;\n          }\n        }\n      } else {\n        // Pages de catégorie\n        this.extraction.pages[category] = [];\n        for (const pagePath of paths) {\n          const fullPath = path.join(this.projectPath, pagePath);\n          if (fs.existsSync(fullPath)) {\n            this.extraction.pages[category].push({\n              filename: pagePath,\n              fullContent: fs.readFileSync(fullPath, 'utf8')\n            });\n          }\n        }\n      }\n    }\n\n    console.log('  ✅ Pages avec code complet extraites');\n  }\n\n  async analyzeCurrentPatterns() {\n    console.log('🔍 Analyse des patterns actuels...');\n    \n    const allContent = [];\n    \n    // Collecter tout le contenu\n    Object.values(this.extraction.baseComponents).forEach(comp => {\n      if (comp) allContent.push(comp.fullContent);\n    });\n    \n    Object.values(this.extraction.layouts).forEach(layout => {\n      if (layout) allContent.push(layout.fullContent);\n    });\n    \n    if (this.extraction.pages.dashboard) {\n      allContent.push(this.extraction.pages.dashboard.fullContent);\n    }\n    \n    Object.values(this.extraction.pages).forEach(category => {\n      if (Array.isArray(category)) {\n        category.forEach(page => allContent.push(page.fullContent));\n      }\n    });\n\n    const allCode = allContent.join('\\n');\n\n    // Analyser les patterns\n    this.extraction.currentPatterns = {\n      colorUsage: this.extractColorPatterns(allCode),\n      buttonVariants: this.extractButtonPatterns(allCode),\n      cardVariants: this.extractCardPatterns(allCode),\n      spacingPatterns: this.extractSpacingPatterns(allCode),\n      typographyPatterns: this.extractTypographyPatterns(allCode)\n    };\n\n    console.log('  ✅ Patterns actuels analysés');\n  }\n\n  extractColorPatterns(content) {\n    const patterns = {};\n    \n    // Extraire toutes les classes de couleur\n    const colorMatches = content.match(/(bg-|text-|border-)[a-zA-Z]+-\\d+/g);\n    if (colorMatches) {\n      colorMatches.forEach(match => {\n        const [type, color, shade] = match.split('-');\n        const key = `${type}-${color}`;\n        if (!patterns[key]) patterns[key] = [];\n        if (!patterns[key].includes(shade)) {\n          patterns[key].push(shade);\n        }\n      });\n    }\n    \n    return patterns;\n  }\n\n  extractButtonPatterns(content) {\n    const buttonClasses = content.match(/className=[\"`']([^\"`']*(?:btn|button)[^\"`']*)[\"`']/gi);\n    return buttonClasses ? [...new Set(buttonClasses.map(match => \n      match.replace(/className=[\"`']([^\"`']*)[\"`']/, '$1')\n    ))] : [];\n  }\n\n  extractCardPatterns(content) {\n    const cardClasses = content.match(/className=[\"`']([^\"`']*(?:card|container)[^\"`']*)[\"`']/gi);\n    return cardClasses ? [...new Set(cardClasses.map(match => \n      match.replace(/className=[\"`']([^\"`']*)[\"`']/, '$1')\n    ))] : [];\n  }\n\n  extractSpacingPatterns(content) {\n    const spacingMatches = content.match(/(p-|px-|py-|m-|mx-|my-|gap-|space-)[a-zA-Z0-9.\\[\\]]+/g);\n    return spacingMatches ? [...new Set(spacingMatches)] : [];\n  }\n\n  extractTypographyPatterns(content) {\n    const typographyMatches = content.match(/(text-|font-|leading-|tracking-)[a-zA-Z0-9.\\[\\]\\/]+/g);\n    return typographyMatches ? [...new Set(typographyMatches)] : [];\n  }\n\n  async generateModernDesignRecommendations() {\n    console.log('🎨 Génération recommandations design moderne...');\n    \n    this.extraction.modernDesignRecommendations = {\n      colorPalette: this.generateModernColorPalette(),\n      componentSystem: this.generateModernComponentSystem(),\n      layoutImprovements: this.generateLayoutImprovements()\n    };\n\n    console.log('  ✅ Recommandations design moderne générées');\n  }\n\n  generateModernColorPalette() {\n    return {\n      // Palette moderne pour app BTP/Construction\n      primary: {\n        50: '#f0f9ff',   // Bleu très clair (existant)\n        100: '#e0f2fe',  // Bleu clair (existant)\n        500: '#0ea5e9',  // Bleu principal (existant)\n        600: '#0284c7',  // Bleu foncé (existant)\n        700: '#0369a1',  // Bleu très foncé (existant)\n        900: '#0c4a6e'   // Bleu profond (existant)\n      },\n      \n      // Nouvelle palette construction/chantier\n      construction: {\n        50: '#fefce8',   // Jaune sécurité très clair\n        100: '#fef3c7',  // Jaune sécurité clair\n        400: '#fbbf24',  // Jaune sécurité\n        500: '#f59e0b',  // Orange chantier\n        600: '#d97706',  // Orange foncé\n        700: '#b45309'   // Orange très foncé\n      },\n      \n      // Gris modernes pour UI\n      neutral: {\n        50: '#fafafa',   // Blanc cassé\n        100: '#f5f5f5',  // Gris très clair\n        200: '#e5e5e5',  // Gris clair\n        300: '#d4d4d4',  // Gris moyen clair\n        400: '#a3a3a3',  // Gris moyen\n        500: '#737373',  // Gris\n        600: '#525252',  // Gris foncé\n        700: '#404040',  // Gris très foncé\n        800: '#262626',  // Gris sombre\n        900: '#171717'   // Noir\n      },\n      \n      // États sémantiques\n      semantic: {\n        success: '#10b981',   // Vert succès\n        warning: '#f59e0b',   // Orange warning\n        error: '#ef4444',     // Rouge erreur\n        info: '#3b82f6'       // Bleu info\n      }\n    };\n  }\n\n  generateModernComponentSystem() {\n    return {\n      buttons: {\n        primary: \"bg-primary-600 hover:bg-primary-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 shadow-sm\",\n        secondary: \"bg-white hover:bg-neutral-50 text-primary-600 font-medium px-4 py-2 rounded-lg border border-neutral-300 transition-colors duration-200\",\n        ghost: \"hover:bg-neutral-100 text-neutral-700 font-medium px-4 py-2 rounded-lg transition-colors duration-200\",\n        construction: \"bg-construction-500 hover:bg-construction-600 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 shadow-sm\"\n      },\n      \n      cards: {\n        default: \"bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md transition-shadow duration-200\",\n        elevated: \"bg-white rounded-xl shadow-lg border border-neutral-100\",\n        interactive: \"bg-white rounded-xl border border-neutral-200 shadow-sm hover:shadow-md hover:border-primary-300 transition-all duration-200 cursor-pointer\"\n      },\n      \n      inputs: {\n        default: \"w-full px-3 py-2 rounded-lg border border-neutral-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200\",\n        error: \"w-full px-3 py-2 rounded-lg border border-red-300 focus:ring-2 focus:ring-red-500 focus:border-red-500\"\n      },\n      \n      badges: {\n        primary: \"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800\",\n        construction: \"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-construction-100 text-construction-800\",\n        success: \"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800\",\n        warning: \"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800\",\n        error: \"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800\"\n      }\n    };\n  }\n\n  generateLayoutImprovements() {\n    return {\n      spacing: {\n        sections: \"space-y-8\",\n        cards: \"space-y-6\", \n        elements: \"space-y-4\",\n        inline: \"space-x-4\"\n      },\n      \n      containers: {\n        page: \"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8\",\n        section: \"max-w-4xl mx-auto\",\n        card: \"p-6\"\n      },\n      \n      typography: {\n        pageTitle: \"text-3xl font-bold text-neutral-900\",\n        sectionTitle: \"text-xl font-semibold text-neutral-900\",\n        cardTitle: \"text-lg font-medium text-neutral-900\",\n        body: \"text-neutral-700\",\n        caption: \"text-sm text-neutral-500\"\n      }\n    };\n  }\n\n  async createCompleteArchive() {\n    console.log('📦 Création archive complète...');\n    \n    // Créer le rapport complet\n    const completeReport = {\n      meta: {\n        extractedAt: this.extraction.timestamp,\n        project: this.extraction.project,\n        purpose: \"Uniformisation design moderne - Page par page\",\n        approach: \"Modification de l'existant avec charte couleur moderne\"\n      },\n      \n      systemConfig: {\n        tailwind: this.extraction.tailwindConfig,\n        globalCSS: this.extraction.globalCSS,\n        typescript: this.extraction.tsConfig\n      },\n      \n      currentCodebase: {\n        baseComponents: this.extraction.baseComponents,\n        layouts: this.extraction.layouts,\n        pages: this.extraction.pages\n      },\n      \n      currentPatterns: this.extraction.currentPatterns,\n      \n      modernDesignSystem: this.extraction.modernDesignRecommendations,\n      \n      migrationPlan: {\n        phase1: \"Modifier composants UI de base (Button, Card, Input, Badge)\",\n        phase2: \"Appliquer nouvelle palette couleurs dans Tailwind config\",\n        phase3: \"Migrer pages une par une en commençant par Dashboard\",\n        phase4: \"Mettre à jour layout system avec design moderne\",\n        phase5: \"Nettoyer et optimiser\"\n      }\n    };\n\n    // Sauvegarder l'archive complète\n    const archivePath = path.join(this.projectPath, 'design-modern-extraction.json');\n    fs.writeFileSync(archivePath, JSON.stringify(completeReport, null, 2));\n    \n    // Créer le guide de migration\n    const migrationGuide = this.generateMigrationGuide(completeReport);\n    const guidePath = path.join(this.projectPath, 'design-modern-migration-guide.md');\n    fs.writeFileSync(guidePath, migrationGuide);\n\n    console.log('\\n✅ Extraction complète terminée !');\n    console.log(`📦 Archive complète: ${archivePath}`);\n    console.log(`📋 Guide migration: ${guidePath}`);\n    console.log(`\\n🎨 Prêt pour uniformisation design moderne page par page !`);\n    \n    return completeReport;\n  }\n\n  generateMigrationGuide(report) {\n    return `# Guide Migration Design Moderne - ChantierPro\n\n## 🎯 Objectif\nTransformer ChantierPro en application moderne avec design unifié, page par page.\n\n## 🎨 Nouvelle Charte Couleur Moderne\n\n### Palette Construction/BTP\n- **Primary (Bleu professionnel)**: Conservé et optimisé\n- **Construction (Orange chantier)**: Nouvelle palette thématique\n- **Neutral (Gris modernes)**: Remplacement des gris incohérents\n- **Semantic (États)**: Couleurs d'état standardisées\n\n## 📋 Plan de Migration\n\n### Phase 1: Composants de Base\n- [ ] Button: ${Object.keys(report.currentCodebase.baseComponents).filter(k => k === 'button').length > 0 ? '✅ Code extrait' : '❌ À extraire'}\n- [ ] Card: ${Object.keys(report.currentCodebase.baseComponents).filter(k => k === 'card').length > 0 ? '✅ Code extrait' : '❌ À extraire'}\n- [ ] Input: ${Object.keys(report.currentCodebase.baseComponents).filter(k => k === 'input').length > 0 ? '✅ Code extrait' : '❌ À extraire'}\n- [ ] Badge: ${Object.keys(report.currentCodebase.baseComponents).filter(k => k === 'badge').length > 0 ? '✅ Code extrait' : '❌ À extraire'}\n\n### Phase 2: Configuration\n- [ ] Tailwind Config: ${report.systemConfig.tailwind ? '✅ Extrait' : '❌ À extraire'}\n- [ ] CSS Global: ${report.systemConfig.globalCSS ? '✅ Extrait' : '❌ À extraire'}\n\n### Phase 3: Pages (Une par une)\n- [ ] Dashboard: ${report.currentCodebase.pages.dashboard ? '✅ Code extrait' : '❌ À extraire'}\n- [ ] Chantiers: ${report.currentCodebase.pages.chantiers.length} pages extraites\n- [ ] Messages: ${report.currentCodebase.pages.messages.length} pages extraites\n- [ ] Devis: ${report.currentCodebase.pages.devis.length} pages extraites\n- [ ] Documents: ${report.currentCodebase.pages.documents.length} pages extraites\n- [ ] Planning: ${report.currentCodebase.pages.planning.length} pages extraites\n\n## 🚀 Prêt pour le Code !\n\nToutes les informations nécessaires sont extraites.\nL'agent peut maintenant commencer l'uniformisation design moderne.\n\n**Commande:** \"Commence l'uniformisation design moderne\"\n`;\n  }\n}\n\n// Script principal\nasync function main() {\n  const extractor = new ChantierProDesignExtractor();\n  \n  console.log('🎨 ChantierPro Design Moderne - Extraction Complète\\n');\n  console.log('Ce script va extraire TOUT le code nécessaire pour:');\n  console.log('✅ Créer un design moderne unifié');\n  console.log('✅ Modifier l\\'existant page par page');\n  console.log('✅ Appliquer une nouvelle charte couleur moderne');\n  console.log('✅ Fournir un plan de migration complet\\n');\n  \n  await extractor.extract();\n}\n\n// Exécution si appelé directement\nif (require.main === module) {\n  main().catch(console.error);\n}\n\nmodule.exports = ChantierProDesignExtractor;",
+    "customColors": null,
+    "customSpacing": "spacing: {\n        sections: \"space-y-8\",\n        cards: \"space-y-6\", \n        elements: \"space-y-4\",\n        inline: \"space-x-4\"\n      }",
+    "customFonts": null
+  },
+  "designSystem": {
+    "colors": [
+      "bg-black",
+      "bg-black/20",
+      "bg-black/50",
+      "bg-black/60",
+      "bg-black/90",
+      "bg-black/[.05]",
+      "bg-blue-100",
+      "bg-blue-300",
+      "bg-blue-400",
+      "bg-blue-50",
+      "bg-blue-500",
+      "bg-blue-600",
+      "bg-clip-text",
+      "bg-foreground",
+      "bg-gradient-to-br",
+      "bg-gradient-to-r",
+      "bg-gray-100",
+      "bg-gray-200",
+      "bg-gray-300",
+      "bg-gray-50",
+      "bg-gray-500",
+      "bg-green-100",
+      "bg-green-400",
+      "bg-green-50",
+      "bg-green-500",
+      "bg-green-500/10",
+      "bg-indigo-500",
+      "bg-opacity-50",
+      "bg-orange-100",
+      "bg-orange-400",
+      "bg-orange-500",
+      "bg-orange-500/10",
+      "bg-purple-400",
+      "bg-purple-50",
+      "bg-purple-500",
+      "bg-red-400",
+      "bg-red-50",
+      "bg-red-500",
+      "bg-red-500/10",
+      "bg-red-500/20",
+      "bg-slate-900",
+      "bg-white",
+      "bg-white/10",
+      "bg-white/20",
+      "bg-white/5",
+      "bg-white/80",
+      "bg-white/95",
+      "bg-yellow-50",
+      "border-2",
+      "border-4",
+      "border-b",
+      "border-b-2",
+      "border-black/[.08]",
+      "border-blue-200",
+      "border-blue-600",
+      "border-border-light",
+      "border-dashed",
+      "border-gray-100",
+      "border-gray-200",
+      "border-gray-300",
+      "border-gray-900",
+      "border-green-200",
+      "border-green-500/20",
+      "border-l-4",
+      "border-l-blue-500",
+      "border-l-purple-500",
+      "border-orange-500",
+      "border-orange-500/20",
+      "border-purple-200",
+      "border-r",
+      "border-red-200",
+      "border-red-300",
+      "border-red-500/20",
+      "border-red-500/30",
+      "border-solid",
+      "border-t",
+      "border-t-blue-600",
+      "border-t-transparent",
+      "border-t-white",
+      "border-transparent",
+      "border-white",
+      "border-white/10",
+      "border-white/20",
+      "border-white/30",
+      "border-white/5",
+      "border-yellow-200",
+      "text-2xl",
+      "text-3xl",
+      "text-4xl",
+      "text-6xl",
+      "text-background",
+      "text-blue-100",
+      "text-blue-200",
+      "text-blue-300",
+      "text-blue-500",
+      "text-blue-600",
+      "text-blue-700",
+      "text-blue-800",
+      "text-blue-900",
+      "text-center",
+      "text-gray-300",
+      "text-gray-400",
+      "text-gray-500",
+      "text-gray-600",
+      "text-gray-700",
+      "text-gray-900",
+      "text-green-100",
+      "text-green-200",
+      "text-green-300",
+      "text-green-500",
+      "text-green-600",
+      "text-green-700",
+      "text-green-800",
+      "text-left",
+      "text-lg",
+      "text-orange-200",
+      "text-orange-400",
+      "text-orange-600",
+      "text-orange-800",
+      "text-primary",
+      "text-purple-600",
+      "text-purple-700",
+      "text-red-200",
+      "text-red-300",
+      "text-red-500",
+      "text-red-600",
+      "text-red-700",
+      "text-red-800",
+      "text-right",
+      "text-secondary",
+      "text-sm",
+      "text-sm/6",
+      "text-text-placeholder",
+      "text-transparent",
+      "text-white",
+      "text-white/60",
+      "text-white/70",
+      "text-white/80",
+      "text-xl",
+      "text-xs",
+      "text-yellow-300",
+      "text-yellow-700",
+      "text-yellow-800"
+    ],
+    "spacing": [
+      "gap-0",
+      "gap-1",
+      "gap-16",
+      "gap-2",
+      "gap-3",
+      "gap-4",
+      "gap-6",
+      "gap-8",
+      "gap-[24px]",
+      "gap-[32px]",
+      "gap-px",
+      "mb-1",
+      "mb-2",
+      "mb-3",
+      "mb-4",
+      "mb-6",
+      "mb-8",
+      "ml-1",
+      "ml-2",
+      "ml-4",
+      "mr-1",
+      "mr-2",
+      "mr-3",
+      "mt-0.5",
+      "mt-1",
+      "mt-2",
+      "mt-4",
+      "mt-6",
+      "mt-8",
+      "mx-4",
+      "mx-auto",
+      "p-1",
+      "p-2",
+      "p-3",
+      "p-4",
+      "p-5",
+      "p-6",
+      "p-8",
+      "pb-20",
+      "pl-10",
+      "pr-12",
+      "pr-20",
+      "pr-3",
+      "pr-4",
+      "pt-2",
+      "pt-4",
+      "pt-6",
+      "px-1",
+      "px-2",
+      "px-3",
+      "px-4",
+      "px-6",
+      "py-0.5",
+      "py-1",
+      "py-12",
+      "py-2",
+      "py-3",
+      "py-4",
+      "py-6",
+      "py-8",
+      "space-x-2",
+      "space-x-3",
+      "space-x-4",
+      "space-y-1",
+      "space-y-2",
+      "space-y-3",
+      "space-y-4",
+      "space-y-6",
+      "space-y-8"
+    ],
+    "typography": [
+      "font-bold",
+      "font-medium",
+      "font-mono",
+      "font-sans",
+      "font-semibold",
+      "text-2xl",
+      "text-3xl",
+      "text-4xl",
+      "text-6xl",
+      "text-background",
+      "text-blue-100",
+      "text-blue-200",
+      "text-blue-300",
+      "text-blue-500",
+      "text-blue-600",
+      "text-blue-700",
+      "text-blue-800",
+      "text-blue-900",
+      "text-center",
+      "text-gray-300",
+      "text-gray-400",
+      "text-gray-500",
+      "text-gray-600",
+      "text-gray-700",
+      "text-gray-900",
+      "text-green-100",
+      "text-green-200",
+      "text-green-300",
+      "text-green-500",
+      "text-green-600",
+      "text-green-700",
+      "text-green-800",
+      "text-left",
+      "text-lg",
+      "text-orange-200",
+      "text-orange-400",
+      "text-orange-600",
+      "text-orange-800",
+      "text-primary",
+      "text-purple-600",
+      "text-purple-700",
+      "text-red-200",
+      "text-red-300",
+      "text-red-500",
+      "text-red-600",
+      "text-red-700",
+      "text-red-800",
+      "text-right",
+      "text-secondary",
+      "text-sm",
+      "text-sm/6",
+      "text-text-placeholder",
+      "text-transparent",
+      "text-white",
+      "text-white/60",
+      "text-white/70",
+      "text-white/80",
+      "text-xl",
+      "text-xs",
+      "text-yellow-300",
+      "text-yellow-700",
+      "text-yellow-800",
+      "tracking-[-.01em]",
+      "tracking-wide",
+      "tracking-wider"
+    ],
+    "shadows": [
+      "shadow-2xl",
+      "shadow-lg",
+      "shadow-sm",
+      "shadow-xl"
+    ],
+    "borderRadius": [
+      "rounded",
+      "rounded-2xl",
+      "rounded-3xl",
+      "rounded-full",
+      "rounded-lg",
+      "rounded-md",
+      "rounded-r-lg",
+      "rounded-t-2xl",
+      "rounded-xl"
+    ]
+  },
+  "components": [
+    {
+      "name": "AuthProvider",
+      "file": "components/auth/AuthProvider.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect, ReactNode } from 'react';",
+        "import { useRouter } from 'next/navigation';",
+        "import { AuthContext, User } from '@/hooks/useAuth';"
+      ]
+    },
+    {
+      "name": "ChantierCard",
+      "file": "components/chantiers/ChantierCard.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import Link from \"next/link\";",
+        "import StatusBadge from \"./StatusBadge\";",
+        "import ProgressBar from \"./ProgressBar\";"
+      ]
+    },
+    {
+      "name": "ChantierHero",
+      "file": "components/chantiers/ChantierHero.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-ghost",
+          "btn-ghost",
+          "btn-ghost"
+        ],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import StatusBadge from \"./StatusBadge\";",
+        "import ProgressBar from \"./ProgressBar\";"
+      ]
+    },
+    {
+      "name": "ChantierTabs",
+      "file": "components/chantiers/ChantierTabs.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from \"react\";"
+      ]
+    },
+    {
+      "name": "ProgressBar",
+      "file": "components/chantiers/ProgressBar.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useEffect, useState } from \"react\";"
+      ]
+    },
+    {
+      "name": "SearchFilter",
+      "file": "components/chantiers/SearchFilter.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect } from \"react\";",
+        "import StatusBadge from \"./StatusBadge\";"
+      ]
+    },
+    {
+      "name": "StatusBadge",
+      "file": "components/chantiers/StatusBadge.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "ActivityFeed",
+      "file": "components/dashboard/ActivityFeed.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { ActivityItem } from \"@/types\";"
+      ]
+    },
+    {
+      "name": "DevisWidget",
+      "file": "components/dashboard/DevisWidget.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect } from 'react';",
+        "import Link from 'next/link';",
+        "import StatusBadge from '@/components/devis/StatusBadge';"
+      ]
+    },
+    {
+      "name": "QuickActions",
+      "file": "components/dashboard/QuickActions.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import Link from \"next/link\";",
+        "import NotificationBadge from \"@/components/ui/NotificationBadge\";",
+        "import { useMessages } from \"@/hooks/useMessages\";"
+      ]
+    },
+    {
+      "name": "QuickActions_updated",
+      "file": "components/dashboard/QuickActions_updated.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import Link from \"next/link\";",
+        "import NotificationBadge from \"@/components/layout/NotificationBadge\";"
+      ]
+    },
+    {
+      "name": "StatsCard",
+      "file": "components/dashboard/StatsCard.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "StatsCardEnhanced",
+      "file": "components/dashboard/StatsCardEnhanced.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useEffect, useState } from 'react';",
+        "import NotificationBadge from '@/components/ui/NotificationBadge';",
+        "import { useMessages } from '@/hooks/useMessages';"
+      ]
+    },
+    {
+      "name": "header",
+      "file": "components/dashboard/header.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "sidebar",
+      "file": "components/dashboard/sidebar.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "DevisBulkActions",
+      "file": "components/devis/DevisBulkActions.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import DevisExportDialog from './DevisExportDialog';"
+      ]
+    },
+    {
+      "name": "DevisCard",
+      "file": "components/devis/DevisCard.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import Link from 'next/link';"
+      ]
+    },
+    {
+      "name": "DevisExportDialog",
+      "file": "components/devis/DevisExportDialog.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';"
+      ]
+    },
+    {
+      "name": "DevisFilters",
+      "file": "components/devis/DevisFilters.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "DevisPreviewModal",
+      "file": "components/devis/DevisPreviewModal.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import DevisPrintView from './DevisPrintView';"
+      ]
+    },
+    {
+      "name": "DevisPrintView",
+      "file": "components/devis/DevisPrintView.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "DevisStats",
+      "file": "components/devis/DevisStats.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card",
+          "card",
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useDevisStats } from '@/hooks/useDevis';"
+      ]
+    },
+    {
+      "name": "LigneDevis",
+      "file": "components/devis/LigneDevis.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';"
+      ]
+    },
+    {
+      "name": "StatusBadge",
+      "file": "components/devis/StatusBadge.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "TemplateSelector",
+      "file": "components/devis/TemplateSelector.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';"
+      ]
+    },
+    {
+      "name": "TotauxCalculator",
+      "file": "components/devis/TotauxCalculator.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';"
+      ]
+    },
+    {
+      "name": "DocumentList",
+      "file": "components/documents/DocumentList.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { File, Download, Eye, Trash2, Calendar, User, Building } from 'lucide-react';",
+        "import DocumentCard from './DocumentCard';",
+        "import { useDocumentDownload } from '@/hooks/useFileUpload';"
+      ]
+    },
+    {
+      "name": "DocumentUpload",
+      "file": "components/documents/DocumentUpload.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef } from 'react';",
+        "import { Upload, X, File, Image, FileText } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "FileCard",
+      "file": "components/documents/FileCard.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { "
+      ]
+    },
+    {
+      "name": "FileUploader",
+      "file": "components/documents/FileUploader.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef, useCallback } from 'react';",
+        "import { Upload, X, File, Image, FileText, Folder } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "FolderTree",
+      "file": "components/documents/FolderTree.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { Folder, FolderOpen, FileText, ChevronRight, ChevronDown } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "MediaViewer",
+      "file": "components/documents/MediaViewer.tsx",
+      "patterns": {
+        "buttons": [
+          "btn btn-primary flex items-center gap-2",
+          "btn btn-primary flex items-center gap-2",
+          "btn btn-primary"
+        ],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { ZoomIn, ZoomOut, RotateCw, Download, Maximize } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "ShareDialog",
+      "file": "components/documents/ShareDialog.tsx",
+      "patterns": {
+        "buttons": [
+          "btn bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2",
+          "btn btn-primary flex items-center gap-2"
+        ],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { Share2, Link as LinkIcon, Copy, X, Check } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "EtapeCard",
+      "file": "components/etapes/EtapeCard.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { EtapeChantier, ETAPE_STATUS_LABELS, ETAPE_STATUS_COLORS } from '@/types/etapes';",
+        "import { Calendar, User, Edit, Trash2 } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "EtapeForm",
+      "file": "components/etapes/EtapeForm.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { EtapeFormData, EtapeChantier } from '@/types/etapes';",
+        "import { X, Save } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "EtapesList",
+      "file": "components/etapes/EtapesList.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { useEtapes } from '@/hooks/useEtapes';",
+        "import { useAuth } from '@/hooks/useAuth';",
+        "import EtapeCard from './EtapeCard';",
+        "import EtapeForm from './EtapeForm';"
+      ]
+    },
+    {
+      "name": "FacturesDashboard",
+      "file": "components/factures/FacturesDashboard.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "PaiementTracker",
+      "file": "components/factures/PaiementTracker.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect } from 'react';",
+        "import StatusBadge from '@/components/devis/StatusBadge';"
+      ]
+    },
+    {
+      "name": "RelanceManager",
+      "file": "components/factures/RelanceManager.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect } from 'react';"
+      ]
+    },
+    {
+      "name": "DashboardLayout",
+      "file": "components/layout/DashboardLayout.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "container mx-auto px-4 lg:px-8 py-6 max-w-7xl"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React, { useState } from 'react';",
+        "import { ModernSidebar } from './ModernSidebar';",
+        "import { ToastProvider } from '@/components/ui/Toast';",
+        "import { useAuth } from '@/hooks/useAuth';",
+        "import { Menu } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "DocumentTitleBadge",
+      "file": "components/layout/DocumentTitleBadge.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React, { useEffect } from 'react';"
+      ]
+    },
+    {
+      "name": "MinimalHeader",
+      "file": "components/layout/MinimalHeader.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React from 'react';",
+        "import { Menu, Search, Bell } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "ModernHeader",
+      "file": "components/layout/ModernHeader.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import Link from 'next/link';",
+        "import { useAuth } from '@/hooks/useAuth';",
+        "import UserMenu from './UserMenu';",
+        "import { Menu, Search, Bell, MessageCircle } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "ModernSidebar",
+      "file": "components/layout/ModernSidebar.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React from 'react';",
+        "import Link from 'next/link';",
+        "import { usePathname } from 'next/navigation';",
+        "import { cn } from '@/lib/utils';",
+        "import { useAuth } from '@/hooks/useAuth';"
+      ]
+    },
+    {
+      "name": "NotificationBadge",
+      "file": "components/layout/NotificationBadge.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { CSSProperties } from 'react';"
+      ]
+    },
+    {
+      "name": "ToastNotification",
+      "file": "components/layout/ToastNotification.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect } from 'react';",
+        "import NotificationBadge from './NotificationBadge';"
+      ]
+    },
+    {
+      "name": "UserMenu",
+      "file": "components/layout/UserMenu.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef, useEffect } from 'react';",
+        "import { useAuth } from '@/hooks/useAuth';",
+        "import Link from 'next/link';",
+        "import { User, Settings, LogOut, ChevronDown } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "ChatWidget",
+      "file": "components/messages/ChatWidget.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef, useEffect } from 'react';",
+        "import { useMessages } from '@/hooks/useMessages';",
+        "import MessageBubble from './MessageBubble';",
+        "import MessageInput from './MessageInput';"
+      ]
+    },
+    {
+      "name": "ConversationList",
+      "file": "components/messages/ConversationList.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from \"react\";",
+        "import UserAvatar from \"./UserAvatar\";"
+      ]
+    },
+    {
+      "name": "ConversationList_v2",
+      "file": "components/messages/ConversationList_v2.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect, useRef } from \"react\";",
+        "import { useRouter } from \"next/navigation\";",
+        "import UserAvatar from \"./UserAvatar\";",
+        "import NewMessageModal from \"./NewMessageModal\";"
+      ]
+    },
+    {
+      "name": "MediaViewer",
+      "file": "components/messages/MediaViewer.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect, useRef } from 'react';"
+      ]
+    },
+    {
+      "name": "MessageActions",
+      "file": "components/messages/MessageActions.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef, useEffect } from 'react';"
+      ]
+    },
+    {
+      "name": "MessageBubble",
+      "file": "components/messages/MessageBubble.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef } from 'react';",
+        "import UserAvatar from \"./UserAvatar\";",
+        "import MessageActions from \"./MessageActions\";",
+        "import MessageEdit from \"./MessageEdit\";"
+      ]
+    },
+    {
+      "name": "MessageEdit",
+      "file": "components/messages/MessageEdit.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef, useEffect } from 'react';"
+      ]
+    },
+    {
+      "name": "MessageInput",
+      "file": "components/messages/MessageInput.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef, useCallback } from 'react';"
+      ]
+    },
+    {
+      "name": "MessageThread",
+      "file": "components/messages/MessageThread.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect, useRef } from 'react';",
+        "import UserAvatar from './UserAvatar';",
+        "import MessageBubble from './MessageBubble';",
+        "import MessageInput from './MessageInput';"
+      ]
+    },
+    {
+      "name": "MobileLayout",
+      "file": "components/messages/MobileLayout.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect } from 'react';"
+      ]
+    },
+    {
+      "name": "NewMessageModal",
+      "file": "components/messages/NewMessageModal.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect, useCallback } from 'react';",
+        "import UserAvatar from './UserAvatar';"
+      ]
+    },
+    {
+      "name": "TypingIndicator",
+      "file": "components/messages/TypingIndicator.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useEffect, useState } from 'react';"
+      ]
+    },
+    {
+      "name": "UserAvatar",
+      "file": "components/messages/UserAvatar.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "Calendar",
+      "file": "components/planning/Calendar.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { useCalendar } from '@/hooks/useCalendar';",
+        "import { usePlanning } from '@/hooks/usePlanning';",
+        "import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "CalendarView",
+      "file": "components/planning/CalendarView.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { ChevronLeft, ChevronRight, Clock, Users, MapPin } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "ConflictAlert",
+      "file": "components/planning/ConflictAlert.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { AlertTriangle, Clock, Users } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "EventCard",
+      "file": "components/planning/EventCard.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { Calendar, Clock, Users, MapPin, Building } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "EventForm",
+      "file": "components/planning/EventForm.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect, useCallback } from 'react';",
+        "import { usePlanning } from '@/hooks/usePlanning';"
+      ]
+    },
+    {
+      "name": "PlanningFilters",
+      "file": "components/planning/PlanningFilters.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import { Search, Filter, Calendar, MapPin, Users } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "providers",
+      "file": "components/providers.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "ErrorBoundary",
+      "file": "components/ui/ErrorBoundary.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React from 'react';"
+      ]
+    },
+    {
+      "name": "NotificationBadge",
+      "file": "components/ui/NotificationBadge.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React from 'react';"
+      ]
+    },
+    {
+      "name": "Toast",
+      "file": "components/ui/Toast.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { createContext, useContext, useState, ReactNode } from 'react';",
+        "import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';"
+      ]
+    },
+    {
+      "name": "accordion",
+      "file": "components/ui/accordion.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "avatar",
+      "file": "components/ui/avatar.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "badge",
+      "file": "components/ui/badge.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React from 'react';",
+        "import { cn } from '@/lib/utils';"
+      ]
+    },
+    {
+      "name": "button",
+      "file": "components/ui/button.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import * as React from \"react\";",
+        "import { cn } from \"@/lib/utils\";"
+      ]
+    },
+    {
+      "name": "card",
+      "file": "components/ui/card.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import * as React from \"react\";",
+        "import { cn } from \"@/lib/utils\";"
+      ]
+    },
+    {
+      "name": "checkbox",
+      "file": "components/ui/checkbox.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "index",
+      "file": "components/ui/index.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "input",
+      "file": "components/ui/input.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import * as React from \"react\";",
+        "import { cn } from \"@/lib/utils\";"
+      ]
+    },
+    {
+      "name": "label",
+      "file": "components/ui/label.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "progress",
+      "file": "components/ui/progress.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React from 'react';",
+        "import { cn } from '@/lib/utils';"
+      ]
+    },
+    {
+      "name": "separator",
+      "file": "components/ui/separator.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "switch",
+      "file": "components/ui/switch.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    },
+    {
+      "name": "textarea",
+      "file": "components/ui/textarea.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": []
+    }
+  ],
+  "pages": [
+    {
+      "name": "route",
+      "file": "app/api/auth/[...nextauth]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/auth/login/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/chantiers/[id]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/chantiers/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/devis/[id]/convert/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/devis/[id]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/devis/[id]/send/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/devis/export/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/devis/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/devis/stats/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/documents/[id]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/documents/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/documents/upload/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/equipes/[id]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/equipes/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/etapes/[id]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/etapes/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/factures/analytics/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/factures/paiements/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/factures/relances/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/[id]/edit/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/[id]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/chantier/[id]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/contacts/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/conversation/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/files/upload/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/mark-read/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/message/[id]/read/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/messages/search/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/planning/[id]/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/planning/conflicts/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/planning/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/profile/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "route",
+      "file": "app/api/users/route.ts",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/auth/login/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/auth/register/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/chantiers/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "container mx-auto px-4 py-8"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "ChantierEtapes",
+      "file": "app/dashboard/chantiers/[id]/components/ChantierEtapes.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/chantiers/[id]/etapes/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/chantiers/[id]/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card",
+          "card",
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/chantiers/nouveau/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-ghost",
+          "btn-ghost",
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/chantiers/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card",
+          "card",
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "layout",
+      "file": "app/dashboard/client/layout.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/client/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "layout",
+      "file": "app/dashboard/commercial/layout.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/commercial/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/devis/[id]/edit/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card",
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/devis/[id]/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card",
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/devis/nouveau/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/devis/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary",
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/documents/[id]/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn btn-primary",
+          "btn bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2",
+          "btn bg-green-500 hover:bg-green-600 text-white flex items-center gap-2",
+          "btn bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2",
+          "btn bg-red-500 hover:bg-red-600 text-white flex items-center gap-2"
+        ],
+        "inputs": [],
+        "cards": [
+          "container mx-auto px-4 py-8"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/documents/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn btn-primary",
+          "btn btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "container",
+          "card",
+          "card",
+          "card",
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/documents/upload/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "container mx-auto px-4 py-8"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/equipes/[id]/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/equipes/nouveau/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/equipes/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/factures/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "layout",
+      "file": "app/dashboard/layout.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/messages/nouveau/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary",
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/messages/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/messages/recherche/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn-primary"
+        ],
+        "inputs": [],
+        "cards": [
+          "card",
+          "card"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/planning/[id]/page.tsx",
+      "patterns": {
+        "buttons": [
+          "btn btn-primary",
+          "btn bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2",
+          "btn bg-green-500 hover:bg-green-600 text-white flex items-center gap-2",
+          "btn bg-green-500 hover:bg-green-600 text-white flex items-center gap-2",
+          "btn btn-ghost flex items-center gap-2",
+          "btn bg-red-500 hover:bg-red-600 text-white flex items-center gap-2"
+        ],
+        "inputs": [],
+        "cards": [
+          "container mx-auto px-4 py-8"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/planning/nouveau/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "container mx-auto px-4 py-8"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/planning/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "ProfileForm",
+      "file": "app/dashboard/profile/ProfileForm.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "ProfileForm",
+      "file": "app/dashboard/profile/components/ProfileForm.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/profile/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/dashboard/users/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "layout",
+      "file": "app/layout.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "app/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "layout",
+      "file": "src/app/layout.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "name": "page",
+      "file": "src/app/page.tsx",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    }
+  ],
+  "layouts": [
+    {
+      "file": "src/app/layout.tsx",
+      "content": "import type { Metadata } from \"next\";\nimport { Geist, Geist_Mono } from \"next/font/google\";\nimport \"./globals.css\";\n\nconst geistSans = Geist({\n  variable: \"--font-geist-sans\",\n  subsets: [\"latin\"],\n});\n\nconst geistMono = Geist_Mono({\n  variable: \"--font-geist-mono\",\n  subsets: [\"latin\"],\n});\n\nexport const metadata: Metadata = {\n  title: \"Create Next App\",\n  description: \"Generated by create next app\",\n};\n\nexport default function RootLayout({\n  children,\n}: Readonly<{\n  children: React.ReactNode;\n}>) {\n  return (\n    <html lang=\"en\">\n      <body\n        className={`${geistSans.variable} ${geistMono.variable} antialiased`}\n      >\n        {children}\n      </body>\n    </html>\n  );\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      }
+    },
+    {
+      "file": "components/layout/DashboardLayout.tsx",
+      "name": "DashboardLayout",
+      "content": "\"use client\";\n\nimport React, { useState } from 'react';\nimport { ModernSidebar } from './ModernSidebar';\nimport { ToastProvider } from '@/components/ui/Toast';\nimport { useAuth } from '@/hooks/useAuth';\nimport { Menu } from 'lucide-react';\n\ninterface DashboardLayoutProps {\n  children: React.ReactNode;\n}\n\nexport default function DashboardLayout({ children }: DashboardLayoutProps) {\n  const [sidebarOpen, setSidebarOpen] = useState(false);\n  const { user, isLoading } = useAuth();\n\n  if (isLoading) {\n    return (\n      <div className=\"min-h-screen bg-gray-50 flex items-center justify-center\">\n        <div className=\"text-center\">\n          <div className=\"w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse\">\n            <span className=\"text-2xl\">🏗️</span>\n          </div>\n          <div className=\"text-lg font-semibold text-gray-900\">Chargement...</div>\n        </div>\n      </div>\n    );\n  }\n\n  if (!user) {\n    return (\n      <div className=\"min-h-screen bg-gray-50 flex items-center justify-center\">\n        <div className=\"text-center\">\n          <div className=\"text-lg font-semibold text-gray-900\">Connexion requise</div>\n        </div>\n      </div>\n    );\n  }\n\n  return (\n    <ToastProvider>\n      <div className=\"flex h-screen bg-gray-50 overflow-hidden\">\n        <ModernSidebar open={sidebarOpen} setOpen={setSidebarOpen} />\n\n        <div className=\"flex-1 flex flex-col overflow-hidden\">\n          <div className=\"lg:hidden flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200 shadow-sm\">\n            <button\n              onClick={() => setSidebarOpen(true)}\n              className=\"p-2 rounded-md text-gray-600 hover:bg-gray-50 hover:text-blue-500 transition-colors\"\n            >\n              <Menu size={24} />\n            </button>\n            <div className=\"flex items-center gap-2\">\n              <div className=\"w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm\">\n                🏗️\n              </div>\n              <span className=\"font-bold text-lg text-gray-900\">ChantierPro</span>\n            </div>\n            <div className=\"w-10\" />\n          </div>\n\n          <main className=\"flex-1 overflow-auto\">\n            <div className=\"container mx-auto px-4 lg:px-8 py-6 max-w-7xl\">\n              {children}\n            </div>\n          </main>\n        </div>\n      </div>\n    </ToastProvider>\n  );\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [
+          "container mx-auto px-4 lg:px-8 py-6 max-w-7xl"
+        ],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React, { useState } from 'react';",
+        "import { ModernSidebar } from './ModernSidebar';",
+        "import { ToastProvider } from '@/components/ui/Toast';",
+        "import { useAuth } from '@/hooks/useAuth';",
+        "import { Menu } from 'lucide-react';"
+      ],
+      "exports": [
+        "export default function DashboardLayout({ children }: DashboardLayoutProps) {"
+      ]
+    },
+    {
+      "file": "components/layout/DocumentTitleBadge.tsx",
+      "name": "DocumentTitleBadge",
+      "content": "\"use client\";\n\nimport React, { useEffect } from 'react';\n\ninterface DocumentTitleBadgeProps {\n  count?: number;\n  baseTitle?: string;\n}\n\nexport default function DocumentTitleBadge({ \n  count = 0, \n  baseTitle = 'ChantierPro' \n}: DocumentTitleBadgeProps) {\n  useEffect(() => {\n    if (typeof document === 'undefined') return;\n    \n    if (count > 0) {\n      document.title = `(${count}) ${baseTitle}`;\n    } else {\n      document.title = baseTitle;\n    }\n    \n    return () => {\n      document.title = baseTitle;\n    };\n  }, [count, baseTitle]);\n\n  return null;\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React, { useEffect } from 'react';"
+      ],
+      "exports": [
+        "export default function DocumentTitleBadge({ "
+      ]
+    },
+    {
+      "file": "components/layout/MinimalHeader.tsx",
+      "name": "MinimalHeader",
+      "content": "import React from 'react';\nimport { Menu, Search, Bell } from 'lucide-react';\n\ninterface HeaderProps {\n  onMenuClick: () => void;\n}\n\nexport function MinimalHeader({ onMenuClick }: HeaderProps) {\n  return (\n    <header className=\"flex-shrink-0 h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-border-light bg-white/80 backdrop-blur-sm\">\n      <button onClick={onMenuClick} className=\"lg:hidden p-2 -ml-2 rounded-md text-secondary hover:text-primary hover:bg-gray-100\">\n        <Menu size={24} />\n      </button>\n      \n      {/* This can be dynamic based on the page later */}\n      <h1 className=\"text-xl font-semibold text-primary hidden lg:block\">Dashboard</h1>\n\n      <div className=\"flex items-center gap-4\">\n        <div className=\"relative\">\n          <Search size={18} className=\"absolute left-3 top-1/2 -translate-y-1/2 text-text-placeholder\" />\n          <input \n            type=\"text\"\n            placeholder=\"Rechercher un chantier, un contact...\"\n            className=\"w-40 sm:w-64 pl-10 pr-4 py-2 text-sm rounded-md border border-border-light bg-white focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-accent-blue\"\n          />\n        </div>\n        <button className=\"p-2 rounded-full text-secondary hover:text-primary hover:bg-gray-100 relative\">\n          <Bell size={20} />\n          <span className=\"absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full\"></span>\n        </button>\n      </div>\n    </header>\n  );\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React from 'react';",
+        "import { Menu, Search, Bell } from 'lucide-react';"
+      ],
+      "exports": [
+        "export function MinimalHeader({ onMenuClick }: HeaderProps) {"
+      ]
+    },
+    {
+      "file": "components/layout/ModernHeader.tsx",
+      "name": "ModernHeader",
+      "content": "'use client';\n\nimport { useState } from 'react';\nimport Link from 'next/link';\nimport { useAuth } from '@/hooks/useAuth';\nimport UserMenu from './UserMenu';\nimport { Menu, Search, Bell, MessageCircle } from 'lucide-react';\n\ninterface ModernHeaderProps {\n  onSidebarToggle: () => void;\n}\n\nexport default function ModernHeader({ onSidebarToggle }: ModernHeaderProps) {\n  const { user } = useAuth();\n  const [searchOpen, setSearchOpen] = useState(false);\n\n  if (!user) return null;\n\n  return (\n    <header className=\"fixed top-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-md border-b border-gray-200 z-30 shadow-sm lg:pl-72\">\n      <div className=\"flex items-center justify-between h-full px-4 lg:px-6\">\n        <div className=\"flex items-center gap-4\">\n          <button\n            onClick={onSidebarToggle}\n            className=\"lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors\"\n          >\n            <Menu size={20} className=\"text-gray-600\" />\n          </button>\n          \n          <div className=\"hidden lg:flex items-center gap-3\">\n            <div className=\"w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-orange-500 flex items-center justify-center text-white text-sm font-bold\">\n              🏗️\n            </div>\n            <div>\n              <h1 className=\"text-lg font-bold bg-gradient-to-r from-blue-600 to-orange-500 bg-clip-text text-transparent\">\n                ChantierPro\n              </h1>\n            </div>\n          </div>\n        </div>\n\n        <div className=\"flex items-center gap-3\">\n          <div className=\"hidden md:flex items-center gap-2\">\n            <button className=\"relative p-2 rounded-xl hover:bg-gray-100 transition-colors\">\n              <Search size={20} className=\"text-gray-600\" />\n            </button>\n            \n            <button className=\"relative p-2 rounded-xl hover:bg-gray-100 transition-colors\">\n              <Bell size={20} className=\"text-gray-600\" />\n              <span className=\"absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full\"></span>\n            </button>\n            \n            <button className=\"relative p-2 rounded-xl hover:bg-gray-100 transition-colors\">\n              <MessageCircle size={20} className=\"text-gray-600\" />\n              <span className=\"absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full\"></span>\n            </button>\n          </div>\n\n          <div className=\"w-px h-6 bg-gray-300 hidden md:block\"></div>\n\n          <UserMenu />\n        </div>\n      </div>\n    </header>\n  );\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState } from 'react';",
+        "import Link from 'next/link';",
+        "import { useAuth } from '@/hooks/useAuth';",
+        "import UserMenu from './UserMenu';",
+        "import { Menu, Search, Bell, MessageCircle } from 'lucide-react';"
+      ],
+      "exports": [
+        "export default function ModernHeader({ onSidebarToggle }: ModernHeaderProps) {"
+      ]
+    },
+    {
+      "file": "components/layout/ModernSidebar.tsx",
+      "name": "ModernSidebar",
+      "content": "'use client';\n\nimport React from 'react';\nimport Link from 'next/link';\nimport { usePathname } from 'next/navigation';\nimport { cn } from '@/lib/utils';\nimport { useAuth } from '@/hooks/useAuth';\nimport {\n  LayoutDashboard, GanttChartSquare, MessagesSquare, Users, FileText, Calendar, Folder, X, Settings, LogOut, User\n} from 'lucide-react';\n\nconst getRoleBasedItems = (role: string) => {\n  switch (role) {\n    case 'ADMIN':\n      return [\n        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },\n        { name: 'Chantiers', href: '/dashboard/chantiers', icon: GanttChartSquare },\n        { name: 'Messages', href: '/dashboard/messages', icon: MessagesSquare },\n        { name: 'Utilisateurs', href: '/dashboard/users', icon: Users },\n        { name: 'Devis', href: '/dashboard/devis', icon: FileText },\n        { name: 'Planning', href: '/dashboard/planning', icon: Calendar },\n        { name: 'Documents', href: '/dashboard/documents', icon: Folder }\n      ];\n    \n    case 'COMMERCIAL':\n      return [\n        { name: 'Dashboard Commercial', href: '/dashboard/commercial', icon: LayoutDashboard },\n        { name: 'Mes Chantiers', href: '/dashboard/chantiers', icon: GanttChartSquare },\n        { name: 'Devis & Factures', href: '/dashboard/devis', icon: FileText },\n        { name: 'Messages Clients', href: '/dashboard/messages', icon: MessagesSquare },\n        { name: 'Planning', href: '/dashboard/planning', icon: Calendar },\n        { name: 'Documents', href: '/dashboard/documents', icon: Folder }\n      ];\n    \n    case 'CLIENT':\n      return [\n        { name: 'Mes Projets', href: '/dashboard/client', icon: LayoutDashboard },\n        { name: 'Mes Chantiers', href: '/dashboard/chantiers', icon: GanttChartSquare },\n        { name: 'Messages', href: '/dashboard/messages', icon: MessagesSquare },\n        { name: 'Mes Documents', href: '/dashboard/documents', icon: Folder }\n      ];\n    \n    default:\n      return [];\n  }\n};\n\ninterface SidebarProps {\n  open: boolean;\n  setOpen: (open: boolean) => void;\n}\n\nexport function ModernSidebar({ open, setOpen }: SidebarProps) {\n  const pathname = usePathname();\n  const { user, logout } = useAuth();\n\n  if (!user) return null;\n\n  const menuItems = getRoleBasedItems(user.role);\n\n  const getRoleColor = (role: string) => {\n    switch (role) {\n      case 'ADMIN': return 'from-red-500 to-red-600';\n      case 'COMMERCIAL': return 'from-green-500 to-green-600';\n      case 'CLIENT': return 'from-blue-500 to-blue-600';\n      default: return 'from-gray-500 to-gray-600';\n    }\n  };\n\n  const getRoleLabel = (role: string) => {\n    switch (role) {\n      case 'ADMIN': return 'Administrateur';\n      case 'COMMERCIAL': return 'Commercial';\n      case 'CLIENT': return 'Client';\n      default: return role;\n    }\n  };\n\n  const getRoleIcon = (role: string) => {\n    switch (role) {\n      case 'ADMIN': return '👑';\n      case 'COMMERCIAL': return '💼';\n      case 'CLIENT': return '🏠';\n      default: return '🏗️';\n    }\n  };\n\n  return (\n    <>\n      {open && <div className=\"fixed inset-0 bg-black/60 z-30 lg:hidden\" onClick={() => setOpen(false)}></div>}\n\n      <aside className={cn(\n        \"fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 text-gray-900 flex flex-col transition-transform duration-300 ease-in-out shadow-lg\",\n        \"lg:relative lg:translate-x-0\",\n        open ? \"flex translate-x-0\" : \"hidden lg:flex -translate-x-full lg:translate-x-0\"\n      )}>\n        <div className=\"flex flex-col h-full\">\n          <div className=\"flex items-center justify-between h-20 px-6 border-b border-gray-200\">\n            <div className=\"flex items-center gap-3\">\n              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getRoleColor(user.role)} flex items-center justify-center text-white font-bold text-lg shadow-md`}>\n                {getRoleIcon(user.role)}\n              </div>\n              <div>\n                <span className=\"font-bold text-xl text-gray-900\">ChantierPro</span>\n                <p className=\"text-xs text-gray-500\">v2.0 • {getRoleLabel(user.role)}</p>\n              </div>\n            </div>\n            <button onClick={() => setOpen(false)} className=\"lg:hidden p-2 rounded-md hover:bg-gray-100 text-gray-500\">\n              <X size={20} />\n            </button>\n          </div>\n\n          <nav className=\"flex-1 px-4 py-6 space-y-1\">\n            {menuItems.map((item) => {\n              const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));\n              return (\n                <Link key={item.name} href={item.href}\n                  className={cn(\n                    \"flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 group\",\n                    isActive\n                      ? `bg-gradient-to-r ${getRoleColor(user.role)} text-white shadow-md transform scale-[1.02]`\n                      : 'text-gray-600 hover:bg-gray-50 hover:text-blue-500 hover:transform hover:scale-[1.01]'\n                  )}>\n                  <item.icon size={20} className={cn(\"transition-colors\", isActive ? \"text-white\" : \"text-gray-600 group-hover:text-blue-500\")} />\n                  <span>{item.name}</span>\n                </Link>\n              );\n            })}\n          </nav>\n\n          <div className=\"px-4 py-6 border-t border-gray-200 space-y-4\">\n            <Link href=\"/dashboard/profile\" className=\"flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-blue-500 transition-colors\">\n              <User size={20} />\n              <span>Mon Profil</span>\n            </Link>\n            \n            {user.role === 'ADMIN' && (\n              <Link href=\"/dashboard/settings\" className=\"flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-blue-500 transition-colors\">\n                <Settings size={20} />\n                <span>Paramètres</span>\n              </Link>\n            )}\n            \n            <div className=\"flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200\">\n              <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getRoleColor(user.role)} flex items-center justify-center text-white text-sm font-bold shadow-sm`}>\n                {user.avatar}\n              </div>\n              <div className=\"flex-1 min-w-0\">\n                <p className=\"text-sm font-semibold text-gray-900 truncate\">{user.name}</p>\n                <p className=\"text-xs text-gray-600\">{getRoleLabel(user.role)}</p>\n              </div>\n              <button \n                onClick={logout}\n                className=\"p-2 text-gray-600 rounded-md hover:bg-gray-100 hover:text-red-500 transition-colors\"\n                title=\"Se déconnecter\"\n              >\n                <LogOut size={18} />\n              </button>\n            </div>\n          </div>\n        </div>\n      </aside>\n    </>\n  );\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import React from 'react';",
+        "import Link from 'next/link';",
+        "import { usePathname } from 'next/navigation';",
+        "import { cn } from '@/lib/utils';",
+        "import { useAuth } from '@/hooks/useAuth';",
+        "import {"
+      ],
+      "exports": [
+        "export function ModernSidebar({ open, setOpen }: SidebarProps) {"
+      ]
+    },
+    {
+      "file": "components/layout/NotificationBadge.tsx",
+      "name": "NotificationBadge",
+      "content": "\"use client\";\n\nimport { CSSProperties } from 'react';\n\ninterface NotificationBadgeProps {\n  count: number;\n  maxCount?: number;\n  color?: string;\n  backgroundColor?: string;\n  size?: 'sm' | 'md' | 'lg';\n  animate?: boolean;\n  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';\n  className?: string;\n  style?: CSSProperties;\n}\n\nexport default function NotificationBadge({ \n  count, \n  maxCount = 99, \n  color = '#ffffff',\n  backgroundColor = '#ef4444',\n  size = 'md',\n  animate = true,\n  position = 'top-right',\n  className = '',\n  style = {}\n}: NotificationBadgeProps) {\n  if (count <= 0) return null;\n\n  const sizeConfig = {\n    sm: { \n      fontSize: '0.625rem', \n      minWidth: '1rem', \n      height: '1rem',\n      padding: '0 0.25rem'\n    },\n    md: { \n      fontSize: '0.75rem', \n      minWidth: '1.25rem', \n      height: '1.25rem',\n      padding: '0 0.375rem'\n    },\n    lg: { \n      fontSize: '0.875rem', \n      minWidth: '1.5rem', \n      height: '1.5rem',\n      padding: '0 0.5rem'\n    }\n  };\n\n  const positionConfig = {\n    'top-right': { top: '-6px', right: '-6px' },\n    'top-left': { top: '-6px', left: '-6px' },\n    'bottom-right': { bottom: '-6px', right: '-6px' },\n    'bottom-left': { bottom: '-6px', left: '-6px' }\n  };\n\n  const displayCount = count > maxCount ? `${maxCount}+` : count.toString();\n\n  const badgeStyle: CSSProperties = {\n    position: 'absolute',\n    background: backgroundColor,\n    color,\n    fontWeight: 'bold',\n    borderRadius: '50%',\n    display: 'flex',\n    alignItems: 'center',\n    justifyContent: 'center',\n    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',\n    border: '2px solid white',\n    zIndex: 10,\n    fontFamily: 'system-ui, -apple-system, sans-serif',\n    lineHeight: 1,\n    whiteSpace: 'nowrap',\n    ...sizeConfig[size],\n    ...positionConfig[position],\n    ...style\n  };\n\n  return (\n    <>\n      <div \n        className={className}\n        style={{\n          ...badgeStyle,\n          animation: animate ? 'notification-pulse 2s infinite' : 'none'\n        }}\n      >\n        {displayCount}\n      </div>\n\n      {animate && (\n        <style jsx>{`\n          @keyframes notification-pulse {\n            0%, 100% { \n              transform: scale(1); \n              box-shadow: 0 2px 4px rgba(0,0,0,0.2);\n            }\n            50% { \n              transform: scale(1.1); \n              box-shadow: 0 4px 8px rgba(0,0,0,0.3);\n            }\n          }\n        `}</style>\n      )}\n    </>\n  );\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { CSSProperties } from 'react';"
+      ],
+      "exports": [
+        "export default function NotificationBadge({ "
+      ]
+    },
+    {
+      "file": "components/layout/ToastNotification.tsx",
+      "name": "ToastNotification",
+      "content": "\"use client\";\n\nimport { useState, useEffect } from 'react';\nimport NotificationBadge from './NotificationBadge';\n\ninterface Toast {\n  id: string;\n  type: 'success' | 'error' | 'info' | 'warning';\n title: string;\n message: string;\n duration?: number;\n action?: {\n   label: string;\n   onClick: () => void;\n };\n}\n\ninterface ToastNotificationProps {\n toasts: Toast[];\n onDismiss: (id: string) => void;\n}\n\nexport default function ToastNotification({ toasts, onDismiss }: ToastNotificationProps) {\n const getToastStyles = (type: Toast['type']) => {\n   const baseStyles = {\n     background: 'white',\n     border: '1px solid',\n     borderRadius: '0.75rem',\n     boxShadow: '0 10px 25px rgba(0,0,0,0.15)',\n     padding: '1rem',\n     minWidth: '300px',\n     maxWidth: '400px',\n     marginBottom: '0.75rem',\n     position: 'relative' as const,\n     overflow: 'hidden' as const\n   };\n\n   const typeStyles = {\n     success: {\n       borderColor: '#10b981',\n       borderLeftWidth: '4px',\n       borderLeftColor: '#10b981'\n     },\n     error: {\n       borderColor: '#ef4444',\n       borderLeftWidth: '4px',\n       borderLeftColor: '#ef4444'\n     },\n     warning: {\n       borderColor: '#f59e0b',\n       borderLeftWidth: '4px',\n       borderLeftColor: '#f59e0b'\n     },\n     info: {\n       borderColor: '#3b82f6',\n       borderLeftWidth: '4px',\n       borderLeftColor: '#3b82f6'\n     }\n   };\n\n   return { ...baseStyles, ...typeStyles[type] };\n };\n\n const getIcon = (type: Toast['type']) => {\n   const icons = {\n     success: '✅',\n     error: '❌',\n     warning: '⚠️',\n     info: '💬'\n   };\n   return icons[type];\n };\n\n const getColor = (type: Toast['type']) => {\n   const colors = {\n     success: '#10b981',\n     error: '#ef4444',\n     warning: '#f59e0b',\n     info: '#3b82f6'\n   };\n   return colors[type];\n };\n\n useEffect(() => {\n   toasts.forEach(toast => {\n     if (toast.duration !== 0) {\n       const timer = setTimeout(() => {\n         onDismiss(toast.id);\n       }, toast.duration || 5000);\n\n       return () => clearTimeout(timer);\n     }\n   });\n }, [toasts, onDismiss]);\n\n if (toasts.length === 0) return null;\n\n return (\n   <div style={{\n     position: 'fixed',\n     top: '2rem',\n     right: '2rem',\n     zIndex: 9999,\n     pointerEvents: 'auto'\n   }}>\n     {toasts.map((toast, index) => (\n       <div\n         key={toast.id}\n         style={{\n           ...getToastStyles(toast.type),\n           animation: `slideInRight 0.3s ease ${index * 0.1}s both`\n         }}\n       >\n         {/* Barre de progression */}\n         {toast.duration !== 0 && (\n           <div\n             style={{\n               position: 'absolute',\n               bottom: 0,\n               left: 0,\n               height: '3px',\n               background: getColor(toast.type),\n               animation: `progress ${toast.duration || 5000}ms linear`\n             }}\n           />\n         )}\n\n         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>\n           <div style={{\n             fontSize: '1.25rem',\n             flexShrink: 0,\n             marginTop: '0.125rem'\n           }}>\n             {getIcon(toast.type)}\n           </div>\n\n           <div style={{ flex: 1, minWidth: 0 }}>\n             <h4 style={{\n               margin: '0 0 0.25rem 0',\n               fontSize: '0.875rem',\n               fontWeight: '600',\n               color: '#1e293b'\n             }}>\n               {toast.title}\n             </h4>\n             \n             <p style={{\n               margin: 0,\n               fontSize: '0.875rem',\n               color: '#64748b',\n               lineHeight: 1.4\n             }}>\n               {toast.message}\n             </p>\n\n             {toast.action && (\n               <button\n                 onClick={() => {\n                   toast.action!.onClick();\n                   onDismiss(toast.id);\n                 }}\n                 style={{\n                   marginTop: '0.75rem',\n                   padding: '0.5rem 1rem',\n                   border: `1px solid ${getColor(toast.type)}`,\n                   borderRadius: '0.5rem',\n                   background: 'transparent',\n                   color: getColor(toast.type),\n                   fontSize: '0.875rem',\n                   cursor: 'pointer',\n                   transition: 'all 0.2s ease'\n                 }}\n                 onMouseEnter={(e) => {\n                   e.currentTarget.style.background = getColor(toast.type);\n                   e.currentTarget.style.color = 'white';\n                 }}\n                 onMouseLeave={(e) => {\n                   e.currentTarget.style.background = 'transparent';\n                   e.currentTarget.style.color = getColor(toast.type);\n                 }}\n               >\n                 {toast.action.label}\n               </button>\n             )}\n           </div>\n\n           <button\n             onClick={() => onDismiss(toast.id)}\n             style={{\n               width: '1.5rem',\n               height: '1.5rem',\n               borderRadius: '50%',\n               border: 'none',\n               background: 'transparent',\n               color: '#94a3b8',\n               cursor: 'pointer',\n               fontSize: '1rem',\n               display: 'flex',\n               alignItems: 'center',\n               justifyContent: 'center',\n               flexShrink: 0\n             }}\n             onMouseEnter={(e) => {\n               e.currentTarget.style.background = '#f1f5f9';\n               e.currentTarget.style.color = '#64748b';\n             }}\n             onMouseLeave={(e) => {\n               e.currentTarget.style.background = 'transparent';\n               e.currentTarget.style.color = '#94a3b8';\n             }}\n           >\n             ×\n           </button>\n         </div>\n       </div>\n     ))}\n\n     <style jsx>{`\n       @keyframes slideInRight {\n         from {\n           transform: translateX(100%);\n           opacity: 0;\n         }\n         to {\n           transform: translateX(0);\n           opacity: 1;\n         }\n       }\n\n       @keyframes progress {\n         from {\n           width: 100%;\n         }\n         to {\n           width: 0%;\n         }\n       }\n     `}</style>\n   </div>\n );\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useEffect } from 'react';",
+        "import NotificationBadge from './NotificationBadge';"
+      ],
+      "exports": [
+        "export default function ToastNotification({ toasts, onDismiss }: ToastNotificationProps) {"
+      ]
+    },
+    {
+      "file": "components/layout/UserMenu.tsx",
+      "name": "UserMenu",
+      "content": "'use client';\n\nimport { useState, useRef, useEffect } from 'react';\nimport { useAuth } from '@/hooks/useAuth';\nimport Link from 'next/link';\nimport { User, Settings, LogOut, ChevronDown } from 'lucide-react';\n\nexport default function UserMenu() {\n  const { user, logout } = useAuth();\n  const [isOpen, setIsOpen] = useState(false);\n  const menuRef = useRef<HTMLDivElement>(null);\n\n  useEffect(() => {\n    const handleClickOutside = (event: MouseEvent) => {\n      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {\n        setIsOpen(false);\n      }\n    };\n\n    document.addEventListener('mousedown', handleClickOutside);\n    return () => document.removeEventListener('mousedown', handleClickOutside);\n  }, []);\n\n  if (!user) return null;\n\n  const getRoleColor = (role: string) => {\n    switch (role) {\n      case 'ADMIN': return 'from-red-500 to-red-600';\n      case 'COMMERCIAL': return 'from-green-500 to-green-600';\n      case 'CLIENT': return 'from-blue-500 to-blue-600';\n      default: return 'from-gray-500 to-gray-600';\n    }\n  };\n\n  const getRoleLabel = (role: string) => {\n    switch (role) {\n      case 'ADMIN': return 'Administrateur';\n      case 'COMMERCIAL': return 'Commercial';\n      case 'CLIENT': return 'Client';\n      default: return role;\n    }\n  };\n\n  const getInitials = (name: string) => {\n    return name\n      .split(' ')\n      .map(word => word[0])\n      .join('')\n      .toUpperCase()\n      .slice(0, 2);\n  };\n\n  const handleLogout = () => {\n    setIsOpen(false);\n    logout();\n  };\n\n  return (\n    <div className=\"relative\" ref={menuRef}>\n      <button\n        onClick={() => setIsOpen(!isOpen)}\n        className=\"flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2\"\n      >\n        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getRoleColor(user.role)} flex items-center justify-center text-white font-semibold text-sm shadow-md`}>\n          {user.avatar || getInitials(user.name)}\n        </div>\n        <div className=\"hidden md:block text-left\">\n          <p className=\"text-sm font-semibold text-gray-900 truncate max-w-32\">\n            {user.name}\n          </p>\n          <p className=\"text-xs text-gray-500\">\n            {getRoleLabel(user.role)}\n          </p>\n        </div>\n        <ChevronDown \n          size={16} \n          className={`hidden md:block text-gray-400 transition-transform duration-200 ${\n            isOpen ? 'rotate-180' : ''\n          }`} \n        />\n      </button>\n\n      {isOpen && (\n        <div className=\"absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50\">\n          <div className=\"px-4 py-3 border-b border-gray-100\">\n            <div className=\"flex items-center gap-3\">\n              <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${getRoleColor(user.role)} flex items-center justify-center text-white font-bold shadow-md`}>\n                {user.avatar || getInitials(user.name)}\n              </div>\n              <div className=\"flex-1 min-w-0\">\n                <p className=\"text-sm font-semibold text-gray-900 truncate\">\n                  {user.name}\n                </p>\n                <p className=\"text-xs text-gray-500 truncate\">\n                  {user.email}\n                </p>\n                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${\n                  user.role === 'ADMIN' ? 'bg-red-100 text-red-800' :\n                  user.role === 'COMMERCIAL' ? 'bg-green-100 text-green-800' :\n                  'bg-blue-100 text-blue-800'\n                }`}>\n                  {getRoleLabel(user.role)}\n                </span>\n              </div>\n            </div>\n          </div>\n\n          <div className=\"py-2\">\n            <Link\n              href=\"/dashboard/profile\"\n              onClick={() => setIsOpen(false)}\n              className=\"flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors\"\n            >\n              <User size={16} className=\"text-gray-500\" />\n              <span>Mon profil</span>\n            </Link>\n\n            {user.role === 'ADMIN' && (\n              <Link\n                href=\"/dashboard/settings\"\n                onClick={() => setIsOpen(false)}\n                className=\"flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors\"\n              >\n                <Settings size={16} className=\"text-gray-500\" />\n                <span>Paramètres</span>\n              </Link>\n            )}\n          </div>\n\n          <div className=\"border-t border-gray-100 pt-2\">\n            <button\n              onClick={handleLogout}\n              className=\"flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors w-full text-left\"\n            >\n              <LogOut size={16} />\n              <span>Se déconnecter</span>\n            </button>\n          </div>\n        </div>\n      )}\n    </div>\n  );\n}\n",
+      "patterns": {
+        "buttons": [],
+        "inputs": [],
+        "cards": [],
+        "headers": [],
+        "navigation": [],
+        "colors": [],
+        "spacing": [],
+        "typography": [],
+        "shadows": [],
+        "borders": []
+      },
+      "imports": [
+        "import { useState, useRef, useEffect } from 'react';",
+        "import { useAuth } from '@/hooks/useAuth';",
+        "import Link from 'next/link';",
+        "import { User, Settings, LogOut, ChevronDown } from 'lucide-react';"
+      ],
+      "exports": [
+        "export default function UserMenu() {"
+      ]
+    }
+  ],
+  "inconsistencies": [
+    {
+      "type": "colors",
+      "description": "Variations incohérentes dans les couleurs",
+      "items": [
+        {
+          "base": "text-gray",
+          "variants": [
+            "text-gray-500",
+            "text-gray-400",
+            "text-gray-900",
+            "text-gray-600",
+            "text-gray-700",
+            "text-gray-300"
+          ],
+          "count": 6
+        },
+        {
+          "base": "bg-blue",
+          "variants": [
+            "bg-blue-50",
+            "bg-blue-600",
+            "bg-blue-500",
+            "bg-blue-100",
+            "bg-blue-400",
+            "bg-blue-300"
+          ],
+          "count": 6
+        },
+        {
+          "base": "text-blue",
+          "variants": [
+            "text-blue-700",
+            "text-blue-600",
+            "text-blue-500",
+            "text-blue-200",
+            "text-blue-100",
+            "text-blue-300",
+            "text-blue-900",
+            "text-blue-800"
+          ],
+          "count": 8
+        },
+        {
+          "base": "text-red",
+          "variants": [
+            "text-red-700",
+            "text-red-500",
+            "text-red-800",
+            "text-red-600",
+            "text-red-200",
+            "text-red-300"
+          ],
+          "count": 6
+        },
+        {
+          "base": "border-gray",
+          "variants": [
+            "border-gray-200",
+            "border-gray-300",
+            "border-gray-100",
+            "border-gray-900"
+          ],
+          "count": 4
+        },
+        {
+          "base": "bg-gray",
+          "variants": [
+            "bg-gray-50",
+            "bg-gray-200",
+            "bg-gray-100",
+            "bg-gray-300",
+            "bg-gray-500"
+          ],
+          "count": 5
+        },
+        {
+          "base": "bg-green",
+          "variants": [
+            "bg-green-50",
+            "bg-green-100",
+            "bg-green-500",
+            "bg-green-400"
+          ],
+          "count": 4
+        },
+        {
+          "base": "text-green",
+          "variants": [
+            "text-green-800",
+            "text-green-600",
+            "text-green-700",
+            "text-green-100",
+            "text-green-500",
+            "text-green-300",
+            "text-green-200"
+          ],
+          "count": 7
+        },
+        {
+          "base": "text-orange",
+          "variants": [
+            "text-orange-600",
+            "text-orange-400",
+            "text-orange-200",
+            "text-orange-800"
+          ],
+          "count": 4
+        }
+      ]
+    },
+    {
+      "type": "spacing",
+      "description": "Variations incohérentes dans l'espacement",
+      "items": [
+        "mt-0.5",
+        "py-0.5"
+      ]
+    },
+    {
+      "type": "buttons",
+      "description": "Styles de boutons incohérents",
+      "items": [
+        "btn-ghost",
+        "btn-primary",
+        "btn btn-primary flex items-center gap-2",
+        "btn btn-primary",
+        "btn bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-2",
+        "btn bg-green-500 hover:bg-green-600 text-white flex items-center gap-2",
+        "btn bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2",
+        "btn bg-red-500 hover:bg-red-600 text-white flex items-center gap-2",
+        "btn btn-ghost flex items-center gap-2"
+      ]
+    },
+    {
+      "type": "cards",
+      "description": "Styles de cards incohérents",
+      "items": [
+        "card",
+        "container mx-auto px-4 lg:px-8 py-6 max-w-7xl",
+        "container mx-auto px-4 py-8",
+        "container"
+      ]
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "type": "standardization",
+      "title": "Standardiser les composants incohérents",
+      "description": "4 types d'inconsistances détectées",
+      "actions": [
+        "Uniformiser colors: Variations incohérentes dans les couleurs",
+        "Uniformiser spacing: Variations incohérentes dans l'espacement",
+        "Uniformiser buttons: Styles de boutons incohérents",
+        "Uniformiser cards: Styles de cards incohérents"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "type": "colors",
+      "title": "Réduire la palette de couleurs",
+      "description": "143 variations de couleurs détectées",
+      "actions": [
+        "Définir une palette limitée",
+        "Utiliser les couleurs système"
+      ]
+    }
+  ]
+}

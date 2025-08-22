@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { ModernSidebar } from './ModernSidebar';
 import { ToastProvider } from '@/components/ui/Toast';
+import { useAuth } from '@/hooks/useAuth';
 import { Menu } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -11,16 +12,37 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <span className="text-2xl">🏗️</span>
+          </div>
+          <div className="text-lg font-semibold text-gray-900">Chargement...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-semibold text-gray-900">Connexion requise</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ToastProvider>
       <div className="flex h-screen bg-gray-50 overflow-hidden">
-        {/* Sidebar */}
         <ModernSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
 
-        {/* Main content */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Mobile header */}
           <div className="lg:hidden flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200 shadow-sm">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -34,10 +56,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               </div>
               <span className="font-bold text-lg text-gray-900">ChantierPro</span>
             </div>
-            <div className="w-10" /> {/* Spacer for centering */}
+            <div className="w-10" />
           </div>
 
-          {/* Main content area */}
           <main className="flex-1 overflow-auto">
             <div className="container mx-auto px-4 lg:px-8 py-6 max-w-7xl">
               {children}

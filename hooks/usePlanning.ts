@@ -1,88 +1,61 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-
-interface Planning {
-  id: string;
-  titre: string;
-  description?: string;
-  type: string;
-  dateDebut: string;
-  dateFin: string;
-  statut: string;
-  lieu?: string;
-  notes?: string;
-  organisateur: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  participants?: Array<{
-    id: string;
-    name: string;
-    role: string;
-  }>;
-  chantier?: {
-    id: string;
-    nom: string;
-  };
-}
+import { useState, useEffect } from 'react';
 
 interface UsePlanningOptions {
-  dateDebut?: Date;
-  dateFin?: Date;
-  chantierId?: string;
-  userId?: string;
+  search?: string;
   type?: string;
+  chantierId?: string;
+  dateDebut?: string;
+  dateFin?: string;
   autoRefresh?: boolean;
 }
 
 export function usePlanning(options: UsePlanningOptions = {}) {
-  const [plannings, setPlannings] = useState<Planning[]>([]);
+  const [planning, setPlanning] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    pages: 0
+  });
 
-  const fetchPlannings = useCallback(async () => {
+  const fetchPlanning = async (page = 1) => {
     try {
       setLoading(true);
       setError(null);
-
-      const params = new URLSearchParams();
       
-      if (options.dateDebut) {
-        params.append('dateDebut', options.dateDebut.toISOString());
-      }
-      if (options.dateFin) {
-        params.append('dateFin', options.dateFin.toISOString());
-      }
-      if (options.chantierId) {
-        params.append('chantierId', options.chantierId);
-      }
-      if (options.userId) {
-        params.append('userId', options.userId);
-      }
-      if (options.type && options.type !== 'TOUS') {
-        params.append('type', options.type);
-      }
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: pagination.limit.toString()
+      });
+      
+      if (options.search) params.append('search', options.search);
+      if (options.type) params.append('type', options.type);
+      if (options.chantierId) params.append('chantierId', options.chantierId);
+      if (options.dateDebut) params.append('dateDebut', options.dateDebut);
+      if (options.dateFin) params.append('dateFin', options.dateFin);
 
       const response = await fetch(`/api/planning?${params}`);
-      
-      if (!response.ok) {
-        throw new Error('Erreur lors du chargement des plannings');
-      }
-
       const data = await response.json();
-      setPlannings(data.plannings || []);
-
+      
+      if (response.ok) {
+        setPlanning(data.planning || []);
+        setPagination(data.pagination || pagination);
+      } else {
+        setError(data.error || 'Erreur lors du chargement');
+      }
     } catch (err) {
-      console.error('Erreur fetchPlannings:', err);
-      setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      setError('Erreur réseau');
+      console.error('Erreur usePlanning:', err);
     } finally {
       setLoading(false);
     }
-  }, [options.dateDebut, options.dateFin, options.chantierId, options.userId, options.type]);
+  };
 
-  const createPlanning = useCallback(async (data: any) => {
+  const createEvent = async (data: any) => {
     try {
       const response = await fetch('/api/planning', {
         method: 'POST',
@@ -93,7 +66,7 @@ export function usePlanning(options: UsePlanningOptions = {}) {
       const result = await response.json();
       
       if (response.ok) {
-        await fetchPlannings();
+        await fetchPlanning();
         return result;
       } else {
         throw new Error(result.error || 'Erreur lors de la création');
@@ -101,9 +74,9 @@ export function usePlanning(options: UsePlanningOptions = {}) {
     } catch (err) {
       throw err;
     }
-  }, [fetchPlannings]);
+  };
 
-  const updatePlanning = useCallback(async (id: string, data: any) => {
+  const updateEvent = async (id: string, data: any) => {
     try {
       const response = await fetch(`/api/planning/${id}`, {
         method: 'PUT',
@@ -114,7 +87,7 @@ export function usePlanning(options: UsePlanningOptions = {}) {
       const result = await response.json();
       
       if (response.ok) {
-        await fetchPlannings();
+        await fetchPlanning();
         return result;
       } else {
         throw new Error(result.error || 'Erreur lors de la modification');
@@ -122,16 +95,16 @@ export function usePlanning(options: UsePlanningOptions = {}) {
     } catch (err) {
       throw err;
     }
-  }, [fetchPlannings]);
+  };
 
-  const deletePlanning = useCallback(async (id: string) => {
+  const deleteEvent = async (id: string) => {
     try {
       const response = await fetch(`/api/planning/${id}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
-        await fetchPlannings();
+        await fetchPlanning();
         return true;
       } else {
         const result = await response.json();
@@ -140,66 +113,68 @@ export function usePlanning(options: UsePlanningOptions = {}) {
     } catch (err) {
       throw err;
     }
-  }, [fetchPlannings]);
+  };
 
-  const checkConflicts = useCallback(async (data: {
-    dateDebut: string;
-    dateFin: string;
-    participantIds: string[];
-    excludeId?: string;
-  }) => {
+  const checkConflicts = async (eventData: any) => {
     try {
       const response = await fetch('/api/planning/conflicts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(eventData)
       });
 
       const result = await response.json();
-      return result.conflicts || [];
+      
+      if (response.ok) {
+        return result.conflicts || [];
+      } else {
+        throw new Error(result.error || 'Erreur lors de la vérification des conflits');
+      }
     } catch (err) {
-      console.error('Erreur vérification conflits:', err);
-      return [];
+      throw err;
     }
-  }, []);
+  };
 
   useEffect(() => {
-    fetchPlannings();
-  }, [fetchPlannings]);
+    fetchPlanning();
+  }, [options.search, options.type, options.chantierId, options.dateDebut, options.dateFin]);
 
   useEffect(() => {
     if (options.autoRefresh) {
       const interval = setInterval(() => {
-        fetchPlannings();
+        fetchPlanning(pagination.page);
       }, 30000);
 
       return () => clearInterval(interval);
     }
-  }, [options.autoRefresh, fetchPlannings]);
+  }, [options.autoRefresh, pagination.page]);
 
   return {
-    plannings,
+    planning,
     loading,
     error,
+    pagination,
     actions: {
-      fetchPlannings,
-      createPlanning,
-      updatePlanning,
-      deletePlanning,
+      fetchPlanning,
+      createEvent,
+      updateEvent,
+      deleteEvent,
       checkConflicts,
-      refresh: fetchPlannings
+      refresh: () => fetchPlanning(pagination.page),
+      loadPage: fetchPlanning
     }
   };
 }
 
 export function usePlanningStats() {
   const [stats, setStats] = useState({
-    totalPlannings: 0,
-    planifie: 0,
-    enCours: 0,
-    termine: 0,
+    totalEvents: 0,
+    reunions: 0,
+    livraisons: 0,
+    inspections: 0,
     thisWeek: 0,
-    nextWeek: 0
+    thisMonth: 0,
+    conflicts: 0
   });
   const [loading, setLoading] = useState(true);
 

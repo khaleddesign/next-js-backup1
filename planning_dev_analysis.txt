@@ -1,0 +1,941 @@
+🚀 CHANTIERPRO - ANALYSE ESSENTIELLE POUR IA
+=============================================
+Généré le: Ven 22 aoû 2025 11:04:44 CET
+Objectif: Comprendre le projet pour développer
+=============================================
+
+🗄️ MODÈLE PRISMA (COMPLET - ESSENTIEL)
+======================================
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  nom           String?
+  name          String?
+  email         String    @unique
+  password      String?
+  image         String?
+  role          Role      @default(CLIENT)
+  phone         String?
+  company       String?
+  address       String?
+  
+  accounts      Account[]
+  sessions      Session[]
+  chantiers     Chantier[] @relation("ChantierClient")
+  assignedChantiers Chantier[] @relation("ChantierAssignee")
+  messages      Message[]
+  comments      Comment[]
+  timelineEvents TimelineEvent[]
+  devis         Devis[] @relation("DevisClient")
+  planningsOrganisateur Planning[] @relation("PlanningOrganisateur")
+  planningsParticipant Planning[] @relation("PlanningParticipants")
+  notifications Notification[]
+  documents     Document[] @relation("DocumentUploader")
+  etapesCreated EtapeChantier[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Chantier {
+  id          String        @id @default(cuid())
+  nom         String
+  description String        @db.Text
+  adresse     String
+  client      User          @relation("ChantierClient", fields: [clientId], references: [id])
+  clientId    String
+  statut      ChantierStatus @default(PLANIFIE)
+  progression Int           @default(0)
+  dateDebut   DateTime
+  dateFin     DateTime
+  budget      Float
+  superficie  String
+  photo       String?
+  photos      String[]
+  lat         Float?
+  lng         Float?
+  
+  assignees   User[]        @relation("ChantierAssignee")
+  timeline    TimelineEvent[]
+  comments    Comment[]
+  messages    Message[]
+  devis       Devis[]
+  plannings   Planning[] @relation("PlanningChantier")
+  documents   Document[] @relation("DocumentChantier")
+  etapes      EtapeChantier[]
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model TimelineEvent {
+  id          String            @id @default(cuid())
+  chantier    Chantier          @relation(fields: [chantierId], references: [id], onDelete: Cascade)
+  chantierId  String
+  titre       String
+  description String            @db.Text
+  date        DateTime
+  type        TimelineEventType
+  createdBy   User              @relation(fields: [createdById], references: [id])
+  createdById String
+  
+  createdAt   DateTime          @default(now())
+}
+
+model Comment {
+  id         String      @id @default(cuid())
+  chantier   Chantier    @relation(fields: [chantierId], references: [id], onDelete: Cascade)
+  chantierId String
+  auteur     User        @relation(fields: [auteurId], references: [id])
+  auteurId   String
+  message    String      @db.Text
+  photos     String[]
+  reactions  Json        @default("[]")
+  
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  expediteur     User        @relation(fields: [expediteurId], references: [id])
+  expediteurId   String
+  destinataireId String?
+  chantier       Chantier?   @relation(fields: [chantierId], references: [id])
+  chantierId     String?
+  message        String      @db.Text
+  photos         String[]
+  typeMessage    MessageType @default(DIRECT)
+  lu             Boolean     @default(false)
+  reactions      Json        @default("[]")
+  threadId       String?
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model Devis {
+  id              String        @id @default(cuid())
+  numero          String        @unique
+  chantier        Chantier?     @relation(fields: [chantierId], references: [id])
+  chantierId      String?
+  client          User          @relation("DevisClient", fields: [clientId], references: [id])
+  clientId        String
+  type            DevisType
+  objet           String?
+  montant         Float
+  totalHT         Float?
+  totalTVA        Float?
+  totalTTC        Float?
+  tva             Float         @default(20.0)
+  statut          DevisStatus   @default(BROUILLON)
+  dateCreation    DateTime      @default(now())
+  dateEcheance    DateTime
+  lignes          Json          @default("[]")
+  ligneDevis      LigneDevis[]
+  paiements       Paiement[]    @relation("FacturePaiements")
+  relances        Relance[]     @relation("FactureRelances")
+  notes           String?       @db.Text
+  conditionsVente String?       @db.Text
+  factureId       String?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model LigneDevis {
+  id          String  @id @default(cuid())
+  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
+  devisId     String
+  description String
+  quantite    Float
+  prixUnit    Float
+  total       Float
+  ordre       Int     @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Paiement {
+  id          String   @id @default(cuid())
+  facture     Devis    @relation("FacturePaiements", fields: [factureId], references: [id], onDelete: Cascade)
+  factureId   String
+  montant     Float
+  datePaiement DateTime
+  methode     String
+  reference   String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Relance {
+  id          String   @id @default(cuid())
+  facture     Devis    @relation("FactureRelances", fields: [factureId], references: [id], onDelete: Cascade)
+  factureId   String
+  dateRelance DateTime
+  type        String   @default("EMAIL")
+  message     String   @db.Text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Planning {
+  id            String         @id @default(cuid())
+  titre         String
+  description   String?        @db.Text
+  type          PlanningType   @default(REUNION)
+  dateDebut     DateTime
+  dateFin       DateTime
+  recurrence    String?
+  
+  chantier      Chantier?      @relation("PlanningChantier", fields: [chantierId], references: [id])
+  chantierId    String?
+  organisateur  User           @relation("PlanningOrganisateur", fields: [organisateurId], references: [id])
+  organisateurId String
+  participants  User[]         @relation("PlanningParticipants")
+  
+  statut        PlanningStatus @default(PLANIFIE)
+  notes         String?        @db.Text
+  lieu          String?
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Document {
+  id            String       @id @default(cuid())
+  nom           String
+  nomOriginal   String
+  type          TypeDocument
+  taille        Int
+  url           String
+  urlThumbnail  String?
+  
+  chantier      Chantier?    @relation("DocumentChantier", fields: [chantierId], references: [id])
+  chantierId    String?
+  uploader      User         @relation("DocumentUploader", fields: [uploaderId], references: [id])
+  uploaderId    String
+  
+  metadonnees   Json?
+  tags          String[]
+  dossier       String?
+  public        Boolean      @default(false)
+  lienPartage   String?      @unique
+  
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  titre     String
+  message   String           @db.Text
+  type      NotificationType @default(INFO)
+  lu        Boolean          @default(false)
+  lien      String?
+  
+  createdAt DateTime         @default(now())
+}
+
+model EtapeChantier {
+  id          String      @id @default(cuid())
+  titre       String
+  description String?
+  dateDebut   DateTime
+  dateFin     DateTime
+  statut      EtapeStatus @default(A_FAIRE)
+  ordre       Int         @default(0)
+  
+  chantier    Chantier    @relation(fields: [chantierId], references: [id], onDelete: Cascade)
+  chantierId  String
+  createdBy   User        @relation(fields: [createdById], references: [id])
+  createdById String
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum Role {
+  ADMIN
+  COMMERCIAL
+  OUVRIER
+  CLIENT
+}
+
+enum ChantierStatus {
+  PLANIFIE
+  EN_COURS
+  EN_ATTENTE
+  TERMINE
+  ANNULE
+}
+
+enum TimelineEventType {
+  DEBUT
+  ETAPE
+  PROBLEME
+  FIN
+  ATTENTE
+}
+
+enum MessageType {
+  DIRECT
+  CHANTIER
+  GROUPE
+}
+
+enum DevisType {
+  DEVIS
+  FACTURE
+}
+
+enum DevisStatus {
+  BROUILLON
+  ENVOYE
+  ACCEPTE
+  REFUSE
+  PAYE
+}
+
+enum PlanningType {
+  REUNION
+  LIVRAISON
+  INSPECTION
+  AUTRE
+}
+
+enum PlanningStatus {
+  PLANIFIE
+  EN_COURS
+  TERMINE
+  ANNULE
+}
+
+enum TypeDocument {
+  PHOTO
+  PDF
+  PLAN
+  FACTURE
+  CONTRAT
+  AUTRE
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum EtapeStatus {
+  A_FAIRE
+  EN_COURS
+  TERMINE
+}
+
+📝 TYPES PRINCIPAUX
+==================
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'ADMIN' | 'COMMERCIAL' | 'OUVRIER' | 'CLIENT';
+  phone?: string;
+  company?: string;
+  address?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Chantier {
+  id: string;
+  nom: string;
+  description?: string;
+  adresse: string;
+  client: User;
+  clientId: string;
+  assignedTo?: User;
+  assignedToId?: string;
+  statut: 'PLANIFIE' | 'EN_COURS' | 'EN_ATTENTE' | 'TERMINE' | 'ANNULE';
+  progression: number;
+  budgetPrevisionnel?: number;
+  budget?: number;
+  superficie?: string;
+  photo?: string;
+  photos?: string[];
+  dateDebut: string;
+  dateFin?: string;
+  lat?: number;
+  lng?: number;
+  assignees?: User[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Message {
+  id: string;
+  expediteur: User;
+  expediteurId: string;
+  destinataireId?: string;
+  chantierId?: string;
+  message: string;
+  photos: string[];
+  files?: string[];
+  typeMessage: 'DIRECT' | 'CHANTIER' | 'GROUPE';
+  parentId?: string;
+  threadId?: string;
+  lu: boolean;
+  reactions?: any[];
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+}
+
+export interface Conversation {
+  id: string;
+  nom: string;
+  type: 'chantier' | 'direct' | 'groupe';
+  participants: User[];
+  lastMessage?: {
+    id?: string;
+    text: string;
+    time: string;
+    expediteur: string;
+  };
+  unreadCount: number;
+  photo?: string;
+  updatedAt: string;
+  isFavorite?: boolean;
+  isPinned?: boolean;
+}
+
+export interface SearchResult {
+  type: 'message' | 'contact' | 'file';
+  id: string;
+  title: string;
+  content: string;
+  timestamp: string;
+  relevanceScore: number;
+  context?: any;
+  metadata: {
+    expediteur?: {
+      id: string;
+      name: string;
+      role: string;
+    };
+    chantier?: {
+      id: string;
+      nom: string;
+    };
+    fileUrl?: string;
+    fileType?: string;
+    fileSize?: number;
+  };
+}
+
+export interface ActivityItem {
+  id: string;
+  message: string;
+  timestamp: string;
+  type: 'message' | 'chantier' | 'user' | 'system';
+  user?: string;
+  userId?: string;
+  chantierId?: string;
+  icon?: string;
+  href?: string;
+}
+
+🔐 CONFIGURATION AUTH
+=====================
+--- lib/auth.ts ---
+import { NextAuthOptions } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import GoogleProvider from "next-auth/providers/google";
+import { db } from "./db";
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(db),
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+  callbacks: {
+    session: async ({ session, token }) => {
+      if (session?.user && token?.sub) {
+        session.user.id = token.sub;
+        const user = await db.user.findUnique({
+          where: { id: token.sub },
+          select: { role: true },
+        });
+        session.user.role = user?.role || 'CLIENT';
+      }
+      return session;
+    },
+    jwt: async ({ user, token }) => {
+      if (user) {
+        token.uid = user.id;
+      }
+      return token;
+    },
+  },
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/auth/login",
+    newUser: "/auth/onboarding",
+  },
+};
+--- useAuth (interfaces) ---
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+--
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+--
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+--
+export const useRequireAuth = (allowedRoles?: string[]) => {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+--
+
+🌐 PATTERN API
+===============
+--- app/api/chantiers/route.ts (RÉFÉRENCE COMPLÈTE) ---
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { Prisma, ChantierStatus } from '@prisma/client';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search') || '';
+    const statut = searchParams.get('statut') || '';
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '12');
+    const offset = (page - 1) * limit;
+
+    const where: Prisma.ChantierWhereInput = {};
+    
+    if (search) {
+      where.OR = [
+        { nom: { contains: search, mode: 'insensitive' } },
+        { client: { name: { contains: search, mode: 'insensitive' } } }
+      ];
+    }
+
+    if (statut && statut !== 'TOUS') {
+      where.statut = statut as ChantierStatus;
+    }
+
+    const [chantiers, total] = await Promise.all([
+      db.chantier.findMany({
+        where,
+        include: {
+          client: {
+            select: { id: true, name: true, email: true, company: true }
+          },
+          assignees: {
+            select: { id: true, name: true, role: true }
+          },
+          _count: {
+            select: {
+              messages: true,
+              comments: true,
+              timeline: true
+            }
+          }
+        },
+        orderBy: { updatedAt: 'desc' },
+        take: limit,
+        skip: offset
+      }),
+      db.chantier.count({ where })
+    ]);
+
+    return NextResponse.json({
+      chantiers,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
+
+  } catch (error) {
+    console.error('Erreur API chantiers:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const data = await request.json();
+    
+    const required = ['nom', 'description', 'adresse', 'clientId', 'dateDebut', 'dateFin', 'budget'];
+    for (const field of required) {
+      if (!data[field]) {
+        return NextResponse.json({ error: `Le champ ${field} est requis` }, { status: 400 });
+      }
+    }
+
+    // Validation des dates
+    const dateDebut = new Date(data.dateDebut);
+    const dateFin = new Date(data.dateFin);
+    
+    if (isNaN(dateDebut.getTime()) || isNaN(dateFin.getTime())) {
+      return NextResponse.json({ error: 'Dates invalides' }, { status: 400 });
+    }
+
+    if (dateFin <= dateDebut) {
+      return NextResponse.json({ error: 'La date de fin doit être après la date de début' }, { status: 400 });
+    }
+
+    // Validation du budget
+    const budget = parseFloat(data.budget);
+    if (isNaN(budget) || budget <= 0) {
+      return NextResponse.json({ error: 'Le budget doit être un nombre positif' }, { status: 400 });
+    }
+
+    // Vérifier que le client existe
+    const client = await db.user.findUnique({
+      where: { id: data.clientId },
+      select: { id: true, role: true }
+    });
+
+    if (!client) {
+      return NextResponse.json({ error: 'Client introuvable' }, { status: 404 });
+    }
+
+    if (client.role !== 'CLIENT') {
+      return NextResponse.json({ error: 'L\'utilisateur sélectionné n\'est pas un client' }, { status: 400 });
+    }
+
+    const chantier = await db.chantier.create({
+      data: {
+        nom: data.nom,
+        description: data.description,
+        adresse: data.adresse,
+        clientId: data.clientId,
+        dateDebut: new Date(data.dateDebut),
+        dateFin: new Date(data.dateFin),
+        budget: parseFloat(data.budget),
+        superficie: data.superficie || '',
+        photo: data.photo || null,
+        photos: data.photos || [],
+        statut: 'PLANIFIE',
+        progression: 0
+      },
+      include: {
+        client: {
+          select: { id: true, name: true, email: true, company: true }
+        }
+      }
+    });
+
+    return NextResponse.json(chantier, { status: 201 });
+
+  } catch (error) {
+    console.error('Erreur création chantier:', error);
+    return NextResponse.json({ error: 'Erreur lors de la création du chantier' }, { status: 500 });
+  }
+}
+
+🎣 PATTERN HOOK
+===============
+--- hooks/useDevis.ts (RÉFÉRENCE) ---
+'use client';
+
+import { useState, useEffect } from 'react';
+
+interface UseDevisOptions {
+  search?: string;
+  statut?: string;
+  type?: string;
+  autoRefresh?: boolean;
+}
+
+export function useDevis(options: UseDevisOptions = {}) {
+  const [devis, setDevis] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    pages: 0
+  });
+
+  const fetchDevis = async (page = 1) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: pagination.limit.toString()
+      });
+      
+      if (options.search) params.append('search', options.search);
+      if (options.statut) params.append('statut', options.statut);
+      if (options.type) params.append('type', options.type);
+
+      const response = await fetch(`/api/devis?${params}`);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setDevis(data.devis || []);
+        setPagination(data.pagination || pagination);
+      } else {
+        setError(data.error || 'Erreur lors du chargement');
+      }
+    } catch (err) {
+      setError('Erreur réseau');
+      console.error('Erreur useDevis:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createDevis = async (data: any) => {
+    try {
+      const response = await fetch('/api/devis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        await fetchDevis();
+        return result;
+      } else {
+        throw new Error(result.error || 'Erreur lors de la création');
+      }
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteDevis = async (id: string) => {
+    try {
+      const response = await fetch(`/api/devis/${id}`, {
+        method: 'DELETE'
+      });
+
+... [reste du hook - pattern visible]
+
+🛠️ UTILITAIRES DB
+==================
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const db = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
+
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+🎨 LAYOUT & NAVIGATION
+======================
+--- Layout principal ---
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ToastProvider } from "@/components/ui/Toast";import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "ChantierPro - Gestion de chantiers",
+  description: "Application de gestion de chantiers de construction professionnelle",
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="fr">
+      <head>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+      </head>
+      <body className={inter.className}>
+        <AuthProvider>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
+        </AuthProvider>
+      </body>
+    </html>
+  );
+}
+
+--- Navigation structure ---
+        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+        { name: 'Chantiers', href: '/dashboard/chantiers', icon: GanttChartSquare },
+        { name: 'Messages', href: '/dashboard/messages', icon: MessagesSquare },
+        { name: 'Utilisateurs', href: '/dashboard/users', icon: Users },
+        { name: 'Devis', href: '/dashboard/devis', icon: FileText },
+        { name: 'Planning', href: '/dashboard/planning', icon: Calendar },
+        { name: 'Documents', href: '/dashboard/documents', icon: Folder }
+        { name: 'Dashboard Commercial', href: '/dashboard/commercial', icon: LayoutDashboard },
+        { name: 'Mes Chantiers', href: '/dashboard/chantiers', icon: GanttChartSquare },
+        { name: 'Devis & Factures', href: '/dashboard/devis', icon: FileText },
+        { name: 'Messages Clients', href: '/dashboard/messages', icon: MessagesSquare },
+        { name: 'Planning', href: '/dashboard/planning', icon: Calendar },
+        { name: 'Documents', href: '/dashboard/documents', icon: Folder }
+        { name: 'Mes Projets', href: '/dashboard/client', icon: LayoutDashboard },
+        { name: 'Mes Chantiers', href: '/dashboard/chantiers', icon: GanttChartSquare },
+        { name: 'Messages', href: '/dashboard/messages', icon: MessagesSquare },
+        { name: 'Mes Documents', href: '/dashboard/documents', icon: Folder }
+  const pathname = usePathname();
+              const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+                <Link key={item.name} href={item.href}
+
+📁 STRUCTURE PROJET
+==================
+--- API Routes ---
+app/api/auth/[...nextauth]/route.ts
+app/api/auth/login/route.ts
+app/api/chantiers/[id]/route.ts
+app/api/chantiers/route.ts
+app/api/devis/[id]/convert/route.ts
+app/api/devis/[id]/route.ts
+app/api/devis/[id]/send/route.ts
+app/api/devis/export/route.ts
+app/api/devis/route.ts
+app/api/devis/stats/route.ts
+app/api/documents/[id]/route.ts
+app/api/documents/route.ts
+app/api/equipes/[id]/route.ts
+app/api/equipes/route.ts
+app/api/etapes/[id]/route.ts
+
+--- Pages Dashboard ---
+app/dashboard/chantiers/[id]/etapes/page.tsx
+app/dashboard/chantiers/[id]/page.tsx
+app/dashboard/chantiers/nouveau/page.tsx
+app/dashboard/chantiers/page.tsx
+app/dashboard/client/page.tsx
+app/dashboard/commercial/page.tsx
+app/dashboard/devis/[id]/edit/page.tsx
+app/dashboard/devis/[id]/page.tsx
+app/dashboard/devis/nouveau/page.tsx
+app/dashboard/devis/page.tsx
+
+--- Hooks ---
+hooks/useEtapes.ts
+hooks/useDevis.ts
+hooks/useDocuments.ts
+hooks/useAuth.ts
+hooks/useUsers.ts
+hooks/useToasts.ts
+hooks/useMessages.ts
+
+🎯 GUIDE DÉVELOPPEMENT IA
+==========================
+
+ARCHITECTURE:
+✅ Next.js 15 + React 19 + TypeScript + Prisma + PostgreSQL
+✅ Auth: NextAuth + rôles (ADMIN/COMMERCIAL/OUVRIER/CLIENT)
+✅ UI: Tailwind CSS + Radix UI
+
+PATTERNS IDENTIFIÉS:
+
+1. API Routes (app/api/[module]/route.ts):
+   - GET: pagination + filtres + include relations Prisma
+   - POST: validation + création avec relations
+   - Gestion erreurs + réponses JSON standardisées
+
+2. Hooks personnalisés (hooks/use[Module].ts):
+   - useState pour données + loading + error
+   - Functions: fetch, create, update, delete
+   - Auto-refresh + pagination
+
+3. Modèle Prisma:
+   - Relations: User ↔ Chantier ↔ Message/Planning
+   - Enums pour statuts
+   - Timestamps automatiques
+
+4. Structure pages:
+   - app/dashboard/[module]/page.tsx
+   - Protection par rôle via useRequireAuth()
+   - Layout dashboard commun
+
+POUR NOUVEAU MODULE:
+1. Étendre schema.prisma avec nouveau model
+2. Créer app/api/[module]/route.ts (CRUD)
+3. Créer hooks/use[Module].ts (logique)
+4. Créer components/[module]/ (UI)
+5. Créer app/dashboard/[module]/page.tsx
+6. Ajouter navigation dans sidebar
+
+
+=== ANALYSE ESSENTIELLE TERMINÉE ===
+📊 STATS:      940 lignes, 24.7KB

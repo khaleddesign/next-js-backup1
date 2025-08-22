@@ -12,7 +12,7 @@ model User {
   nom           String?
   name          String?
   email         String    @unique
-  emailVerified DateTime?
+  password      String?
   image         String?
   role          Role      @default(CLIENT)
   phone         String?
@@ -31,6 +31,7 @@ model User {
   planningsParticipant Planning[] @relation("PlanningParticipants")
   notifications Notification[]
   documents     Document[] @relation("DocumentUploader")
+  etapesCreated EtapeChantier[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -88,6 +89,7 @@ model Chantier {
   devis       Devis[]
   plannings   Planning[] @relation("PlanningChantier")
   documents   Document[] @relation("DocumentChantier")
+  etapes      EtapeChantier[]
   
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -267,6 +269,24 @@ model Notification {
   createdAt DateTime         @default(now())
 }
 
+model EtapeChantier {
+  id          String      @id @default(cuid())
+  titre       String
+  description String?
+  dateDebut   DateTime
+  dateFin     DateTime
+  statut      EtapeStatus @default(A_FAIRE)
+  ordre       Int         @default(0)
+  
+  chantier    Chantier    @relation(fields: [chantierId], references: [id], onDelete: Cascade)
+  chantierId  String
+  createdBy   User        @relation(fields: [createdById], references: [id])
+  createdById String
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
 enum Role {
   ADMIN
   COMMERCIAL
@@ -337,4 +357,10 @@ enum NotificationType {
   SUCCESS
   WARNING
   ERROR
+}
+
+enum EtapeStatus {
+  A_FAIRE
+  EN_COURS
+  TERMINE
 }

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, MapPin, ArrowLeft, Edit, Trash2, Check, X, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { usePlanning } from '@/hooks/usePlanning';
 import { useToasts } from '@/hooks/useToasts';
 
 interface PlanningDetailPageProps {

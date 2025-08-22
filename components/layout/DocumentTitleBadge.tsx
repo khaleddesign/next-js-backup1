@@ -1,24 +1,21 @@
 "use client";
 
-import { useEffect } from 'react';
-import { useMessages } from '@/hooks/useMessages';
+import React, { useEffect } from 'react';
 
 interface DocumentTitleBadgeProps {
+  count?: number;
   baseTitle?: string;
-  userId?: string;
 }
 
 export default function DocumentTitleBadge({ 
-  baseTitle = 'ChantierPro',
-  userId = 'test-client-123'
+  count = 0, 
+  baseTitle = 'ChantierPro' 
 }: DocumentTitleBadgeProps) {
-  const { totalUnreadCount } = useMessages({ userId, pollingInterval: 60000 }); // 1 minute pour le titre
-
   useEffect(() => {
     if (typeof document === 'undefined') return;
     
-    if (totalUnreadCount > 0) {
-      document.title = `(${totalUnreadCount}) ${baseTitle}`;
+    if (count > 0) {
+      document.title = `(${count}) ${baseTitle}`;
     } else {
       document.title = baseTitle;
     }
@@ -26,7 +23,7 @@ export default function DocumentTitleBadge({
     return () => {
       document.title = baseTitle;
     };
-  }, [totalUnreadCount, baseTitle]);
+  }, [count, baseTitle]);
 
   return null;
 }

@@ -1,11 +1,9 @@
 "use client";
 
-import ChatWidget from "@/components/messages/ChatWidget";
 
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";import Link from "next/link";import ChantierEtapes from './components/ChantierEtapes';
 import ChantierHero from "../../../../components/chantiers/ChantierHero";
 import ChantierTabs from "../../../../components/chantiers/ChantierTabs";
 import StatusBadge from "../../../../components/chantiers/StatusBadge";
@@ -221,7 +219,8 @@ export default function ChantierDetailPage() {
     { id: "timeline", label: "Timeline", icon: "📅", count: chantier?._count.timeline },
     { id: "photos", label: "Photos", icon: "📸", count: chantier?.photos.length },
     { id: "messages", label: "Messages", icon: "💬", count: chantier?._count.messages },
-    { id: "equipe", label: "Équipe", icon: "👥", count: chantier?.assignees.length }
+    { id: "equipe", label: "Équipe", icon: "👥", count: chantier?.assignees.length },
+    { id: "etapes", label: "Étapes", icon: "📋", count: 0 }
   ];
 
   const formatDate = (dateString: string) => {
@@ -618,6 +617,13 @@ export default function ChantierDetailPage() {
 </div>
         );
 
+      case "etapes":
+        return (
+          <div>
+            <ChantierEtapes chantierId={chantier.id} />
+          </div>
+        );
+
       case "equipe":
         return (
           <div style={{ maxWidth: '600px' }}>
@@ -728,7 +734,6 @@ export default function ChantierDetailPage() {
           {renderTabContent()}
         </ChantierTabs>
         
-        <ChatWidget chantierId={chantier?.id} userId="test-client-123" />
       </div>
     </div>
   );

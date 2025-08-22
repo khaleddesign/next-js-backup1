@@ -1,346 +1,331 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { useMessages } from "@/hooks/useMessages";
-import MessageBubble from "@/components/messages/MessageBubble";
-import MessageThread from "@/components/messages/MessageThread";
+import { Search, Plus, Phone, Video, MoreVertical, Paperclip, Smile, Send, Check, CheckCheck, Users, Settings, X } from 'lucide-react';
 
-export default function MessagesPage() {
- const [searchTerm, setSearchTerm] = useState("");
- const [filter, setFilter] = useState("all");
- 
- const { 
-   conversations, 
-   messages, 
-   activeConversationId,
-   totalUnreadCount,
-   loading, 
-   loadingMessages,
-   sending,
-   error,
-   sendMessage,
-   editMessage,
-   deleteMessage,
-   pinMessage,
-   copyMessage,
-   setActiveConversation
- } = useMessages({
-   userId: 'test-client-123',
-   pollingInterval: 30000,
-   enableNotifications: true
- });
+export default function ModernMessagesPage() {
+  const { user } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [messageText, setMessageText] = useState("");
+  const [showNewConversation, setShowNewConversation] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
- const handleSendReply = async (text: string, photos: string[], parentId: string) => {
-   return await sendMessage(text, photos, activeConversationId || undefined, parentId);
- };
+  const {
+    conversations,
+    messages,
+    contacts,
+    activeConversationId,
+    totalUnreadCount,
+    loading,
+    loadingMessages,
+    sending,
+    error,
+    sendMessage,
+    setActiveConversation,
+    createNewConversation
+  } = useMessages();
 
- const handleSendMessage = async (text: string, photos: string[]) => {
-   return await sendMessage(text, photos, activeConversationId || undefined);
- };
+  const sendMessageHandler = async () => {
+    if (!messageText.trim() || !activeConversationId) return;
+    
+    console.log('Envoi message:', messageText, 'vers conversation:', activeConversationId);
+    
+    const success = await sendMessage(messageText, activeConversationId);
+    if (success) {
+      setMessageText("");
+      console.log('Message envoyé avec succès');
+    } else {
+      console.error('Échec envoi message');
+    }
+  };
 
- const filteredConversations = conversations.filter(conv => {
-   const matchesSearch = conv.nom.toLowerCase().includes(searchTerm.toLowerCase());
-   const matchesFilter = filter === 'all' || (filter === 'unread' && conv.unreadCount > 0);
-   return matchesSearch && matchesFilter;
- });
+  const filteredConversations = conversations.filter(conv =>
+    conv.nom && conv.nom.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
- if (loading) {
-   return (
-     <div style={{ minHeight: '100vh', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-       <div style={{ textAlign: 'center' }}>
-         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
-         <p style={{ color: '#64748b' }}>Chargement des conversations...</p>
-       </div>
-     </div>
-   );
- }
+  const createNewConversationHandler = (userId: string) => {
+    createNewConversation(userId);
+    setShowNewConversation(false);
+  };
 
- return (
-   <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
-     <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '2rem' }}>
-       <div style={{ marginBottom: '2rem' }}>
-         <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1e293b', margin: '0 0 0.5rem 0' }}>
-           💬 Messages
-         </h1>
-         <p style={{ color: '#64748b', margin: 0 }}>
-           {totalUnreadCount > 0 ? `${totalUnreadCount} message${totalUnreadCount > 1 ? 's' : ''} non lu${totalUnreadCount > 1 ? 's' : ''}` : 'Toutes vos conversations'}
-         </p>
-       </div>
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-       <div style={{ display: 'grid', gridTemplateColumns: '350px 1fr', gap: '2rem', height: '70vh' }}>
-         <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-           <div style={{ padding: '1.5rem', borderBottom: '1px solid #e2e8f0' }}>
-             <input
-               type="text"
-               placeholder="Rechercher une conversation..."
-               value={searchTerm}
-               onChange={(e) => setSearchTerm(e.target.value)}
-               style={{
-                 width: '100%',
-                 padding: '0.75rem',
-                 border: '1px solid #e2e8f0',
-                 borderRadius: '0.5rem',
-                 fontSize: '0.875rem',
-                 marginBottom: '1rem'
-               }}
-             />
-             
-             <div style={{ display: 'flex', gap: '0.5rem' }}>
-               <button
-                 onClick={() => setFilter('all')}
-                 className={filter === 'all' ? 'btn-primary' : 'btn-ghost'}
-                 style={{ fontSize: '0.75rem', padding: '0.5rem' }}
-               >
-                 Toutes
-               </button>
-               <button
-                 onClick={() => setFilter('unread')}
-                 className={filter === 'unread' ? 'btn-primary' : 'btn-ghost'}
-                 style={{ fontSize: '0.75rem', padding: '0.5rem' }}
-               >
-                 Non lues
-               </button>
-             </div>
-           </div>
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
-           <div style={{ flex: 1, overflowY: 'auto' }}>
-             {filteredConversations.length === 0 ? (
-               <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
-                 <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</div>
-                 <p>Aucune conversation</p>
-               </div>
-             ) : (
-               filteredConversations.map((conv) => (
-                 <div
-                   key={conv.id}
-                   onClick={() => setActiveConversation(conv.id)}
-                   style={{
-                     padding: '1rem',
-                     borderBottom: '1px solid #f1f5f9',
-                     cursor: 'pointer',
-                     background: activeConversationId === conv.id ? '#f0f9ff' : 'transparent',
-                     transition: 'all 0.2s ease'
-                   }}
-                   onMouseEnter={(e) => {
-                     if (activeConversationId !== conv.id) {
-                       e.currentTarget.style.backgroundColor = '#f8fafc';
-                     }
-                   }}
-                   onMouseLeave={(e) => {
-                     if (activeConversationId !== conv.id) {
-                       e.currentTarget.style.backgroundColor = 'transparent';
-                     }
-                   }}
-                 >
-                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                     <div style={{
-                       width: '2.5rem',
-                       height: '2.5rem',
-                       borderRadius: '50%',
-                       background: 'linear-gradient(135deg, #3b82f6, #f97316)',
-                       display: 'flex',
-                       alignItems: 'center',
-                       justifyContent: 'center',
-                       color: 'white',
-                       fontSize: '1rem',
-                       fontWeight: 'bold',
-                       flexShrink: 0
-                     }}>
-                       🏗️
-                     </div>
-                     
-                     <div style={{ flex: 1, minWidth: 0 }}>
-                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                         <h3 style={{ 
-                           margin: 0, 
-                           fontSize: '0.875rem', 
-                           fontWeight: '600', 
-                           color: '#1e293b',
-                           overflow: 'hidden',
-                           textOverflow: 'ellipsis',
-                           whiteSpace: 'nowrap'
-                         }}>
-                           {conv.nom}
-                         </h3>
-                         {conv.unreadCount > 0 && (
-                           <span style={{
-                             background: '#ef4444',
-                             color: 'white',
-                             fontSize: '0.625rem',
-                             fontWeight: 'bold',
-                             padding: '0.125rem 0.375rem',
-                             borderRadius: '0.75rem',
-                             minWidth: '1rem',
-                             height: '1rem',
-                             display: 'flex',
-                             alignItems: 'center',
-                             justifyContent: 'center'
-                           }}>
-                             {conv.unreadCount}
-                           </span>
-                         )}
-                       </div>
-                       
-                       {conv.lastMessage && (
-                         <p style={{ 
-                           margin: '0.25rem 0 0 0', 
-                           fontSize: '0.75rem', 
-                           color: '#64748b',
-                           overflow: 'hidden',
-                           textOverflow: 'ellipsis',
-                           whiteSpace: 'nowrap'
-                         }}>
-                           {conv.lastMessage.text}
-                         </p>
-                       )}
-                     </div>
-                   </div>
-                 </div>
-               ))
-             )}
-           </div>
-         </div>
+  return (
+    <div className="h-screen bg-gray-50 flex flex-col">
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              💬 Messages
+            </h1>
+            <p className="text-sm text-gray-600">
+              Connecté en tant que <span className="font-medium">{user.name}</span> 
+              <span className="ml-1 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                {user.role}
+              </span>
+            </p>
+            {loading && <p className="text-xs text-gray-500">Chargement des conversations...</p>}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowNewConversation(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <Plus size={20} />
+              Nouvelle conversation
+            </button>
+          </div>
+        </div>
+      </div>
 
-         <div className="card" style={{ display: 'flex', flexDirection: 'column' }}>
-           {!activeConversationId ? (
-             <div style={{ 
-               flex: 1, 
-               display: 'flex', 
-               alignItems: 'center', 
-               justifyContent: 'center',
-               textAlign: 'center',
-               color: '#64748b'
-             }}>
-               <div>
-                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💬</div>
-                 <h3 style={{ margin: '0 0 0.5rem 0' }}>Sélectionnez une conversation</h3>
-                 <p style={{ margin: 0 }}>Choisissez une conversation pour commencer à discuter</p>
-               </div>
-             </div>
-           ) : (
-             <>
-               <div style={{ 
-                 padding: '1rem', 
-                 borderBottom: '1px solid #e2e8f0',
-                 background: '#f8fafc'
-               }}>
-                 <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: '600', color: '#1e293b' }}>
-                   {conversations.find(c => c.id === activeConversationId)?.nom || 'Conversation'}
-                 </h3>
-               </div>
+      <div className="flex flex-1 overflow-hidden">
+        <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+          <div className="p-4 border-b border-gray-200">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Rechercher une conversation..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
 
-               <div style={{ 
-                 flex: 1, 
-                 overflowY: 'auto', 
-                 padding: '1rem',
-                 display: 'flex',
-                 flexDirection: 'column',
-                 gap: '1rem'
-               }}>
-                 {loadingMessages ? (
-                   <div style={{ textAlign: 'center', color: '#64748b' }}>
-                     <div>⏳</div>
-                     <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.875rem' }}>
-                       Chargement des messages...
-                     </p>
-                   </div>
-                 ) : messages.length === 0 ? (
-                   <div style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>
-                     <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</div>
-                     <p style={{ margin: 0, fontSize: '0.875rem' }}>
-                       Aucun message dans cette conversation
-                     </p>
-                   </div>
-                 ) : (
-                   messages.map((message) => (
-                     message.parentId ? null : (
-                       <MessageThread
-                         key={message.id}
-                         parentMessage={message}
-                         thread={messages}
-                         currentUserId="test-client-123"
-                         onSendReply={handleSendReply}
-                       />
-                     )
-                   ))
-                 )}
-               </div>
+          <div className="flex-1 overflow-y-auto">
+            {loading ? (
+              <div className="p-8 text-center text-gray-500">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <p>Chargement...</p>
+              </div>
+            ) : filteredConversations.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <div className="text-4xl mb-2">💬</div>
+                <p>Aucune conversation</p>
+                <p className="text-xs mt-1">Conversations trouvées: {conversations.length}</p>
+              </div>
+            ) : (
+              <>
+                <div className="p-2 text-xs text-gray-500 border-b">
+                  {filteredConversations.length} conversation(s)
+                </div>
+                {filteredConversations.map((conv) => (
+                  <div
+                    key={conv.id}
+                    onClick={() => {
+                      console.log('Sélection conversation:', conv.id, conv.nom);
+                      setActiveConversation(conv.id);
+                    }}
+                    className={`p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
+                      activeConversationId === conv.id ? 'bg-blue-50 border-blue-200' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
+                          {conv.nom ? conv.nom.charAt(0) : '?'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div>
+                            <h3 className="font-medium text-gray-900 truncate">{conv.nom || 'Sans nom'}</h3>
+                            {conv.metadata && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                  conv.metadata.statut === 'EN_COURS' ? 'bg-green-100 text-green-800' :
+                                  conv.metadata.statut === 'PLANIFIE' ? 'bg-blue-100 text-blue-800' :
+                                  conv.metadata.statut === 'TERMINE' ? 'bg-gray-100 text-gray-800' :
+                                  'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {conv.metadata.statut}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {conv.metadata.progression}%
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500">ID: {conv.id}</p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-xs text-gray-500">
+                          {conv.lastMessage?.time ? new Date(conv.lastMessage.time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''}
+                        </span>
+                        {conv.unreadCount > 0 && (
+                          <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                            {conv.unreadCount}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-600 truncate">{conv.lastMessage?.text || 'Aucun message'}</p>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </div>
 
-               <div style={{ 
-                 padding: '1rem', 
-                 borderTop: '1px solid #e2e8f0',
-                 background: '#f8fafc'
-               }}>
-                 {error && (
-                   <div style={{
-                     background: '#fee2e2',
-                     color: '#dc2626',
-                     padding: '0.5rem',
-                     borderRadius: '0.5rem',
-                     fontSize: '0.875rem',
-                     marginBottom: '0.5rem'
-                   }}>
-                     ⚠️ {error}
-                   </div>
-                 )}
-                 
-                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
-                   <textarea
-                     placeholder="Écrivez votre message..."
-                     style={{
-                       flex: 1,
-                       minHeight: '60px',
-                       maxHeight: '120px',
-                       padding: '0.75rem',
-                       border: '1px solid #e2e8f0',
-                       borderRadius: '0.5rem',
-                       resize: 'vertical',
-                       fontFamily: 'inherit',
-                       fontSize: '0.875rem'
-                     }}
-                     onKeyDown={(e) => {
-                       if (e.key === 'Enter' && e.ctrlKey) {
-                         const target = e.target as HTMLTextAreaElement;
-                         if (target.value.trim()) {
-                           handleSendMessage(target.value.trim(), []);
-                           target.value = '';
-                         }
-                       }
-                     }}
-                   />
-                   <button
-                     onClick={async () => {
-                       const textarea = document.querySelector('textarea') as HTMLTextAreaElement;
-                       if (textarea?.value.trim()) {
-                         await handleSendMessage(textarea.value.trim(), []);
-                         textarea.value = '';
-                       }
-                     }}
-                     disabled={sending}
-                     className="btn-primary"
-                     style={{
-                       opacity: sending ? 0.5 : 1,
-                       cursor: sending ? 'not-allowed' : 'pointer',
-                       minWidth: '80px'
-                     }}
-                   >
-                     {sending ? '⏳' : '📤 Envoyer'}
-                   </button>
-                 </div>
-                 
-                 <p style={{ 
-                   margin: '0.5rem 0 0 0', 
-                   fontSize: '0.75rem', 
-                   color: '#64748b' 
-                 }}>
-                   Appuyez sur Ctrl+Entrée pour envoyer rapidement
-                 </p>
-               </div>
-             </>
-           )}
-         </div>
-       </div>
-     </div>
-   </div>
- );
+        <div className="flex-1 flex flex-col">
+          {!activeConversationId ? (
+            <div className="flex-1 flex items-center justify-center text-center text-gray-500">
+              <div>
+                <div className="text-6xl mb-4">💬</div>
+                <h3 className="text-xl font-medium mb-2">Sélectionnez une conversation</h3>
+                <p>Choisissez une conversation pour commencer à discuter</p>
+                <p className="text-xs mt-2">Total conversations: {conversations.length}</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="bg-white border-b border-gray-200 px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+                      {conversations.find(c => c.id === activeConversationId)?.nom?.charAt(0) || '💬'}
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-gray-900">
+                        {conversations.find(c => c.id === activeConversationId)?.nom || `Conversation ${activeConversationId}`}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {loadingMessages ? 'Chargement...' : `${messages.length} message(s)`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {loadingMessages ? (
+                  <div className="text-center text-gray-500">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                    <p>Chargement des messages...</p>
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    <div className="text-4xl mb-2">💬</div>
+                    <p>Aucun message dans cette conversation</p>
+                    <p className="text-xs mt-1">Conversation ID: {activeConversationId}</p>
+                  </div>
+                ) : (
+                  messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.senderId === user.id ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          message.senderId === user.id
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-900'
+                        }`}
+                      >
+                        {message.senderId !== user.id && (
+                          <p className="text-xs font-medium mb-1 opacity-70">
+                            {message.senderName} ({message.senderId})
+                          </p>
+                        )}
+                        <p>{message.content}</p>
+                        <div className={`flex items-center justify-between mt-1 text-xs ${
+                          message.senderId === user.id ? 'text-blue-100' : 'text-gray-500'
+                        }`}>
+                          <span>{message.timestamp}</span>
+                          <span className="ml-2 text-xs opacity-60">ID: {message.id.slice(-4)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <div className="bg-white border-t border-gray-200 px-6 py-4">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg mb-4">
+                    ⚠️ {error}
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessageHandler()}
+                      placeholder={`Tapez votre message pour: ${conversations.find(c => c.id === activeConversationId)?.nom || activeConversationId}`}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <button
+                    onClick={sendMessageHandler}
+                    disabled={!messageText.trim() || sending}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {sending ? 'Envoi...' : 'Envoyer'}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {showNewConversation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">Nouvelle conversation</h3>
+              <button
+                onClick={() => setShowNewConversation(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {contacts && contacts.length > 0 ? (
+                contacts.map((contact) => (
+                  <button
+                    key={contact.id}
+                    onClick={() => createNewConversationHandler(contact.id)}
+                    className="w-full p-3 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                        {contact.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{contact.name}</p>
+                        <p className="text-sm text-gray-500">{contact.role}</p>
+                      </div>
+                    </div>
+                  </button>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">Aucun contact disponible</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

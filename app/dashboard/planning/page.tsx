@@ -1,394 +1,378 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Clock, Users, MapPin, Plus, Filter, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Calendar, Clock, Users, MapPin, Plus, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { usePlanning } from '@/hooks/usePlanning';
-import { useToasts } from '@/hooks/useToasts';
+import { useRequireAuth } from '@/hooks/useAuth';
 
 export default function PlanningPage() {
-  const [viewMode, setViewMode] = useState<'jour' | 'semaine' | 'mois'>('semaine');
+  useRequireAuth(['ADMIN', 'COMMERCIAL']);
+  
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [filters, setFilters] = useState({
-    chantier: '',
-    type: 'TOUS',
-    utilisateur: ''
-  });
-
-  const { plannings, loading, error, actions } = usePlanning({
-    dateDebut: getDateRange(currentDate, viewMode).debut,
-    dateFin: getDateRange(currentDate, viewMode).fin,
-    ...filters
-  });
-
-  const { success, error: showError } = useToasts();
-
-  useEffect(() => {
-    if (error) {
-      showError('Erreur', error);
+  const [view, setView] = useState<'semaine' | 'mois'>('semaine');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [events, setEvents] = useState([
+    {
+      id: '1',
+      titre: 'Réunion équipe chantier Villa Dupont',
+      type: 'REUNION',
+      dateDebut: '2025-08-25T09:00',
+      dateFin: '2025-08-25T10:30',
+      lieu: 'Bureau',
+      statut: 'PLANIFIE'
+    },
+    {
+      id: '2',
+      titre: 'Livraison matériaux',
+      type: 'LIVRAISON',
+      dateDebut: '2025-08-26T14:00',
+      dateFin: '2025-08-26T16:00',
+      lieu: 'Chantier Rue de la Paix',
+      statut: 'PLANIFIE'
+    },
+    {
+      id: '3',
+      titre: 'Inspection qualité',
+      type: 'INSPECTION',
+      dateDebut: '2025-08-27T11:00',
+      dateFin: '2025-08-27T12:00',
+      lieu: 'Chantier Centre-ville',
+      statut: 'EN_COURS'
     }
-  }, [error, showError]);
+  ]);
 
   const navigateDate = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
-    
-    switch (viewMode) {
-      case 'jour':
-        newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
-        break;
-      case 'semaine':
-        newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
-        break;
-      case 'mois':
-        newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
-        break;
+    if (view === 'semaine') {
+      newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
+    } else {
+      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
     }
-    
     setCurrentDate(newDate);
   };
 
-  const getDateRangeLabel = () => {
-    const { debut, fin } = getDateRange(currentDate, viewMode);
-    
-    switch (viewMode) {
-      case 'jour':
-        return debut.toLocaleDateString('fr-FR', { 
-          weekday: 'long', 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        });
-      case 'semaine':
-        return `${debut.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - ${fin.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-      case 'mois':
-        return debut.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  const getDateLabel = () => {
+    if (view === 'semaine') {
+      const startWeek = new Date(currentDate);
+      startWeek.setDate(currentDate.getDate() - currentDate.getDay());
+      const endWeek = new Date(startWeek);
+      endWeek.setDate(startWeek.getDate() + 6);
+      
+      return `${startWeek.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })} - ${endWeek.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}`;
+    } else {
+      return currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
     }
   };
 
-  const todayEvents = plannings.filter(p => {
+  const getEventIcon = (type: string) => {
+    const icons = {
+      REUNION: '📋',
+      LIVRAISON: '🚚',
+      INSPECTION: '🔍',
+      AUTRE: '📌'
+    };
+    return icons[type as keyof typeof icons] || '📌';
+  };
+
+  const getStatusColor = (statut: string) => {
+    const colors = {
+      PLANIFIE: 'bg-blue-100 text-blue-800',
+      EN_COURS: 'bg-yellow-100 text-yellow-800',
+      TERMINE: 'bg-green-100 text-green-800',
+      ANNULE: 'bg-red-100 text-red-800'
+    };
+    return colors[statut as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getEventsForDate = (date: Date) => {
+    return events.filter(event => {
+      const eventDate = new Date(event.dateDebut);
+      return eventDate.toDateString() === date.toDateString();
+    });
+  };
+
+  const renderCalendar = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay());
+    
+    const days = [];
     const today = new Date();
-    const eventDate = new Date(p.dateDebut);
+    
+    for (let i = 0; i < 42; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      
+      const dayEvents = getEventsForDate(date);
+      const isCurrentMonth = date.getMonth() === month;
+      const isToday = date.toDateString() === today.toDateString();
+      
+      days.push(
+        <div
+          key={i}
+          className={`
+            min-h-[100px] border border-gray-200 p-2 cursor-pointer hover:bg-gray-50 transition-colors
+            ${!isCurrentMonth ? 'bg-gray-50 text-gray-400' : 'bg-white'}
+            ${isToday ? 'bg-blue-50 border-blue-300' : ''}
+          `}
+          onClick={() => {
+            const newEvent = new Date(date);
+            newEvent.setHours(9, 0, 0, 0);
+            window.location.href = `/dashboard/planning/nouveau?date=${date.toISOString().split('T')[0]}&time=09:00`;
+          }}
+        >
+          <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : ''}`}>
+            {date.getDate()}
+          </div>
+          <div className="space-y-1">
+            {dayEvents.slice(0, 2).map((event: any) => (
+              <div
+                key={event.id}
+                className={`
+                  text-xs p-1 rounded text-white cursor-pointer truncate
+                  ${event.type === 'REUNION' ? 'bg-blue-500' : 
+                    event.type === 'LIVRAISON' ? 'bg-green-500' : 
+                    event.type === 'INSPECTION' ? 'bg-orange-500' : 'bg-gray-500'}
+                `}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  alert(`Détails: ${event.titre}`);
+                }}
+                title={event.titre}
+              >
+                {getEventIcon(event.type)} {event.titre}
+              </div>
+            ))}
+            {dayEvents.length > 2 && (
+              <div className="text-xs text-gray-500 font-medium">
+                +{dayEvents.length - 2} autres
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-7 gap-0 border border-gray-200 rounded-lg overflow-hidden">
+        {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
+          <div key={day} className="bg-gray-100 p-3 text-center font-medium text-sm border-b border-gray-200">
+            {day}
+          </div>
+        ))}
+        {days}
+      </div>
+    );
+  };
+
+  const todayEvents = events.filter(event => {
+    const today = new Date();
+    const eventDate = new Date(event.dateDebut);
     return eventDate.toDateString() === today.toDateString();
   });
 
-  const thisWeekEvents = plannings.filter(p => {
+  const thisWeekEvents = events.filter(event => {
     const today = new Date();
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay());
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
     
-    const eventDate = new Date(p.dateDebut);
+    const eventDate = new Date(event.dateDebut);
     return eventDate >= weekStart && eventDate <= weekEnd;
   });
 
+  const filteredEvents = events.filter(event =>
+    event.titre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
-      <div className="container" style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
-        {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <div>
-              <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1e293b', marginBottom: '0.5rem' }}>
-                Mon Planning
-              </h1>
-              <p style={{ color: '#64748b', fontSize: '1rem' }}>
-                Gérez et suivez tous vos rendez-vous et plannings chantier
-              </p>
-            </div>
-            <Link
-              href="/dashboard/planning/nouveau"
-              className="btn btn-primary"
-              style={{ textDecoration: 'none' }}
-            >
-              <Plus style={{ width: '16px', height: '16px' }} />
-              Nouveau planning
-            </Link>
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+              <Calendar className="w-8 h-8 mr-3 text-blue-600" />
+              Planning
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Gérez vos réunions, livraisons et inspections
+            </p>
           </div>
-
-          {/* Barre de recherche */}
-          <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-            <Search 
-              style={{ 
-                position: 'absolute', 
-                left: '12px', 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
-                width: '20px', 
-                height: '20px', 
-                color: '#94a3b8' 
-              }} 
-            />
-            <input
-              type="text"
-              placeholder="Rechercher un événement..."
-              style={{
-                width: '100%',
-                padding: '12px 12px 12px 44px',
-                border: '1px solid #e2e8f0',
-                borderRadius: '8px',
-                fontSize: '14px',
-                backgroundColor: 'white',
-                color: '#1e293b'
-              }}
-            />
-          </div>
-
-          {/* Filtres */}
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-            <span style={{ color: '#64748b', fontSize: '14px', alignSelf: 'center' }}>Filtrer par statut :</span>
-            {[
-              { key: 'TOUS', label: 'Tous les statuts', color: '#64748b' },
-              { key: 'PLANIFIE', label: 'Planifié', color: '#3b82f6' },
-              { key: 'EN_COURS', label: 'En cours', color: '#f59e0b' },
-              { key: 'TERMINE', label: 'Terminé', color: '#10b981' },
-              { key: 'ANNULE', label: 'Annulé', color: '#ef4444' }
-            ].map((status) => (
-              <button
-                key={status.key}
-                onClick={() => setFilters(prev => ({ ...prev, type: status.key }))}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  backgroundColor: filters.type === status.key ? status.color : '#f1f5f9',
-                  color: filters.type === status.key ? 'white' : status.color,
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {status.label}
-              </button>
-            ))}
-          </div>
+          
+          <Link
+            href="/dashboard/planning/nouveau"
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nouveau planning</span>
+          </Link>
         </div>
 
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-          <div className="card" style={{ textAlign: 'center', padding: '1.5rem' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#3b82f6', marginBottom: '0.5rem' }}>
-              {todayEvents.length}
-            </div>
-            <div style={{ color: '#64748b', fontSize: '14px' }}>Aujourd'hui</div>
-          </div>
-          
-          <div className="card" style={{ textAlign: 'center', padding: '1.5rem' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#f59e0b', marginBottom: '0.5rem' }}>
-              {thisWeekEvents.length}
-            </div>
-            <div style={{ color: '#64748b', fontSize: '14px' }}>Cette semaine</div>
-          </div>
-          
-          <div className="card" style={{ textAlign: 'center', padding: '1.5rem' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#10b981', marginBottom: '0.5rem' }}>
-              {plannings.filter(p => p.statut === 'PLANIFIE').length}
-            </div>
-            <div style={{ color: '#64748b', fontSize: '14px' }}>À venir</div>
-          </div>
-          
-          <div className="card" style={{ textAlign: 'center', padding: '1.5rem' }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#1e293b', marginBottom: '0.5rem' }}>
-              {plannings.length}
-            </div>
-            <div style={{ color: '#64748b', fontSize: '14px' }}>Total événements</div>
-          </div>
+        <div className="relative mb-4">
+          <Search className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Rechercher un événement..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
+      </div>
 
-        {/* Calendrier */}
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
+          <div className="text-3xl font-bold text-blue-600 mb-2">{todayEvents.length}</div>
+          <div className="text-gray-600 text-sm">Aujourd'hui</div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
+          <div className="text-3xl font-bold text-orange-600 mb-2">{thisWeekEvents.length}</div>
+          <div className="text-gray-600 text-sm">Cette semaine</div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
+          <div className="text-3xl font-bold text-green-600 mb-2">
+            {events.filter(e => e.statut === 'PLANIFIE').length}
+          </div>
+          <div className="text-gray-600 text-sm">À venir</div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 text-center">
+          <div className="text-3xl font-bold text-gray-900 mb-2">{events.length}</div>
+          <div className="text-gray-600 text-sm">Total événements</div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigateDate('prev')}
-                style={{
-                  padding: '8px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '6px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  color: '#64748b'
-                }}
+                className="p-2 hover:bg-gray-100 rounded-lg"
               >
-                <ChevronLeft style={{ width: '16px', height: '16px' }} />
+                <ChevronLeft className="w-5 h-5" />
               </button>
               
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', margin: 0 }}>
-                {getDateRangeLabel()}
+              <h2 className="text-xl font-semibold text-gray-900">
+                {getDateLabel()}
               </h2>
               
               <button
                 onClick={() => navigateDate('next')}
-                style={{
-                  padding: '8px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '6px',
-                  backgroundColor: 'white',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  color: '#64748b'
-                }}
+                className="p-2 hover:bg-gray-100 rounded-lg"
               >
-                <ChevronRight style={{ width: '16px', height: '16px' }} />
+                <ChevronRight className="w-5 h-5" />
               </button>
             </div>
 
-            <div style={{ display: 'flex', gap: '4px', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '6px' }}>
-              {(['jour', 'semaine', 'mois'] as const).map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => setViewMode(mode)}
-                  style={{
-                    padding: '6px 12px',
-                    border: 'none',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    backgroundColor: viewMode === mode ? 'white' : 'transparent',
-                    color: viewMode === mode ? '#1e293b' : '#64748b',
-                    boxShadow: viewMode === mode ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                </button>
-              ))}
+            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setView('semaine')}
+                className={`px-4 py-2 text-sm ${
+                  view === 'semaine' 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Semaine
+              </button>
+              <button
+                onClick={() => setView('mois')}
+                className={`px-4 py-2 text-sm border-l ${
+                  view === 'mois' 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Mois
+              </button>
             </div>
           </div>
+        </div>
 
-          {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '3rem' }}>
-              <div style={{ 
-                width: '32px', 
-                height: '32px', 
-                border: '3px solid #f1f5f9', 
-                borderTop: '3px solid #3b82f6', 
-                borderRadius: '50%', 
-                animation: 'spin 1s linear infinite' 
-              }}></div>
-              <span style={{ marginLeft: '12px', color: '#64748b' }}>Chargement du planning...</span>
-            </div>
+        <div className="p-6">
+          {view === 'mois' ? (
+            renderCalendar()
           ) : (
-            <div style={{ backgroundColor: '#f8fafc', borderRadius: '8px', padding: '2rem', minHeight: '400px' }}>
-              <div style={{ textAlign: 'center' }}>
-                <Calendar style={{ width: '64px', height: '64px', color: '#cbd5e1', margin: '0 auto 1rem' }} />
-                <h3 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1e293b', marginBottom: '0.5rem' }}>
-                  Vue {viewMode}
-                </h3>
-                <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
-                  {getDateRangeLabel()}
-                </p>
-                
-                {plannings.length === 0 ? (
-                  <div>
-                    <p style={{ color: '#64748b', marginBottom: '1rem' }}>Aucun événement planifié</p>
+            <div>
+              {filteredEvents.length === 0 ? (
+                <div className="text-center py-12">
+                  <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {searchTerm ? 'Aucun événement trouvé' : 'Aucun événement planifié'}
+                  </h3>
+                  <p className="text-gray-500 mb-4">
+                    {searchTerm 
+                      ? 'Essayez de modifier votre recherche'
+                      : 'Commencez par créer votre premier événement'
+                    }
+                  </p>
+                  {!searchTerm && (
                     <Link
                       href="/dashboard/planning/nouveau"
-                      className="btn btn-primary"
-                      style={{ textDecoration: 'none' }}
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
-                      <Plus style={{ width: '16px', height: '16px' }} />
-                      Créer un événement
+                      <Plus className="w-4 h-4" />
+                      <span>Créer un événement</span>
                     </Link>
-                  </div>
-                ) : (
-                  <div style={{ display: 'grid', gap: '12px', maxWidth: '600px', margin: '0 auto' }}>
-                    {plannings.slice(0, 5).map((planning) => (
-                      <div
-                        key={planning.id}
-                        style={{
-                          backgroundColor: 'white',
-                          padding: '16px',
-                          borderRadius: '8px',
-                          border: '1px solid #e2e8f0',
-                          textAlign: 'left',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = 'none';
-                        }}
-                        onClick={() => window.location.href = `/dashboard/planning/${planning.id}`}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '8px' }}>
-                          <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', margin: 0 }}>
-                            {planning.titre}
-                          </h4>
-                          <span style={{
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            fontWeight: '500',
-                            backgroundColor: planning.statut === 'PLANIFIE' ? '#dbeafe' : planning.statut === 'EN_COURS' ? '#fef3c7' : '#d1fae5',
-                            color: planning.statut === 'PLANIFIE' ? '#1d4ed8' : planning.statut === 'EN_COURS' ? '#d97706' : '#059669'
-                          }}>
-                            {planning.statut}
-                          </span>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Événements ({filteredEvents.length})
+                  </h3>
+                  
+                  {filteredEvents.map((event) => (
+                    <div
+                      key={event.id}
+                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => alert(`Détails de l'événement: ${event.titre}`)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-4">
+                          <div className="text-2xl">
+                            {getEventIcon(event.type)}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-900 mb-1">
+                              {event.titre}
+                            </h4>
+                            <div className="flex items-center space-x-4 text-sm text-gray-600">
+                              <span className="flex items-center">
+                                <Clock className="w-4 h-4 mr-1" />
+                                {new Date(event.dateDebut).toLocaleDateString('fr-FR')} à {' '}
+                                {new Date(event.dateDebut).toLocaleTimeString('fr-FR', { 
+                                  hour: '2-digit', 
+                                  minute: '2-digit' 
+                                })}
+                              </span>
+                              {event.lieu && (
+                                <span className="flex items-center">
+                                  <MapPin className="w-4 h-4 mr-1" />
+                                  {event.lieu}
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '16px', fontSize: '14px', color: '#64748b' }}>
-                          <span>{new Date(planning.dateDebut).toLocaleDateString('fr-FR')}</span>
-                          <span>{planning.type.replace('_', ' ')}</span>
-                          {planning.lieu && <span>📍 {planning.lieu}</span>}
-                        </div>
+                        
+                        <span className={`px-3 py-1 text-xs rounded-full font-medium ${getStatusColor(event.statut)}`}>
+                          {event.statut}
+                        </span>
                       </div>
-                    ))}
-                    
-                    {plannings.length > 5 && (
-                      <p style={{ color: '#64748b', fontSize: '14px' }}>
-                        Et {plannings.length - 5} autres événements...
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
-}
-
-function getDateRange(date: Date, viewMode: 'jour' | 'semaine' | 'mois') {
-  const debut = new Date(date);
-  const fin = new Date(date);
-  
-  switch (viewMode) {
-    case 'jour':
-      debut.setHours(0, 0, 0, 0);
-      fin.setHours(23, 59, 59, 999);
-      break;
-    case 'semaine':
-      debut.setDate(date.getDate() - date.getDay());
-      debut.setHours(0, 0, 0, 0);
-      fin.setDate(debut.getDate() + 6);
-      fin.setHours(23, 59, 59, 999);
-      break;
-    case 'mois':
-      debut.setDate(1);
-      debut.setHours(0, 0, 0, 0);
-      fin.setMonth(debut.getMonth() + 1);
-      fin.setDate(0);
-      fin.setHours(23, 59, 59, 999);
-      break;
-  }
-  
-  return { debut, fin };
 }
