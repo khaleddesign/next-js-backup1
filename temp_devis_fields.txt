@@ -1,0 +1,16 @@
+  sirenClient       String?
+  statutElectronique StatutElectronique @default(BROUILLON)
+  formatElectronique FormatElectronique @default(FACTUR_X)
+  pdpProvider       String?
+  pdpReference      String?
+  pdpTransmissionId String?
+  dateTransmission  DateTime?
+  dateReception     DateTime?
+  xmlContent        String?          @db.Text
+  xmlSignature      String?
+  pdfPath           String?
+  adresseFacturation Json?
+  categorieCommande  String?
+  referenceCommande  String?
+  modalitesPaiement  String?
+  transmissionLogs  TransmissionLog[]

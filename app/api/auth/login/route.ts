@@ -42,9 +42,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       user: {
         ...userWithoutPassword,
-        avatar: user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
+        avatar: user.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2),
         permissions: user.role === 'ADMIN' ? ['all'] : 
-                    user.role === 'COMMERCIAL' ? ['chantiers', 'devis', 'clients', 'messages'] :
+                    user.role === 'MANAGER' ? ['chantiers', 'devis', 'clients', 'messages'] :
                     ['view_chantiers', 'messages', 'documents']
       }
     });

@@ -1,0 +1,153 @@
+# Extension du modèle User pour CRM BTP
+
+# Dans le modèle User existant, ajouter :
+model User {
+  id            String    @id @default(cuid())
+  nom           String?
+  name          String?
+  email         String    @unique
+  password      String?
+  image         String?
+  role          Role      @default(CLIENT)
+  phone         String?
+  company       String?
+  address       String?
+  
+  # NOUVEAUX CHAMPS CRM BTP
+  # Segmentation client
+  typeClient         TypeClient @default(PARTICULIER)
+  secteurActivite    String?    # BTP, Immobilier, Public...
+  effectif           String?    # 1-10, 10-50, 50+...
+  chiffreAffaires    Float?     # CA annuel
+  
+  # Coordonnées complètes
+  adresse2           String?    # Complément adresse
+  codePostal         String?    
+  ville              String?
+  pays               String? @default("France")
+  
+  # Infos commerciales
+  sourceProspection  String?    # Site web, recommandation...
+  commercial         User? @relation("Commercial", fields: [commercialId], references: [id])
+  commercialId       String?
+  commerciaux        User[] @relation("Commercial")
+  
+  # Préférences communication
+  prefEmail          Boolean @default(true)
+  prefSMS            Boolean @default(false)
+  prefAppel          Boolean @default(true)
+  
+  # Relations existantes conservées
+  accounts      Account[]
+  sessions      Session[]
+  chantiers     Chantier[] @relation("ChantierClient")
+  assignedChantiers Chantier[] @relation("ChantierAssignee")
+  messages      Message[]
+  comments      Comment[]
+  timelineEvents TimelineEvent[]
+  devis         Devis[] @relation("DevisClient")
+  planningsOrganisateur Planning[] @relation("PlanningOrganisateur")
+  planningsParticipant Planning[] @relation("PlanningParticipants")
+  notifications Notification[]
+  documents     Document[] @relation("DocumentUploader")
+  etapesCreated EtapeChantier[]
+  
+  # NOUVELLES RELATIONS CRM
+  interactions       InteractionClient[]
+  opportunites       Opportunite[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+# Nouveau enum pour types de clients BTP
+enum TypeClient {
+  PARTICULIER       # Clients particuliers
+  PROFESSIONNEL     # Artisans, PME
+  SYNDIC           # Syndics de copropriété  
+  PROMOTEUR        # Promoteurs immobiliers
+  COLLECTIVITE     # Collectivités publiques
+}
+
+# Nouveau modèle Interactions Client
+model InteractionClient {
+  id           String @id @default(cuid())
+  client       User @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId     String
+  
+  type         TypeInteraction
+  objet        String
+  description  String @db.Text
+  dateContact  DateTime @default(now())
+  duree        Int?           # Durée en minutes
+  
+  # Suivi commercial
+  prochaineSuite DateTime?     # Prochaine action
+  priorite       Int @default(3) # 1=Haute, 2=Moyenne, 3=Basse
+  statut         StatutInteraction @default(TERMINEE)
+  
+  # Traçabilité
+  createdBy    String         # ID utilisateur créateur
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum TypeInteraction {
+  APPEL_ENTRANT
+  APPEL_SORTANT
+  EMAIL_ENVOYE
+  EMAIL_RECU
+  VISITE_CLIENT
+  VISITE_CHANTIER
+  REUNION
+  DEMONSTRATION
+  AUTRE
+}
+
+enum StatutInteraction {
+  PLANIFIEE
+  EN_COURS  
+  TERMINEE
+  REPORTEE
+  ANNULEE
+}
+
+# Nouveau modèle Opportunités commerciales
+model Opportunite {
+  id           String @id @default(cuid())
+  client       User @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId     String
+  
+  nom          String         # Nom projet
+  description  String @db.Text
+  valeurEstimee Float         # Montant estimé
+  probabilite  Int @default(50) # % chance succès
+  
+  # Pipeline commercial
+  statut       StatutOpportunite @default(PROSPECT)
+  etapeActuelle String?       # Étape détaillée
+  dateCloture  DateTime?      # Date prévue signature
+  dateClotureReelle DateTime? # Date réelle si gagnée
+  
+  # Concurrence et contexte
+  concurrents  String?        # Concurrents identifiés
+  prescripteur String?        # Qui recommande
+  
+  # Suivi commercial  
+  dernierContact DateTime?
+  prochaineAction String?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum StatutOpportunite {
+  PROSPECT      # Lead non qualifié
+  QUALIFIE      # Besoin confirmé  
+  PROPOSITION   # Devis envoyé
+  NEGOCIATION   # En cours de négociation
+  GAGNE         # Affaire signée
+  PERDU         # Affaire perdue
+  REPORTE       # Projet reporté
+}

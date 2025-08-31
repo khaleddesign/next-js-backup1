@@ -8,7 +8,7 @@ async function seedDevis() {
  try {
    const users = await db.user.findMany({
      where: {
-       role: { in: ['CLIENT', 'ADMIN', 'COMMERCIAL'] }
+       role: { in: ['CLIENT', 'ADMIN', 'MANAGER'] }
      }
    });
 

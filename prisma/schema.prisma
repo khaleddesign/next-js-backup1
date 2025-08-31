@@ -19,6 +19,26 @@ model User {
   company       String?
   address       String?
   
+  // CHAMPS CRM BTP AJOUTÉS
+  typeClient         TypeClient? @default(PARTICULIER)
+  secteurActivite    String?
+  effectif           String?
+  chiffreAffaires    Float?
+  adresse2           String?
+  codePostal         String?
+  ville              String?
+  pays               String? @default("France")
+  sourceProspection  String?
+  prefEmail          Boolean @default(true)
+  prefSMS            Boolean @default(false)
+  prefAppel          Boolean @default(true)
+  
+  // Relations commerciales
+  commercial         User? @relation("Commercial", fields: [commercialId], references: [id])
+  commercialId       String?
+  commerciaux        User[] @relation("Commercial")
+  
+  // Relations existantes
   accounts      Account[]
   sessions      Session[]
   chantiers     Chantier[] @relation("ChantierClient")
@@ -32,6 +52,14 @@ model User {
   notifications Notification[]
   documents     Document[] @relation("DocumentUploader")
   etapesCreated EtapeChantier[]
+  
+  // NOUVELLES RELATIONS CRM
+  interactions       InteractionClient[] @relation("ClientInteractions")
+  opportunites       Opportunite[] @relation("ClientOpportunites")
+  
+  // RELATION PROJETS BTP
+  projets           Projet[] @relation("ProjetClient")
+  assignationsTaches AssignationTache[]
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -158,13 +186,40 @@ model Devis {
   statut          DevisStatus   @default(BROUILLON)
   dateCreation    DateTime      @default(now())
   dateEcheance    DateTime
+  
+  // AJOUTS BTP - SITUATIONS DE TRAVAUX
+  situationNumero    Int?
+  situationParent    String?
+  avancement         Float  @default(0)
+  
+  // AJOUTS BTP - RETENUE DE GARANTIE
+  retenueGarantie    Float?
+  cautionBancaire    Boolean @default(false)
+  dateLiberation     DateTime?
+  
+  // AJOUTS BTP - TVA MULTI-TAUX
+  tva55              Float?
+  tva10              Float?
+  tva20              Float?
+  
+  // AJOUTS BTP - AUTOLIQUIDATION
+  autoliquidation    Boolean @default(false)
+  mentionAutoliq     String?
+  
+  // AJOUTS BTP - SIGNATURES & SUIVI
+  consulteLe         DateTime?
+  signatureLien      String?
+  dateSignature      DateTime?
+  
   lignes          Json          @default("[]")
   ligneDevis      LigneDevis[]
+  ligneDevisDetails LigneDevisDetail[]
   paiements       Paiement[]    @relation("FacturePaiements")
   relances        Relance[]     @relation("FactureRelances")
   notes           String?       @db.Text
   conditionsVente String?       @db.Text
   factureId       String?
+  modalitesPaiement String?
   
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -179,6 +234,24 @@ model LigneDevis {
   prixUnit    Float
   total       Float
   ordre       Int     @default(0)
+  
+  // Relation vers détail BTP
+  details     LigneDevisDetail[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// NOUVEAU MODÈLE BTP - DÉTAIL PAR LIGNE
+model LigneDevisDetail {
+  id          String @id @default(cuid())
+  ligneDevis  LigneDevis @relation(fields: [ligneId], references: [id], onDelete: Cascade)
+  ligneId     String
+  devis       Devis @relation(fields: [devisId], references: [id], onDelete: Cascade)
+  devisId     String
+  tauxTVA     Float @default(20.0)
+  categorie   String?
+  unite       String?
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -287,10 +360,111 @@ model EtapeChantier {
   updatedAt   DateTime    @updatedAt
 }
 
+// NOUVEAU MODÈLE BTP - BIBLIOTHÈQUE PRIX
+model BibliothequePrix {
+  id           String @id @default(cuid())
+  code         String @unique
+  designation  String
+  unite        String
+  prixHT       Float
+  corpsEtat    String
+  region       String @default("France")
+  dateMAJ      DateTime @default(now())
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// NOUVEAUX MODÈLES PLANNING GANTT
+model Projet {
+  id          String @id @default(cuid())
+  nom         String
+  description String?
+  statut      StatutProjet @default(PLANIFICATION)
+  dateDebut   DateTime?
+  dateFin     DateTime?
+  budget      Float?
+  
+  client      User @relation("ProjetClient", fields: [clientId], references: [id])
+  clientId    String
+  
+  taches      TacheProjet[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model TacheProjet {
+  id          String @id @default(cuid())
+  nom         String
+  description String?
+  dateDebut   DateTime
+  dateFin     DateTime
+  dureeJours  Int
+  statut      StatutTache @default(EN_ATTENTE)
+  priorite    PrioriteTache @default(MOYENNE)
+  avancement  Int @default(0)
+  corpsEtat   String
+  dependances Json?
+  
+  projet      Projet @relation(fields: [projetId], references: [id], onDelete: Cascade)
+  projetId    String
+  
+  assignations AssignationTache[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AssignationTache {
+  id        String @id @default(cuid())
+  tache     TacheProjet @relation(fields: [tacheId], references: [id], onDelete: Cascade)
+  tacheId   String
+  user      User @relation(fields: [userId], references: [id])
+  userId    String
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([tacheId, userId])
+}
+
+// EXTENSION CRM - INTERACTIONS CLIENT
+model InteractionClient {
+  id           String @id @default(cuid())
+  client       User @relation("ClientInteractions", fields: [clientId], references: [id], onDelete: Cascade)
+  clientId     String
+  type         TypeInteraction
+  objet        String
+  description  String @db.Text
+  dateContact  DateTime @default(now())
+  prochaineSuite DateTime?
+  createdBy    String
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// EXTENSION CRM - OPPORTUNITÉS
+model Opportunite {
+  id           String @id @default(cuid())
+  client       User @relation("ClientOpportunites", fields: [clientId], references: [id], onDelete: Cascade)
+  clientId     String
+  nom          String
+  description  String @db.Text
+  valeurEstimee Float
+  probabilite  Int @default(50)
+  statut       StatutOpportunite @default(PROSPECT)
+  dateCloture  DateTime?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ENUMS
 enum Role {
   ADMIN
-  COMMERCIAL
-  OUVRIER
+  MANAGER
+  ARTISAN
   CLIENT
 }
 
@@ -327,6 +501,7 @@ enum DevisStatus {
   ACCEPTE
   REFUSE
   PAYE
+  ANNULE
 }
 
 enum PlanningType {
@@ -363,4 +538,50 @@ enum EtapeStatus {
   A_FAIRE
   EN_COURS
   TERMINE
+}
+
+// NOUVEAUX ENUMS BTP
+enum TypeClient {
+  PARTICULIER
+  PROFESSIONNEL
+  SYNDIC
+  PROMOTEUR
+}
+
+enum TypeInteraction {
+  APPEL
+  EMAIL
+  VISITE
+  REUNION
+  AUTRE
+}
+
+enum StatutOpportunite {
+  PROSPECT
+  QUALIFIE
+  PROPOSITION
+  NEGOCIATION
+  GAGNE
+  PERDU
+}
+
+enum StatutProjet {
+  PLANIFICATION
+  EN_COURS
+  TERMINE
+  ANNULE
+}
+
+enum StatutTache {
+  EN_ATTENTE
+  EN_COURS
+  TERMINE
+  SUSPENDU
+}
+
+enum PrioriteTache {
+  BASSE
+  MOYENNE
+  HAUTE
+  CRITIQUE
 }

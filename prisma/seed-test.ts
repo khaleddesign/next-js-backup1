@@ -29,7 +29,7 @@ async function seedTestData() {
         id: 'ouvrier-1',
         name: 'Pierre Maçon',
         email: 'pierre.mason@test.com',
-        role: 'OUVRIER',
+        role: 'ARTISAN',
         company: 'BTP Expert',
         phone: '06 87 65 43 21'
       }
@@ -42,7 +42,7 @@ async function seedTestData() {
         id: 'ouvrier-2',
         name: 'Julie Électricienne',
         email: 'julie.electricienne@test.com',
-        role: 'OUVRIER',
+        role: 'ARTISAN',
         company: 'Électro Pro',
         phone: '06 98 76 54 32'
       }

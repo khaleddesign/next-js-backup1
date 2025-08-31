@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       console.log(`  ${key}:`, value instanceof File ? `File(${value.name}, ${value.size}b)` : value);
     }
     
-    const file = formData.get('file') as File;
+    const file = formData.get('files') as File;
     
     if (!file || !(file instanceof File)) {
       console.log('❌ Pas de fichier trouvé ou type incorrect');

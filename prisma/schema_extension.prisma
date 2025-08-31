@@ -1,0 +1,120 @@
+# Extension du modèle Devis existant avec fonctionnalités BTP
+
+# Dans le modèle Devis existant, ajouter ces champs :
+model Devis {
+  id              String        @id @default(cuid())
+  numero          String        @unique
+  chantier        Chantier?     @relation(fields: [chantierId], references: [id])
+  chantierId      String?
+  client          User          @relation("DevisClient", fields: [clientId], references: [id])
+  clientId        String
+  type            DevisType
+  objet           String?
+  montant         Float
+  totalHT         Float?
+  totalTVA        Float?
+  totalTTC        Float?
+  tva             Float         @default(20.0)
+  statut          DevisStatus   @default(BROUILLON)
+  dateCreation    DateTime      @default(now())
+  dateEcheance    DateTime
+  lignes          Json          @default("[]")
+  ligneDevis      LigneDevis[]
+  paiements       Paiement[]    @relation("FacturePaiements")
+  relances        Relance[]     @relation("FactureRelances")
+  notes           String?       @db.Text
+  conditionsVente String?       @db.Text
+  factureId       String?
+  
+  # NOUVEAUX CHAMPS BTP
+  # Situations de travaux
+  situationNumero    Int?           # S01, S02, S03...
+  situationParent    String?        # ID situation précédente
+  avancement         Float  @default(0)  # % avancement 0-100
+  
+  # Retenue de garantie
+  retenueGarantie    Float?         # % retenue (0-5%)
+  montantRetenue     Float?         # Montant en euros
+  cautionBancaire    Boolean @default(false)
+  dateLiberation     DateTime?      # Libération garantie
+  
+  # TVA multi-taux BTP
+  tva55              Float?         # TVA 5.5% rénovation
+  tva10              Float?         # TVA 10% amélioration
+  tva20              Float?         # TVA 20% standard
+  
+  # Autoliquidation sous-traitance
+  autoliquidation    Boolean @default(false)
+  mentionAutoliq     String?        # Mention légale
+  soustraitanceInfo  String?        # Info sous-traitant
+  
+  # Signatures électroniques
+  consulteLe         DateTime?      # Dernière consultation
+  signatureLien      String?        # Lien signature électronique
+  dateSignature      DateTime?      # Date signature client
+  ipSignature        String?        # IP signature pour traçabilité
+  
+  # Acomptes et paiements
+  acomptesPrevus     Json @default("[]")  # Échéancier acomptes
+  montantAcomptes    Float?         # Total acomptes versés
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+# Extension DevisType pour situations
+enum DevisType {
+  DEVIS
+  FACTURE
+  SITUATION      # Nouvelle: Facture d'avancement
+  AVOIR         # Nouvelle: Avoir/remboursement
+  ACOMPTE       # Nouvelle: Facture d'acompte
+}
+
+# Nouveau modèle pour détail des lignes avec TVA
+model LigneDevisDetail {
+  id          String @id @default(cuid())
+  ligneDevis  LigneDevis @relation(fields: [ligneId], references: [id], onDelete: Cascade)
+  ligneId     String
+  
+  # TVA par ligne pour multi-taux
+  tauxTVA     Float @default(20.0)
+  montantTVA  Float @default(0)
+  
+  # Détails BTP
+  categorie   String?        # Fourniture/Main d'œuvre/Sous-traitance
+  unite       String?        # m², ml, forfait, h...
+  codeBTP     String?        # Code bibliothèque BTP
+  
+  # Traçabilité
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+# Extension du modèle LigneDevis
+model LigneDevis {
+  id          String  @id @default(cuid())
+  devis       Devis   @relation(fields: [devisId], references: [id], onDelete: Cascade)
+  devisId     String
+  description String
+  quantite    Float
+  prixUnit    Float
+  total       Float
+  ordre       Int     @default(0)
+  
+  # NOUVEAUX CHAMPS BTP
+  # TVA par ligne
+  tauxTVA     Float   @default(20.0)
+  montantTVA  Float   @default(0)
+  
+  # Détails BTP  
+  categorie   String? # Fourniture/Main d'œuvre
+  unite       String? # Unité de mesure
+  codeBTP     String? # Code bibliothèque
+  
+  # Relation détails
+  details     LigneDevisDetail[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

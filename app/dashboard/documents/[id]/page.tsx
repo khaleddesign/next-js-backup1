@@ -24,11 +24,12 @@ import ShareDialog from '@/components/documents/ShareDialog';
 import { useToasts } from '@/hooks/useToasts';
 
 interface DocumentDetailPageProps {
- params: Promise<{ id: string }>;
+ params: { id: string };
 }
 
-export default async function DocumentDetailPage({ params }: DocumentDetailPageProps) {
- const { id } = await params;
+// Remplacer async function par function normale
+export default function DocumentDetailPage({ params }: DocumentDetailPageProps) {
+ const { id } = params;
  const router = useRouter();
  const { success, error: showError } = useToasts();
  
@@ -264,8 +265,8 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
                    Uploadé par
                  </label>
                  <div className="text-white">
-                   {document.uploader.name}
-                   <span className="text-blue-200 text-sm ml-2">({document.uploader.role})</span>
+                   {document.uploader && document.uploader.name}
+                   {document.uploader && <span className="text-blue-200 text-sm ml-2">({document.uploader.role})</span>}
                  </div>
                </div>
 

@@ -46,7 +46,7 @@ async function main() {
         id: 'test-commercial-456', // ✅ ID EXACT du code
         name: 'Julie Martin',
         email: 'julie.martin@chantierpro.fr',
-        role: 'COMMERCIAL',
+        role: 'MANAGER',
         phone: '+33 6 98 76 54 32',
         company: 'ChantierPro',
         address: '42 Avenue des Champs, 75008 Paris'
@@ -71,7 +71,7 @@ async function main() {
         id: 'ouvrier-001',
         name: 'Marc Maçon',
         email: 'marc.macon@chantierpro.fr',
-        role: 'OUVRIER',
+        role: 'ARTISAN',
         phone: '+33 6 44 55 66 77',
         company: 'ChantierPro'
       }
@@ -82,7 +82,7 @@ async function main() {
         id: 'ouvrier-002',
         name: 'Sophie Électricienne',
         email: 'sophie.elec@chantierpro.fr',
-        role: 'OUVRIER',
+        role: 'ARTISAN',
         phone: '+33 6 77 88 99 00',
         company: 'ChantierPro'
       }

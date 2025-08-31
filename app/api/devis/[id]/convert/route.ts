@@ -73,3 +73,25 @@ export async function POST(
     return NextResponse.json({ error: 'Erreur lors de la conversion' }, { status: 500 });
   }
 }
+
+// AJOUT: Fonction pour gérer la conversion avec situations
+async function convertirAvecSituations(devis: any) {
+  // Si c'est une situation, convertir en facture de situation
+  if (devis.situationNumero && devis.situationParent) {
+    const factureCount = await db.devis.count({
+      where: { 
+        type: 'FACTURE',
+        situationParent: devis.situationParent 
+      }
+    });
+    
+    return `FAC${devis.numero.split('-')[0].replace('DEV', '')}-S${String(factureCount + 1).padStart(2, '0')}`;
+  }
+  
+  // Conversion standard
+  const factureCount = await db.devis.count({
+    where: { type: 'FACTURE' }
+  });
+  
+  return `FAC${String(factureCount + 1).padStart(4, '0')}`;
+}

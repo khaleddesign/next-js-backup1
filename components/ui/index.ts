@@ -1,10 +1,9 @@
-// Export de tous les composants UI pour la charte ChantierPro
-export { Card, CardHeader, CardTitle, CardSubtitle, CardContent, CardFooter } from './card';
-export { Button } from './button';
-export { Badge, StatusBadge, PriorityBadge } from './badge';
-export { Avatar, AvatarGroup } from './avatar';
-export { Input } from './input';
-export { Progress, LabeledProgress, CircularProgress } from './progress';
-
-// Types utiles
-export type { ButtonProps } from './button';
+// Export des composants UI avec noms corrects
+export { default as Card } from './card';
+export { default as Button } from './button';
+export { default as Badge } from './badge';
+export { default as Avatar } from './avatar';
+export { default as Input } from './input';
+export { default as Progress } from './progress';
+export { default as LoadingSpinner } from './LoadingSpinner';
+export { default as Header } from './Header';

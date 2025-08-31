@@ -1,0 +1,71 @@
+# Modèle Bibliothèque de Prix BTP
+
+model BibliothequePrix {
+  id           String @id @default(cuid())
+  
+  # Codification BTP
+  code         String @unique    # Ex: MA.01.001, PL.02.015
+  designation  String           # Description complète
+  designationCourte String?     # Version abrégée
+  
+  # Prix et unités
+  prixHT       Float            # Prix unitaire HT
+  unite        String           # m², ml, forfait, h, u...
+  
+  # Classification BTP
+  corpsEtat    String           # Maçonnerie, Plomberie, Électricité...
+  sousCategorie String?         # Sous-catégorie détaillée
+  famille      String?          # Famille de produits
+  
+  # Composition prix
+  tauxHoraireMO Float?          # Taux horaire main d'œuvre
+  tempsMO      Float?           # Temps main d'œuvre
+  prixFourniture Float?         # Prix fournitures
+  coefficient   Float? @default(1) # Coefficient multiplicateur
+  
+  # Localisation et validité
+  region       String? @default("National") # Régionalisation
+  departement  String?          # Spécifique département
+  
+  # Gestion des prix
+  dateMAJ      DateTime @default(now())
+  validiteDebut DateTime @default(now())
+  validiteFin   DateTime?       # Fin validité prix
+  
+  # Métadonnées
+  fournisseur  String?          # Fournisseur référence
+  marque       String?          # Marque produit
+  reference    String?          # Référence fabricant
+  
+  # Statut
+  actif        Boolean @default(true)
+  public       Boolean @default(true) # Visible pour tous
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+# Modèle Template Devis BTP
+model TemplateDevis {
+  id           String @id @default(cuid())
+  
+  nom          String           # Nom template
+  description  String?          # Description
+  categorie    String           # Rénovation, Construction...
+  
+  # Contenu template
+  lignesTemplate Json @default("[]") # Structure lignes
+  conditionsVente String? @db.Text   # CGV par défaut
+  notes        String? @db.Text      # Notes par défaut
+  
+  # Utilisation
+  utilisations Int @default(0)      # Compteur utilisation
+  evaluation   Float?               # Note moyenne
+  
+  # Gestion
+  public       Boolean @default(false) # Template public
+  createdBy    String               # Créateur
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
