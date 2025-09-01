@@ -5,8 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import TotauxCalculator from '@/components/devis/TotauxCalculator';
 import LigneDevisComponent from '@/components/devis/LigneDevis';
 
-import LigneDevisComponent from '@/components/devis/LigneDevis';
-
 interface LigneDevisEdit {
   designation: string;
   quantite: string;
@@ -14,7 +12,6 @@ interface LigneDevisEdit {
   total: number;
 }
 
-// Interface pour le calculateur de totaux
 interface LigneCalcul {
   quantite: number;
   prixUnit: number;
