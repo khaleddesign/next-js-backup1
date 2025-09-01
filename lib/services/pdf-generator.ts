@@ -99,7 +99,7 @@ export class PDFGenerator {
     
     // Conditions de vente
     if (devis.conditionsVente) {
-      yPosition += Math.max(20, devis.notes ? notesLines.length * 5 + 20 : 20);
+      yPosition += Math.max(20, devis.notes ? 40 : 20);
       pdf.setFontSize(12);
       pdf.text("Conditions de vente:", 20, yPosition);
       yPosition += 10;

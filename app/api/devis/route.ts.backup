@@ -228,8 +228,7 @@ export async function POST(request: NextRequest) {
 
       const totalHT = data.lignes?.reduce((sum: number, ligne: LigneDevisInput) => 
         sum + (parseFloat(ligne.quantite.toString()) * parseFloat(ligne.prixUnitaire.toString())), 0) || 0;
-      // Calcul TVA - TODO: utiliser multi-taux
-  const totalTVA = totalHT * 0.20; // TODO: Utiliser multi-taux
+      const totalTVA = totalHT * 0.20;
       const totalTTC = totalHT + totalTVA;
 
       const devis = await db.devis.create({

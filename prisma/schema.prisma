@@ -463,8 +463,8 @@ model Opportunite {
 // ENUMS
 enum Role {
   ADMIN
-  MANAGER
-  ARTISAN
+  COMMERCIAL
+  OUVRIER
   CLIENT
 }
 

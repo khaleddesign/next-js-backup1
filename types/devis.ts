@@ -1,46 +1,16 @@
-export interface Devis {
-  id: string;
-  numero: string;
-  type: 'DEVIS' | 'FACTURE';
-  statut: 'BROUILLON' | 'ENVOYE' | 'ACCEPTE' | 'REFUSE' | 'PAYE' | 'ANNULE';
-  objet: string;
-  dateCreation: string;
-  dateValidite?: string;
-  dateEnvoi?: string;
-  dateAcceptation?: string;
-  datePaiement?: string;
-  totalHT: number;
-  totalTVA: number;
-  totalTTC: number;
-  notes?: string;
-  conditionsVente?: string;
-  client: {
-    id: string;
-    name: string;
-    email: string;
-    company?: string;
-  };
-  chantier?: {
-    id: string;
-    nom: string;
-    adresse: string;
-  };
-  ligneDevis: LigneDevis[];
-  _count?: {
-    ligneDevis: number;
-  };
-}
-
 export interface LigneDevis {
   id?: string;
-  description: string;
-  quantite: string | number;
-  prixUnit: string | number;
+  designation: string;
+  quantite: number;
+  prixUnitaire: number;
+  tauxTVA: number;
   total: number;
   ordre?: number;
 }
 
-export interface DevisFormData {
+export interface DevisData {
+  id?: string;
+  numero?: string;
   type: 'DEVIS' | 'FACTURE';
   clientId: string;
   chantierId?: string;
@@ -49,13 +19,33 @@ export interface DevisFormData {
   notes?: string;
   conditionsVente?: string;
   lignes: LigneDevis[];
+  totalHT?: number;
+  totalTVA?: number;
+  totalTTC?: number;
+  statut?: 'BROUILLON' | 'ENVOYE' | 'ACCEPTE' | 'REFUSE' | 'PAYE';
 }
 
-export interface DevisStats {
-  totalDevis: number;
-  totalFactures: number;
-  montantTotal: number;
-  enAttente: number;
-  payes: number;
-  enRetard: number;
+export interface DevisDetail extends DevisData {
+  dateCreation: string;
+  client: {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    company?: string;
+    address?: string;
+  };
+  chantier?: {
+    id: string;
+    nom: string;
+    adresse: string;
+  };
+  ligneDevis: Array<{
+    id: string;
+    description: string;
+    quantite: number;
+    prixUnit: number;
+    total: number;
+    ordre: number;
+  }>;
 }

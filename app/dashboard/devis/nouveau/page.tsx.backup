@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { DevisData, LigneDevis } from '@/types/devis';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast, showSuccessToast, showErrorToast, showWarningToast } from "@/components/ui/Toast";
 
@@ -19,7 +18,7 @@ interface Chantier {
   client: Client;
 }
 
-interface LigneDevisLocal {
+interface LigneDevis {
   designation: string;
   quantite: string;
   prixUnitaire: string;
@@ -27,7 +26,7 @@ interface LigneDevisLocal {
   total: number;
 }
 
-interface DevisDataLocal {
+interface DevisData {
   type: 'DEVIS' | 'FACTURE';
   clientId: string;
   chantierId?: string;
@@ -35,7 +34,7 @@ interface DevisDataLocal {
   dateValidite?: string;
   notes?: string;
   conditionsVente?: string;
-  lignes: LigneDevisLocal[];
+  lignes: LigneDevis[];
 }
 
 function NouveauDevisPageContent() {
@@ -166,12 +165,12 @@ function NouveauDevisPageContent() {
       // Validation côté client avant envoi
       if (!devisData.clientId || !devisData.objet) {
         warningToast('Champs manquants', 'Veuillez remplir tous les champs obligatoires');
-        setLoading(false); return;
+        return;
       }
 
       if (devisData.lignes.some(ligne => !ligne.designation || !ligne.quantite || !ligne.prixUnitaire)) {
         warningToast('Lignes incomplètes', 'Toutes les lignes doivent être complètement remplies');
-        setLoading(false); return;
+        return;
       }
 
       const response = await fetch('/api/devis', {

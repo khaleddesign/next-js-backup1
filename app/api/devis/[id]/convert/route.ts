@@ -24,6 +24,36 @@ export async function POST(
       return NextResponse.json({ error: 'Seul un devis peut être converti en facture' }, { status: 400 });
     }
 
+    if (!devis) {
+      return NextResponse.json({ error: 'Devis introuvable' }, { status: 404 });
+    }
+
+    if (!devis) {
+      return NextResponse.json({ error: 'Devis introuvable' }, { status: 404 });
+    }
+
+    if (devis.statut !== 'ACCEPTE') {
+      return NextResponse.json({ 
+        error: 'Seuls les devis acceptés peuvent être convertis en facture',
+        details: `Statut actuel: ${devis.statut}`
+      }, { status: 400 });
+    }
+    if (devis.statut !== 'ACCEPTE') {
+      return NextResponse.json({ 
+        error: 'Seuls les devis acceptés peuvent être convertis en facture',
+        details: `Statut actuel: ${devis.statut}`
+      }, { status: 400 });
+    }
+    if (!devis) {
+      return NextResponse.json({ error: 'Devis introuvable' }, { status: 404 });
+    }
+
+    if (devis.statut !== 'ACCEPTE') {
+      return NextResponse.json({ 
+        error: 'Seuls les devis acceptés peuvent être convertis en facture',
+        details: `Statut actuel: ${devis.statut}`
+      }, { status: 400 });
+    }
     if (devis.statut !== 'ACCEPTE') {
       return NextResponse.json({ error: 'Seul un devis accepté peut être converti en facture' }, { status: 400 });
     }

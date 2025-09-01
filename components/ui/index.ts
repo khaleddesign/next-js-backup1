@@ -1,9 +1,7 @@
-// Export des composants UI avec noms corrects
-export { default as Card } from './card';
-export { default as Button } from './button';
-export { default as Badge } from './badge';
-export { default as Avatar } from './avatar';
-export { default as Input } from './input';
-export { default as Progress } from './progress';
-export { default as LoadingSpinner } from './LoadingSpinner';
-export { default as Header } from './Header';
+// Exports corrigés
+export { Card } from './card';
+export { Button } from './button';  
+export { Badge } from './badge';
+export { Avatar } from './avatar';
+export { Input } from './input';
+export { Progress } from './progress';

@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import TotauxCalculator from '@/components/devis/TotauxCalculator';
-import LigneDevis from '@/components/devis/LigneDevis';
+import LigneDevisComponent from '@/components/devis/LigneDevis';
+
+import LigneDevisComponent from '@/components/devis/LigneDevis';
 
 interface LigneDevisEdit {
   designation: string;
   quantite: string;
   prixUnitaire: string;
-  tva: string;
   total: number;
 }
 
@@ -95,7 +96,7 @@ export default function EditDevisPage() {
             designation: ligne.designation,
             quantite: ligne.quantite.toString(),
             prixUnitaire: ligne.prixUnitaire.toString(),
-            tva: ligne.tva.toString(),
+            
             total: Number(ligne.total)
           }))
         });
@@ -142,7 +143,7 @@ export default function EditDevisPage() {
       ...formData,
       lignes: [
         ...formData.lignes,
-        { designation: '', quantite: '1', prixUnitaire: '0', tva: '20', total: 0 }
+        { designation: '', quantite: '1', prixUnitaire: '0', total: 0 }
       ]
     });
   };
@@ -384,7 +385,7 @@ export default function EditDevisPage() {
 
         <div style={{ marginBottom: '1.5rem' }}>
           {formData.lignes.map((ligne, index) => (
-            <LigneDevis
+            <LigneDevisComponent
               key={index}
               ligne={ligne}
               index={index}
@@ -399,7 +400,6 @@ export default function EditDevisPage() {
           lignes={formData.lignes.map((ligne): LigneCalcul => ({
             quantite: parseFloat(ligne.quantite) || 0,
             prixUnit: parseFloat(ligne.prixUnitaire) || 0,
-            tva: parseFloat(ligne.tva) || 20
           }))}
         />
       </div>
